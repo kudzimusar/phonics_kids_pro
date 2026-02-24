@@ -5,6 +5,9 @@ import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/phonics_lesson.dart';
 import '../services/phonics_engine.dart';
+import '../models/reward_models.dart';
+import '../repositories/sticker_repository.dart';
+import '../widgets/sticker_reward_overlay.dart';
 import '../widgets/phonic_fox.dart';
 import '../../auth/services/auth_service.dart';
 import '../../auth/screens/subscription_gate_screen.dart';
@@ -25,6 +28,7 @@ class _PhonicsLessonScreenState extends State<PhonicsLessonScreen>
   bool _isRecording = false;
   bool _isProcessing = false;
   double? _lastScore;
+  Sticker? _newSticker;
 
   late AnimationController _cardController;
   late Animation<double> _cardFade;
@@ -66,6 +70,7 @@ class _PhonicsLessonScreenState extends State<PhonicsLessonScreen>
         setState(() {
           _isRecording = true;
           _lastScore = null;
+          _newSticker = null;
           _foxState = FoxExpression.idle;
           _cardController.reverse();
         });
@@ -88,19 +93,27 @@ class _PhonicsLessonScreenState extends State<PhonicsLessonScreen>
         final engine = PhonicsAIEngine();
         final score = await engine.checkPronunciation(bytes, widget.lesson.targetWord);
 
+        Sticker? unlocked;
+        if (score >= 0.8) {
+          unlocked = await StickerRepository().unlockRandomSticker('student_001');
+        }
+
         setState(() {
           _isProcessing = false;
           _lastScore = score;
+          _newSticker = unlocked;
           _foxState = score >= 0.7 ? FoxExpression.cheer : FoxExpression.wrong;
         });
         _cardController.forward();
 
-        Future.delayed(const Duration(seconds: 4), () {
-          if (mounted) {
-            setState(() => _foxState = FoxExpression.idle);
-            _cardController.reverse();
-          }
-        });
+        if (unlocked == null) {
+          Future.delayed(const Duration(seconds: 4), () {
+            if (mounted) {
+              setState(() => _foxState = FoxExpression.idle);
+              _cardController.reverse();
+            }
+          });
+        }
       }
     } catch (e) {
       debugPrint('Error stopping recording: $e');
@@ -231,6 +244,17 @@ class _PhonicsLessonScreenState extends State<PhonicsLessonScreen>
               right: 20,
               child: PhonicFoxWidget(expression: _foxState),
             ),
+            if (_newSticker != null)
+              StickerRewardOverlay(
+                sticker: _newSticker!,
+                onDismiss: () {
+                  setState(() {
+                    _newSticker = null;
+                    _foxState = FoxExpression.idle;
+                    _cardController.reverse();
+                  });
+                },
+              ),
           ],
         ),
       ),

@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 
+import '../../core/config/app_config.dart';
+
 class PhonicsAIEngine {
   late final GenerativeModel _model;
 
   PhonicsAIEngine() {
     _model = FirebaseVertexAI.instance.generativeModel(
-      model: 'gemini-1.5-flash',
+      model: AppConfig.instance.vertexAiModelName,
     );
   }
 

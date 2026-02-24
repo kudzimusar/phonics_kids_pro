@@ -1,1 +1,40 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"phonics-kids-pro","appId":"1:978322211470:android:c52eedc138c5ffe260ffdf","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"phonics-kids-pro","configurations":{"android":"1:978322211470:android:c52eedc138c5ffe260ffdf","web":"1:978322211470:web:300caf22e60ad01060ffdf"}}}}}}
+{
+    "functions": {
+        "source": "functions"
+    },
+    "firestore": {
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json"
+    },
+    "emulators": {
+        "functions": {
+            "port": 5001
+        },
+        "firestore": {
+            "port": 8085
+        },
+        "ui": {
+            "enabled": true
+        }
+    },
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "phonics-kids-pro",
+                    "appId": "1:978322211470:android:c52eedc138c5ffe260ffdf",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "phonics-kids-pro",
+                    "configurations": {
+                        "android": "1:978322211470:android:c52eedc138c5ffe260ffdf",
+                        "web": "1:978322211470:web:300caf22e60ad01060ffdf"
+                    }
+                }
+            }
+        }
+    }
+}

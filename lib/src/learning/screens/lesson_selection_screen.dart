@@ -3,10 +3,29 @@ import 'package:google_fonts/google_fonts.dart';
 import '../repositories/lesson_repository.dart';
 import '../models/phonics_lesson.dart';
 import 'phonics_lesson_screen.dart';
+import 'sticker_book_screen.dart';
+import '../../school/widgets/join_class_dialog.dart';
 import '../../auth/screens/subscription_gate_screen.dart';
 
 class LessonSelectionScreen extends StatelessWidget {
   const LessonSelectionScreen({Key? key}) : super(key: key);
+
+  void _showJoinClass(BuildContext context) async {
+    final result = await showDialog(
+      context: context,
+      builder: (_) => const JoinClassDialog(userId: 'student_001'), // Replace with actual Auth UID if needed
+    );
+
+    if (result == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Successfully joined the class!', style: GoogleFonts.fredoka()),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +44,20 @@ class LessonSelectionScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Join Class',
+            icon: const Icon(Icons.school_rounded, color: Colors.blueAccent),
+            onPressed: () => _showJoinClass(context),
+          ),
+          IconButton(
+            tooltip: 'My Stickers',
+            icon: const Icon(Icons.menu_book_rounded, color: Colors.blueAccent),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const StickerBookScreen()),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Upgrade',
             icon: const Icon(Icons.star_rounded, color: Colors.amber),
             onPressed: () => Navigator.push(
               context,
