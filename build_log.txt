@@ -1,75 +1,248 @@
-
-Compiling lib/main.dart for the Web...                          
-Target dart2js failed: ProcessException: Process exited abnormally with exit code 1:
-../../../.pub-cache/hosted/pub.dev/firebase_ui_oauth-2.0.1/lib/src/oauth_provider_button_style.dart:39:43:
-Error: Type 'Brightness' not found.
-  OAuthProviderButtonStyle withBrightness(Brightness brightness) {
-                                          ^^^^^^^^^^
-../../../.pub-cache/hosted/pub.dev/firebase_ui_shared-1.4.2/lib/src/themed.dart:20:14:
-Error: Type 'Brightness' not found.
-  T getValue(Brightness brightness) {
-             ^^^^^^^^^^
-../../../.pub-cache/hosted/pub.dev/firebase_ui_oauth-2.0.1/lib/src/oauth_provider_button_style.dart:39:43:
-Error: 'Brightness' isn't a type.
-  OAuthProviderButtonStyle withBrightness(Brightness brightness) {
-                                          ^^^^^^^^^^
-../../../.pub-cache/hosted/pub.dev/firebase_ui_shared-1.4.2/lib/src/themed.dart:20:14:
-Error: 'Brightness' isn't a type.
-  T getValue(Brightness brightness) {
-             ^^^^^^^^^^
-../../../.pub-cache/hosted/pub.dev/firebase_ui_shared-1.4.2/lib/src/themed.dart:22:12:
-Error: Undefined name 'Brightness'.
-      case Brightness.dark:
-           ^^^^^^^^^^
-../../../.pub-cache/hosted/pub.dev/firebase_ui_shared-1.4.2/lib/src/themed.dart:24:12:
-Error: Undefined name 'Brightness'.
-      case Brightness.light:
-           ^^^^^^^^^^
-../../../.pub-cache/hosted/pub.dev/firebase_ui_shared-1.4.2/lib/src/themed.dart:20:5:
-Error: A non-null value must be returned since the return type 'T' doesn't allow null.
-  T getValue(Brightness brightness) {
-    ^
-Error: Compilation failed.
-  Command: /Users/shadreckmusarurwa/development/flutter/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/Users/shadreckmusarurwa/development/flutter/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/f73bfc4522dd0bc87bbcdb4bb3088082755c5e87/ --native-null-assertions --no-source-maps -o /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/app.dill --packages=/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/package_config.json --cfe-only /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/main.dart
-#0      RunResult.throwException (package:flutter_tools/src/base/process.dart:118:5)
-#1      _DefaultProcessUtils.run (package:flutter_tools/src/base/process.dart:344:19)
-<asynchronous suspension>
-#2      Dart2JSTarget.build (package:flutter_tools/src/build_system/targets/web.dart:201:5)
-<asynchronous suspension>
-#3      _BuildInstance._invokeInternal (package:flutter_tools/src/build_system/build_system.dart:876:9)
-<asynchronous suspension>
-#4      Future.wait.<anonymous closure> (dart:async/future.dart:528:21)
-<asynchronous suspension>
-#5      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:814:32)
-<asynchronous suspension>
-#6      Future.wait.<anonymous closure> (dart:async/future.dart:528:21)
-<asynchronous suspension>
-#7      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:814:32)
-<asynchronous suspension>
-#8      FlutterBuildSystem.build (package:flutter_tools/src/build_system/build_system.dart:637:16)
-<asynchronous suspension>
-#9      WebBuilder.buildWeb (package:flutter_tools/src/web/compile.dart:93:34)
-<asynchronous suspension>
-#10     BuildWebCommand.runCommand (package:flutter_tools/src/commands/build_web.dart:253:5)
-<asynchronous suspension>
-#11     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1558:27)
-<asynchronous suspension>
-#12     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
-<asynchronous suspension>
-#13     CommandRunner.runCommand (package:args/command_runner.dart:212:13)
-<asynchronous suspension>
-#14     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:496:9)
-<asynchronous suspension>
-#15     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
-<asynchronous suspension>
-#16     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:431:5)
-<asynchronous suspension>
-#17     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:98:11)
-<asynchronous suspension>
-#18     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
-<asynchronous suspension>
-#19     main (package:flutter_tools/executable.dart:99:3)
-<asynchronous suspension>
-
-Compiling lib/main.dart for the Web...                             38.6s
-Error: Failed to compile application for the Web.
+[  +95 ms] Unable to locate an Android SDK.
+[  +39 ms] executing: sysctl hw.optional.arm64
+[  +11 ms] Exit code 1 from: sysctl hw.optional.arm64
+[        ] sysctl: unknown oid 'hw.optional.arm64'
+[  +77 ms] executing: sw_vers -productName
+[  +28 ms] Exit code 0 from: sw_vers -productName
+[   +1 ms] macOS
+[        ] executing: sw_vers -productVersion
+[  +30 ms] Exit code 0 from: sw_vers -productVersion
+[        ] 12.7.6
+[        ] executing: sw_vers -buildVersion
+[  +34 ms] Exit code 0 from: sw_vers -buildVersion
+[        ] 21H1320
+[        ] executing: uname -m
+[  +13 ms] Exit code 0 from: uname -m
+[   +2 ms] x86_64
+[  +52 ms] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[   +5 ms] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[  +10 ms] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[  +93 ms] Artifact Instance of 'MaterialFonts' is not required, skipping update.
+[        ] Artifact Instance of 'GradleWrapper' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[   +7 ms] Artifact Instance of 'FlutterSdk' is not required, skipping update.
+[        ] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FontSubsetArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'PubDependencies' is not required, skipping update.
+[ +115 ms] Skipping pub get: version match.
+[  +77 ms] Found plugin cloud_firestore at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.2/
+[  +21 ms] Found plugin cloud_firestore_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore_web-5.1.2/
+[   +6 ms] Found plugin cloud_functions at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions-6.0.6/
+[  +10 ms] Found plugin cloud_functions_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions_web-5.1.2/
+[  +29 ms] Found plugin firebase_app_check at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check-0.4.1+4/
+[  +13 ms] Found plugin firebase_app_check_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check_web-0.2.2+2/
+[   +7 ms] Found plugin firebase_auth at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth-6.1.4/
+[  +10 ms] Found plugin firebase_auth_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth_web-6.1.2/
+[   +6 ms] Found plugin firebase_core at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core-4.4.0/
+[   +8 ms] Found plugin firebase_core_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core_web-3.4.0/
+[  +19 ms] Found plugin flutter_stripe at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe-11.5.0/
+[   +4 ms] Found plugin flutter_stripe_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe_web-6.5.1/
+[  +69 ms] Found plugin path_provider at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[   +4 ms] Found plugin path_provider_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_android-2.2.19/
+[   +7 ms] Found plugin path_provider_foundation at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.2/
+[   +3 ms] Found plugin path_provider_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[  +11 ms] Found plugin path_provider_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +9 ms] Found plugin record at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record-6.2.0/
+[   +3 ms] Found plugin record_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_android-1.5.1/
+[   +3 ms] Found plugin record_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_ios-1.2.0/
+[   +2 ms] Found plugin record_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_linux-1.3.0/
+[   +2 ms] Found plugin record_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_macos-1.2.1/
+[   +6 ms] Found plugin record_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_web-1.3.0/
+[   +2 ms] Found plugin record_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_windows-1.0.7/
+[   +5 ms] Found plugin rive_native at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/rive_native-0.1.3/
+[   +8 ms] Found plugin sqflite at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite-2.4.2/
+[   +3 ms] Found plugin sqflite_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_android-2.4.1/
+[   +7 ms] Found plugin sqflite_darwin at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/
+[  +20 ms] Found plugin stripe_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_android-11.5.0/
+[   +3 ms] Found plugin stripe_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_ios-11.5.0/
+[  +31 ms] Found plugin url_launcher at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher-6.3.2/
+[   +3 ms] Found plugin url_launcher_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.20/
+[   +4 ms] Found plugin url_launcher_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.4/
+[   +4 ms] Found plugin url_launcher_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_linux-3.2.1/
+[   +5 ms] Found plugin url_launcher_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.3/
+[   +6 ms] Found plugin url_launcher_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_web-2.4.1/
+[   +4 ms] Found plugin url_launcher_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4/
+[  +78 ms] Found plugin cloud_firestore at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.2/
+[   +4 ms] Found plugin cloud_firestore_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore_web-5.1.2/
+[   +2 ms] Found plugin cloud_functions at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions-6.0.6/
+[   +3 ms] Found plugin cloud_functions_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions_web-5.1.2/
+[  +18 ms] Found plugin firebase_app_check at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check-0.4.1+4/
+[   +5 ms] Found plugin firebase_app_check_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check_web-0.2.2+2/
+[   +3 ms] Found plugin firebase_auth at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth-6.1.4/
+[   +6 ms] Found plugin firebase_auth_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth_web-6.1.2/
+[   +2 ms] Found plugin firebase_core at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core-4.4.0/
+[   +4 ms] Found plugin firebase_core_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core_web-3.4.0/
+[   +8 ms] Found plugin flutter_stripe at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe-11.5.0/
+[   +1 ms] Found plugin flutter_stripe_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe_web-6.5.1/
+[  +29 ms] Found plugin path_provider at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[   +1 ms] Found plugin path_provider_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_android-2.2.19/
+[   +2 ms] Found plugin path_provider_foundation at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.2/
+[   +2 ms] Found plugin path_provider_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +4 ms] Found plugin path_provider_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +7 ms] Found plugin record at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record-6.2.0/
+[   +1 ms] Found plugin record_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_android-1.5.1/
+[   +1 ms] Found plugin record_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_ios-1.2.0/
+[   +2 ms] Found plugin record_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_linux-1.3.0/
+[   +1 ms] Found plugin record_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_macos-1.2.1/
+[   +2 ms] Found plugin record_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_web-1.3.0/
+[   +2 ms] Found plugin record_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_windows-1.0.7/
+[   +3 ms] Found plugin rive_native at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/rive_native-0.1.3/
+[   +5 ms] Found plugin sqflite at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite-2.4.2/
+[   +2 ms] Found plugin sqflite_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_android-2.4.1/
+[   +4 ms] Found plugin sqflite_darwin at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/
+[   +6 ms] Found plugin stripe_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_android-11.5.0/
+[   +1 ms] Found plugin stripe_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_ios-11.5.0/
+[  +10 ms] Found plugin url_launcher at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher-6.3.2/
+[   +1 ms] Found plugin url_launcher_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.20/
+[   +1 ms] Found plugin url_launcher_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.4/
+[   +1 ms] Found plugin url_launcher_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_linux-3.2.1/
+[   +1 ms] Found plugin url_launcher_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.3/
+[   +4 ms] Found plugin url_launcher_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_web-2.4.1/
+[   +1 ms] Found plugin url_launcher_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4/
+[  +66 ms] Found plugin cloud_firestore at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.2/
+[   +2 ms] Found plugin cloud_firestore_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore_web-5.1.2/
+[   +2 ms] Found plugin cloud_functions at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions-6.0.6/
+[   +6 ms] Found plugin cloud_functions_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions_web-5.1.2/
+[  +18 ms] Found plugin firebase_app_check at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check-0.4.1+4/
+[   +4 ms] Found plugin firebase_app_check_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check_web-0.2.2+2/
+[   +2 ms] Found plugin firebase_auth at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth-6.1.4/
+[   +3 ms] Found plugin firebase_auth_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth_web-6.1.2/
+[   +4 ms] Found plugin firebase_core at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core-4.4.0/
+[   +3 ms] Found plugin firebase_core_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core_web-3.4.0/
+[   +8 ms] Found plugin flutter_stripe at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe-11.5.0/
+[   +1 ms] Found plugin flutter_stripe_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe_web-6.5.1/
+[  +31 ms] Found plugin path_provider at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[   +1 ms] Found plugin path_provider_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_android-2.2.19/
+[   +2 ms] Found plugin path_provider_foundation at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.2/
+[   +4 ms] Found plugin path_provider_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +6 ms] Found plugin path_provider_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +5 ms] Found plugin record at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record-6.2.0/
+[   +9 ms] Found plugin record_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_android-1.5.1/
+[   +2 ms] Found plugin record_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_ios-1.2.0/
+[   +7 ms] Found plugin record_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_linux-1.3.0/
+[   +7 ms] Found plugin record_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_macos-1.2.1/
+[  +10 ms] Found plugin record_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_web-1.3.0/
+[  +10 ms] Found plugin record_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_windows-1.0.7/
+[  +11 ms] Found plugin rive_native at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/rive_native-0.1.3/
+[  +12 ms] Found plugin sqflite at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite-2.4.2/
+[   +5 ms] Found plugin sqflite_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_android-2.4.1/
+[   +9 ms] Found plugin sqflite_darwin at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/
+[  +21 ms] Found plugin stripe_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_android-11.5.0/
+[   +4 ms] Found plugin stripe_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_ios-11.5.0/
+[  +27 ms] Found plugin url_launcher at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher-6.3.2/
+[   +5 ms] Found plugin url_launcher_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.20/
+[   +3 ms] Found plugin url_launcher_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.4/
+[   +6 ms] Found plugin url_launcher_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_linux-3.2.1/
+[   +7 ms] Found plugin url_launcher_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.3/
+[   +8 ms] Found plugin url_launcher_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_web-2.4.1/
+[   +5 ms] Found plugin url_launcher_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4/
+[  +86 ms] Generating /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+[ +263 ms] executing: sysctl hw.optional.arm64
+[  +34 ms] Exit code 1 from: sysctl hw.optional.arm64
+[   +1 ms] sysctl: unknown oid 'hw.optional.arm64'
+[        ] executing: xcrun xcodebuild -version
+[  +35 ms] Exit code 1 from: xcrun xcodebuild -version
+[   +2 ms] xcrun: error: invalid active developer path (/Library/Developer/CommandLineTools), missing xcrun at: /Library/Developer/CommandLineTools/usr/bin/xcrun
+[+1802 ms] Found plugin cloud_firestore at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.2/
+[  +12 ms] Found plugin cloud_firestore_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore_web-5.1.2/
+[   +4 ms] Found plugin cloud_functions at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions-6.0.6/
+[   +8 ms] Found plugin cloud_functions_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions_web-5.1.2/
+[ +100 ms] Found plugin firebase_app_check at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check-0.4.1+4/
+[  +56 ms] Found plugin firebase_app_check_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check_web-0.2.2+2/
+[   +4 ms] Found plugin firebase_auth at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth-6.1.4/
+[  +22 ms] Found plugin firebase_auth_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth_web-6.1.2/
+[  +11 ms] Found plugin firebase_core at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core-4.4.0/
+[  +23 ms] Found plugin firebase_core_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core_web-3.4.0/
+[  +38 ms] Found plugin flutter_stripe at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe-11.5.0/
+[   +2 ms] Found plugin flutter_stripe_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe_web-6.5.1/
+[ +118 ms] Found plugin path_provider at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[   +7 ms] Found plugin path_provider_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_android-2.2.19/
+[  +31 ms] Found plugin path_provider_foundation at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.2/
+[  +78 ms] Found plugin path_provider_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[  +36 ms] Found plugin path_provider_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[  +77 ms] Found plugin record at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record-6.2.0/
+[  +15 ms] Found plugin record_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_android-1.5.1/
+[   +9 ms] Found plugin record_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_ios-1.2.0/
+[   +6 ms] Found plugin record_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_linux-1.3.0/
+[   +9 ms] Found plugin record_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_macos-1.2.1/
+[  +25 ms] Found plugin record_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_web-1.3.0/
+[   +9 ms] Found plugin record_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_windows-1.0.7/
+[  +16 ms] Found plugin rive_native at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/rive_native-0.1.3/
+[  +30 ms] Found plugin sqflite at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite-2.4.2/
+[  +12 ms] Found plugin sqflite_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_android-2.4.1/
+[  +50 ms] Found plugin sqflite_darwin at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/
+[  +82 ms] Found plugin stripe_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_android-11.5.0/
+[   +1 ms] Found plugin stripe_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_ios-11.5.0/
+[  +25 ms] Found plugin url_launcher at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher-6.3.2/
+[   +4 ms] Found plugin url_launcher_android at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.20/
+[   +7 ms] Found plugin url_launcher_ios at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.4/
+[   +5 ms] Found plugin url_launcher_linux at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_linux-3.2.1/
+[   +3 ms] Found plugin url_launcher_macos at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.3/
+[  +11 ms] Found plugin url_launcher_web at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_web-2.4.1/
+[   +6 ms] Found plugin url_launcher_windows at /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4/
+[ +460 ms] generated_plugin_registrant.dart not found. Skipping.
+[  +13 ms] Compiling lib/main.dart for the Web...
+[ +198 ms] Initializing file store
+[  +38 ms] Done initializing file store
+[+1046 ms] Skipping target: web_entrypoint
+[   +7 ms] Skipping target: gen_localizations
+[   +9 ms] invalidated build due to missing files: /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/*/index.html, /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/flutter_bootstrap.js
+[   +6 ms] web_templated_files: Starting due to {InvalidatedReasonKind.outputMissing: The following outputs were missing: /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/build/web/*/index.html, InvalidatedReasonKind.inputMissing: The following inputs were missing: /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/*/index.html,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/flutter_bootstrap.js}
+[   +6 ms] web_static_assets: Starting due to {InvalidatedReasonKind.outputMissing: The following outputs were missing: /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/flutter.js,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/skwasm_st.js,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/skwasm.js,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/skwasm.js.symbols,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/canvaskit.js.symbols,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/skwasm.wasm,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/chromium/canvaskit.js.symbols,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/chromium/canvaskit.js,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/chromium/canvaskit.wasm,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/skwasm_st.js.symbols,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/canvaskit.js,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/canvaskit.wasm,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/canvaskit/skwasm_st.wasm}
+[+3295 ms] dart2js: Starting due to {InvalidatedReasonKind.buildKeyChanged: The target build key changed.}
+[  +16 ms] executing: /Users/shadreckmusarurwa/development/flutter/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/Users/shadreckmusarurwa/development/flutter/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/f73bfc4522dd0bc87bbcdb4bb3088082755c5e87/ --native-null-assertions --no-source-maps -o /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/app.dill --packages=/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/package_config.json --cfe-only /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/main.dart
+[   +7 ms] web_static_assets: Complete
+[ +227 ms] web_templated_files: Complete
+[+93888 ms] Compiled 56,756,972 input bytes (47,888,189 characters source) to 42,443,128 kernel bytes in 90.5 seconds using N/A MB of memory
+            Dart file .dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/main.dart compiled to dill: .dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/app.dill.
+[   +6 ms] executing: /Users/shadreckmusarurwa/development/flutter/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/Users/shadreckmusarurwa/development/flutter/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/f73bfc4522dd0bc87bbcdb4bb3088082755c5e87/ --native-null-assertions --no-source-maps -O4 -o /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/main.dart.js /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/app.dill
+[+147624 ms] ../../../development/flutter/packages/flutter/lib/src/widgets/widget_state.dart:1045:9:
+             Hint: This 'noSuchMethod' implementation is guaranteed to throw an exception. The generated code will be smaller if it is rewritten.
+             Rewrite to 'noSuchMethod(Invocation i) => super.noSuchMethod(i);'.
+               Never noSuchMethod(Invocation invocation) {
+                     ^
+             Compiled 61,129,016 input bytes (9,858,955 characters source) to 2,771,903 characters JavaScript in 145 seconds using N/A MB of memory
+[ +281 ms] dart2js: Complete
+[ +237 ms] invalidated build due to missing files: /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/DOES_NOT_EXIST_RERUN_FOR_WILDCARD113433867
+[ +278 ms] web_release_bundle: Starting due to {InvalidatedReasonKind.inputChanged: The following inputs have updated contents: /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/main.dart.js,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/pubspec.yaml,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/pubspec.yaml,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/assets/images/cat.png,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/assets/images/fox.png,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8/assets/CupertinoIcons.ttf,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_web-1.3.0/assets/js/record.worklet.js,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_web-1.3.0/assets/js/record.fixwebmduration.js,/Users/shadreckmusarurwa/development/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf,/Users/shadreckmusarurwa/development/flutter/packages/flutter/lib/src/material/shaders/ink_sparkle.frag,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/_flutterfire_internals-1.3.66/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/args-2.7.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/async-2.12.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/boolean_selector-2.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/characters-1.4.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/clock-1.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore-6.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore_platform_interface-7.0.6/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_firestore_web-5.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions-6.0.6/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions_platform_interface-5.8.9/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cloud_functions_web-5.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/collection-1.19.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/crypto-3.0.7/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/fake_async-1.3.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/ffi-2.2.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/file-7.0.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_ai-3.8.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check-0.4.1+4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check_platform_interface-0.2.1+4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_app_check_web-0.2.2+2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth-6.1.4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth_platform_interface-8.1.6/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_auth_web-6.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core-4.4.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core_platform_interface-6.0.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_core_web-3.4.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/firebase_vertexai-2.2.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/fixnum-1.1.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_cache_manager-3.4.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_lints-5.0.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe-11.5.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/flutter_stripe_web-6.5.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/freezed_annotation-2.4.4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/go_router-17.0.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/google_fonts-6.3.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/graphs-2.3.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/http-1.6.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/http_parser-4.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/json_annotation-4.9.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/leak_tracker-10.0.8/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.9/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/lints-5.1.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/logging-1.3.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/matcher-0.12.17/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/material_color_utilities-0.11.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/meta-1.16.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path-1.9.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider-2.1.5/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_android-2.2.19/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_platform_interface-2.1.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/platform-3.1.6/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/plugin_platform_interface-2.1.8/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record-6.2.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_android-1.5.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_ios-1.2.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_linux-1.3.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_macos-1.2.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_platform_interface-1.5.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_web-1.3.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/record_windows-1.0.7/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/rive-0.14.3/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/rive_native-0.1.3/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/rxdart-0.28.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/source_span-1.10.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite-2.4.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_android-2.4.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_common-2.5.5/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/sqflite_platform_interface-2.4.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stack_trace-1.12.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stream_channel-2.1.4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/string_scanner-1.4.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_android-11.5.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_ios-11.5.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_js-6.4.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/stripe_platform_interface-11.5.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/synchronized-3.3.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/term_glyph-1.2.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/test_api-0.7.4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/typed_data-1.4.0/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher-6.3.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.20/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_linux-3.2.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.3/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_platform_interface-2.3.2/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_web-2.4.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/url_launcher_windows-3.1.4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/uuid-4.5.3/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/vector_math-2.1.4/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/vm_service-14.3.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/web-1.1.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/web_socket-1.0.1/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/web_socket_channel-3.0.3/LICENSE,/Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/xdg_directories-1.1.0/LICENSE,/Users/shadreckmusarurwa/development/flutter/bin/cache/pkg/sky_engine/LICENSE,/Users/shadreckmusarurwa/development/flutter/packages/flutter/LICENSE,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/index.html,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/favicon.png,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/icons/Icon-192.png,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/icons/Icon-maskable-192.png,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/icons/Icon-maskable-512.png,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/icons/Icon-512.png,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/web/manifest.json,/Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/build/web/main.dart.js,build/web/assets/assets/images/cat.png,build/web/assets/assets/images/fox.png,build/web/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf,build/web/assets/packages/record_web/assets/js/record.worklet.js,build/web/assets/packages/record_web/assets/js/record.fixwebmduration.js,build/web/assets/fonts/MaterialIcons-Regular.otf,build/web/assets/shaders/ink_sparkle.frag,build/web/assets/AssetManifest.json,build/web/assets/AssetManifest.bin,build/web/assets/AssetManifest.bin.json,build/web/assets/FontManifest.json,build/web/assets/NOTICES,build/web/favicon.png,build/web/icons/Icon-192.png,build/web/icons/Icon-maskable-192.png,build/web/icons/Icon-maskable-512.png,build/web/icons/Icon-512.png,build/web/manifest.json, InvalidatedReasonKind.inputMissing: The following inputs were missing: /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/DOES_NOT_EXIST_RERUN_FOR_WILDCARD113433867}
+[ +779 ms] Manifest contained wildcard assets. Inserting missing file into build graph to force rerun. for more information see #56466.
+[ +182 ms] shaderc command: [/Users/shadreckmusarurwa/development/flutter/bin/cache/artifacts/engine/darwin-x64/impellerc, --sksl, --iplr, --json, --sl=build/web/assets/shaders/ink_sparkle.frag, --spirv=build/web/assets/shaders/ink_sparkle.frag.spirv, --input=/Users/shadreckmusarurwa/development/flutter/packages/flutter/lib/src/material/shaders/ink_sparkle.frag, --input-type=frag, --include=/Users/shadreckmusarurwa/development/flutter/packages/flutter/lib/src/material/shaders, --include=/Users/shadreckmusarurwa/development/flutter/bin/cache/artifacts/engine/darwin-x64/shader_lib]
+[ +291 ms] Running command: /Users/shadreckmusarurwa/development/flutter/bin/cache/dart-sdk/bin/dart /Users/shadreckmusarurwa/development/flutter/bin/cache/artifacts/engine/darwin-x64/const_finder.dart.snapshot --kernel-file /Users/shadreckmusarurwa/Project AI/Phonics Kids Pro/phonics_kids_pro/.dart_tool/flutter_build/fdf90dad18159a1a419a8059c40ab1e1/app.dill --class-library-uri package:flutter/src/widgets/icon_data.dart --class-name IconData --annotation-class-name _StaticIconProvider --annotation-class-library-uri package:flutter/src/widgets/icon_data.dart
+[+16726 ms] Expected to find fontFamily for constant IconData with codepoint: 9658.0, but found fontFamily: null. This usually means you are relying on the system font. Alternatively, font families in an IconData class can be provided in the assets section of your pubspec.yaml, or you are missing "uses-material-design: true".
+[   +4 ms] Running font-subset: /Users/shadreckmusarurwa/development/flutter/bin/cache/artifacts/engine/darwin-x64/font-subset build/web/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf /Users/shadreckmusarurwa/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8/assets/CupertinoIcons.ttf, using codepoints 62468 62730 62717 62419 62415 62629 62318 optional:32
+[   +3 ms] Running font-subset: /Users/shadreckmusarurwa/development/flutter/bin/cache/artifacts/engine/darwin-x64/font-subset build/web/assets/fonts/MaterialIcons-Regular.otf /Users/shadreckmusarurwa/development/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf, using codepoints 63668 61464 58289 983546 58291 57690 61224 57706 57490 62832 58332 57502 57501 57496 57694 57695 57657 57882 57504 61453 57634 57498 57926 57704 57491 61061 61060 62834 62833 59283 59282 57499 57500 61069 61068 62842 62841 59291 59290 58011 58012 61575 61576 63348 63349 59797 59798 58372 58370 61930 61927 63708 63705 60157 60154 58771 58189 62328 61752 983402 63526 60555 59975 58814 58813 57846 57862 58727 57686 61764 57402 983342 983508 63625 63627 62775 63041 63035 983159 63029 983292 983516 63677 983509 58713 57689 983378 983373 optional:32
+[  +85 ms] Font asset "CupertinoIcons.ttf" was tree-shaken, reducing it from 257628 to 1472 bytes (99.4% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+[   +2 ms] Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 10964 bytes (99.3% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+[  +36 ms] web_release_bundle: Complete
+[ +739 ms] web_service_worker: Starting due to {InvalidatedReasonKind.inputChanged: The following inputs have updated contents: build/web/favicon.png,build/web/icons/Icon-192.png,build/web/icons/Icon-maskable-192.png,build/web/icons/Icon-maskable-512.png,build/web/icons/Icon-512.png,build/web/manifest.json,build/web/assets/AssetManifest.json,build/web/assets/NOTICES,build/web/assets/FontManifest.json,build/web/assets/AssetManifest.bin.json,build/web/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf,build/web/assets/packages/record_web/assets/js/record.fixwebmduration.js,build/web/assets/packages/record_web/assets/js/record.worklet.js,build/web/assets/shaders/ink_sparkle.frag,build/web/assets/AssetManifest.bin,build/web/assets/fonts/MaterialIcons-Regular.otf,build/web/assets/assets/images/cat.png,build/web/assets/assets/images/fox.png,build/web/flutter_bootstrap.js,build/web/version.json,build/web/index.html,build/web/main.dart.js,build/web/flutter.js,build/web/canvaskit/skwasm_st.js,build/web/canvaskit/skwasm.js,build/web/canvaskit/skwasm.js.symbols,build/web/canvaskit/canvaskit.js.symbols,build/web/canvaskit/skwasm.wasm,build/web/canvaskit/chromium/canvaskit.js.symbols,build/web/canvaskit/chromium/canvaskit.js,build/web/canvaskit/chromium/canvaskit.wasm,build/web/canvaskit/skwasm_st.js.symbols,build/web/canvaskit/canvaskit.js,build/web/canvaskit/canvaskit.wasm,build/web/canvaskit/skwasm_st.wasm,build/web/flutter_service_worker.js}
+[ +725 ms] web_service_worker: Complete
+[  +12 ms] Persisting file store
+[  +35 ms] Done persisting file store
+[  +89 ms] Compiling lib/main.dart for the Web... (completed in 266.8s)
+[   +1 ms] ✓ Built build/web
+[  +18 ms] "flutter web" took 272,053ms.
+[  +14 ms] Running 1 shutdown hook
+[   +5 ms] Shutdown hooks complete
+[ +283 ms] exiting with code 0

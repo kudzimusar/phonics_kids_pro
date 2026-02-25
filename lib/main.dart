@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'src/auth/screens/auth_gate.dart';
 import 'src/auth/screens/payment_success_screen.dart';
 import 'src/auth/screens/payment_cancel_screen.dart';
+import 'src/learning/textbook/textbook_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
 import 'src/core/config/app_config.dart';
@@ -38,11 +39,15 @@ void main() async {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/textbook', // Temporary for testing
   routes: [
     GoRoute(
       path: '/',
       builder: (context, state) => const AuthGate(),
+    ),
+    GoRoute(
+      path: '/textbook',
+      builder: (context, state) => const TextbookScreen(),
     ),
     GoRoute(
       path: '/payment-success',

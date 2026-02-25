@@ -76,6 +76,19 @@ class LessonSelectionScreen extends StatelessWidget {
           : StreamBuilder<AppUser?>(
               stream: UserService().getUserStream(userId),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error loading profile.',
+                      style: GoogleFonts.quicksand(color: Colors.red),
+                    ),
+                  );
+                }
+
                 final bool hasActiveSubscription = snapshot.data?.hasActiveSubscription ?? false;
 
                 return Padding(

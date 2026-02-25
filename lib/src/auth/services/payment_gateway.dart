@@ -26,11 +26,15 @@ class PaymentGateway {
 
       if (kIsWeb) {
         debugPrint("Initiating Stripe Checkout Session for Web...");
+        
+        // Dynamically grab the current origin so it works on any port or production domain
+        final String origin = Uri.base.origin;
+        
         HttpsCallableResult checkoutResult = await _functions.httpsCallable('createStripeCheckoutSession').call({
           'email': email,
           'tierId': tierId,
-          'successUrl': 'http://localhost:8081/#/payment-success',
-          'cancelUrl': 'http://localhost:8081/#/payment-cancel',
+          'successUrl': '$origin/#/payment-success',
+          'cancelUrl': '$origin/#/payment-cancel',
         });
 
         final String? checkoutUrl = checkoutResult.data['url'];

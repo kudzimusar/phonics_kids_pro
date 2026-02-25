@@ -5,6 +5,8 @@ import '../models/classroom.dart';
 import 'classroom_detail_screen.dart';
 import '../../auth/services/auth_service.dart';
 
+import 'package:go_router/go_router.dart';
+
 class TeacherDashboardScreen extends StatelessWidget {
   const TeacherDashboardScreen({Key? key}) : super(key: key);
 
@@ -23,6 +25,11 @@ class TeacherDashboardScreen extends StatelessWidget {
           style: GoogleFonts.fredoka(color: primaryColor, fontSize: 24),
         ),
         actions: [
+          TextButton.icon(
+            icon: const Icon(Icons.menu_book_rounded, color: Colors.blueAccent),
+            label: Text('Preview Textbook', style: GoogleFonts.fredoka(color: Colors.blueAccent)),
+            onPressed: () => context.push('/textbook'),
+          ),
           IconButton(
             icon: const Icon(Icons.logout_rounded, color: Colors.blueAccent),
             onPressed: () => AuthService().signOut(),

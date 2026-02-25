@@ -22,7 +22,15 @@ class UserService {
   Stream<AppUser?> getUserStream(String id) {
     return _db.collection('users').doc(id).snapshots().map((doc) {
       if (doc.exists && doc.data() != null) {
-        return AppUser.fromMap(doc.data()!);
+        try {
+          return AppUser.fromMap(doc.data()!);
+        } catch (e, stackTrace) {
+          // If parsing fails (e.g., bad data structure), return null instead of crashing the stream
+          // In production, we should log this to Crashlytics
+          print('Error parsing user stream data: $e');
+          print(stackTrace);
+          return null;
+        }
       }
       return null;
     });
