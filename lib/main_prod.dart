@@ -6,13 +6,6 @@ import 'src/core/config/app_config.dart';
 import 'main.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  AppConfig.init(Environment.prod);
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
+  await initializeApp(Environment.prod);
   runApp(const PhonicsKidsProApp());
 }

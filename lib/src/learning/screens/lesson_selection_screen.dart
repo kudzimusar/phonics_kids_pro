@@ -6,6 +6,9 @@ import 'phonics_lesson_screen.dart';
 import 'sticker_book_screen.dart';
 import '../../school/widgets/join_class_dialog.dart';
 import '../../auth/screens/subscription_gate_screen.dart';
+import '../../auth/services/auth_service.dart';
+import '../../auth/services/user_service.dart';
+import '../../auth/models/app_user.dart';
 
 class LessonSelectionScreen extends StatelessWidget {
   const LessonSelectionScreen({Key? key}) : super(key: key);
@@ -32,6 +35,8 @@ class LessonSelectionScreen extends StatelessWidget {
     final lessons = LessonRepository.allLessons;
     const bgColor = Color(0xFFE1F5FE);
     const textColor = Color(0xFF37474F);
+
+    final userId = AuthService().currentUser?.uid;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -66,51 +71,70 @@ class LessonSelectionScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select a lesson to start!',
-              style: GoogleFonts.quicksand(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textColor.withOpacity(0.7),
-              ),
+      body: userId == null
+          ? const Center(child: CircularProgressIndicator())
+          : StreamBuilder<AppUser?>(
+              stream: UserService().getUserStream(userId),
+              builder: (context, snapshot) {
+                final bool hasActiveSubscription = snapshot.data?.hasActiveSubscription ?? false;
+
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Select a lesson to start!',
+                        style: GoogleFonts.quicksand(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: textColor.withOpacity(0.7),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: GridView.builder(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.85,
+                          ),
+                          itemCount: lessons.length,
+                          itemBuilder: (context, index) {
+                            final lesson = lessons[index];
+                            return _LessonTile(
+                              lesson: lesson,
+                              hasActiveSubscription: hasActiveSubscription,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.85,
-                ),
-                itemCount: lessons.length,
-                itemBuilder: (context, index) {
-                  final lesson = lessons[index];
-                  return _LessonTile(lesson: lesson);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
 
 class _LessonTile extends StatelessWidget {
   final PhonicsLesson lesson;
-  const _LessonTile({required this.lesson});
+  final bool hasActiveSubscription;
+  
+  const _LessonTile({
+    required this.lesson,
+    required this.hasActiveSubscription,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final bool isActuallyLocked = lesson.isPremium && !hasActiveSubscription;
+
     return GestureDetector(
       onTap: () {
-        if (lesson.isPremium) {
+        if (isActuallyLocked) {
            Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const SubscriptionGateScreen()),
@@ -183,7 +207,7 @@ class _LessonTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (lesson.isPremium)
+            if (isActuallyLocked)
               Positioned(
                 top: 12,
                 right: 12,
@@ -206,3 +230,4 @@ class _LessonTile extends StatelessWidget {
     );
   }
 }
+

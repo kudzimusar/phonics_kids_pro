@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/config/app_config.dart';
 
 class PaymentGateway {
@@ -12,56 +14,55 @@ class PaymentGateway {
   /// 3. Presents the Payment Sheet to the user.
   Future<void> initiateSubscription({required String email, required String tierId}) async {
     try {
-      // 1. Call the Cloud Function
-      // In production, Firebase Functions points to the live project automatically.
-      // In dev, we can point to the emulator:
-      // if (AppConfig.instance.environment == Environment.dev) {
-      //    _functions.useFunctionsEmulator('127.0.0.1', 5001);
-      // }
-      
-      HttpsCallable callable = _functions.httpsCallable('createStripePaymentIntent');
-      final result = await callable.call({
+      HttpsCallableResult result = await _functions.httpsCallable('createStripePaymentIntent').call({
         'email': email,
-        'tierId': tierId // e.g., 'pro_monthly'
+        'tierId': tierId
       });
 
       final String? clientSecret = result.data['clientSecret'];
-      
       if (clientSecret == null) {
         throw Exception("Failed to retrieve client secret from backend.");
       }
 
-      // 2. Initialize the payment sheet
-      await Stripe.instance.initPaymentSheet(
-        paymentSheetParameters: SetupPaymentSheetParameters(
-          paymentIntentClientSecret: clientSecret,
-          merchantDisplayName: 'Phonics Kids Pro',
-          // Note: In a production app, the backend should also return 
-          // a customer ID and ephemeral key if you want to save cards.
-          allowsDelayedPaymentMethods: true,
-          style: ThemeMode.light,
-          appearance: const PaymentSheetAppearance(
-            colors: PaymentSheetAppearanceColors(
-              primary: Color(0xFF42A5F5),
-            ),
-          ),
-        ),
-      );
+      if (kIsWeb) {
+        debugPrint("Initiating Stripe Checkout Session for Web...");
+        HttpsCallableResult checkoutResult = await _functions.httpsCallable('createStripeCheckoutSession').call({
+          'email': email,
+          'tierId': tierId,
+          'successUrl': 'http://localhost:8081/#/payment-success',
+          'cancelUrl': 'http://localhost:8081/#/payment-cancel',
+        });
 
-      // 3. Display the payment sheet
-      await Stripe.instance.presentPaymentSheet();
-      
-      debugPrint("Stripe Payment Sheet closed. Check Firestore for subscription status.");
+        final String? checkoutUrl = checkoutResult.data['url'];
+        if (checkoutUrl != null) {
+          debugPrint("Redirecting to Stripe Checkout: $checkoutUrl");
+          // Use url_launcher to open the checkout page
+          final Uri url = Uri.parse(checkoutUrl);
+          if (await canLaunchUrl(url)) {
+            await launchUrl(url, mode: LaunchMode.externalApplication);
+          } else {
+            throw Exception("Could not launch checkout URL: $checkoutUrl");
+          }
+        } else {
+          throw Exception("Failed to retrieve checkout URL from backend.");
+        }
+      } else {
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: clientSecret,
+            merchantDisplayName: 'Phonics Kids Pro',
+            allowsDelayedPaymentMethods: true,
+            style: ThemeMode.light,
+          ),
+        );
+        await Stripe.instance.presentPaymentSheet();
+      }
       
     } catch (e) {
       if (e is StripeException) {
         debugPrint("Error from Stripe SDK (Client-Side): ${e.error.localizedMessage}");
-        if (e.error.code == FailureCode.Failed) {
-           debugPrint("TIP: Ensure your Stripe Publishable Key is correctly set in AppConfig.dart and initialized in main.dart");
-        }
       } else if (e is FirebaseFunctionsException) {
         debugPrint("Error from Cloud Functions (Backend): [${e.code}] ${e.message}");
-        debugPrint("TIP: Ensure your Stripe Secret Key is set in Firebase/Emulator config.");
       } else {
         debugPrint("Unforeseen error in PaymentGateway: $e");
       }

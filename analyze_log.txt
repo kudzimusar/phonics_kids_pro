@@ -1,0 +1,66 @@
+Analyzing phonics_kids_pro...                                   
+
+warning • Unused import: 'package:flutter/foundation.dart' • lib/main.dart:11:8 • unused_import
+warning • Unused import: 'package:firebase_core/firebase_core.dart' • lib/main_dev.dart:2:8 • unused_import
+warning • Unused import: 'firebase_options.dart' • lib/main_dev.dart:3:8 • unused_import
+warning • Unused import: 'src/auth/screens/auth_gate.dart' • lib/main_dev.dart:4:8 • unused_import
+warning • Unused import: 'package:firebase_core/firebase_core.dart' • lib/main_prod.dart:2:8 • unused_import
+warning • Unused import: 'firebase_options.dart' • lib/main_prod.dart:3:8 • unused_import
+warning • Unused import: 'src/auth/screens/auth_gate.dart' • lib/main_prod.dart:4:8 • unused_import
+warning • Unused import: '../services/auth_service.dart' • lib/src/auth/screens/auth_gate.dart:6:8 • unused_import
+   info • Parameter 'key' could be a super parameter • lib/src/auth/screens/auth_gate.dart:11:9 • use_super_parameters
+   info • Parameter 'key' could be a super parameter • lib/src/auth/screens/auth_gate.dart:62:9 • use_super_parameters
+   info • Invalid use of a private type in a public API • lib/src/auth/screens/auth_gate.dart:65:3 • library_private_types_in_public_api
+   info • Parameter 'key' could be a super parameter • lib/src/auth/screens/auth_gate.dart:112:9 • use_super_parameters
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/auth/screens/auth_gate.dart:133:37 • deprecated_member_use
+   info • Parameter 'key' could be a super parameter • lib/src/auth/screens/payment_cancel_screen.dart:6:9 • use_super_parameters
+   info • Parameter 'key' could be a super parameter • lib/src/auth/screens/payment_success_screen.dart:6:9 • use_super_parameters
+   info • Parameter 'key' could be a super parameter • lib/src/auth/screens/subscription_gate_screen.dart:8:9 • use_super_parameters
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/auth/screens/subscription_gate_screen.dart:167:21 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/auth/screens/subscription_gate_screen.dart:168:28 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/src/auth/services/auth_service.dart:17:7 • avoid_print
+warning • Unused import: '../../core/config/app_config.dart' • lib/src/auth/services/payment_gateway.dart:6:8 • unused_import
+   info • Parameter 'key' could be a super parameter • lib/src/learning/screens/lesson_selection_screen.dart:14:9 • use_super_parameters
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/lesson_selection_screen.dart:91:44 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/lesson_selection_screen.dart:157:38 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/lesson_selection_screen.dart:174:48 • deprecated_member_use
+   info • Parameter 'key' could be a super parameter • lib/src/learning/screens/phonics_lesson_screen.dart:19:9 • use_super_parameters
+   info • Invalid use of a private type in a public API • lib/src/learning/screens/phonics_lesson_screen.dart:22:3 • library_private_types_in_public_api
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/phonics_lesson_screen.dart:153:30 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/phonics_lesson_screen.dart:204:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/phonics_lesson_screen.dart:219:48 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/phonics_lesson_screen.dart:291:38 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/phonics_lesson_screen.dart:364:22 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/phonics_lesson_screen.dart:366:41 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/phonics_lesson_screen.dart:402:67 • deprecated_member_use
+   info • Parameter 'key' could be a super parameter • lib/src/learning/screens/sticker_book_screen.dart:7:9 • use_super_parameters
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/screens/sticker_book_screen.dart:73:33 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/src/learning/services/caching_service.dart:11:7 • avoid_print
+   info • 'FirebaseVertexAI' is deprecated and shouldn't be used. `FirebaseVertexAI` library and `firebase_vertexai` package have been renamed and replaced by the new Firebase AI SDK: `FirebaseAI` in `firebase_ai` package. See details in the [migration guide](https://firebase.google.com/docs/vertex-ai/migrate-to-latest-sdk) • lib/src/learning/services/phonics_engine.dart:10:14 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/src/learning/services/phonics_engine.dart:39:7 • avoid_print
+   info • Parameter 'key' could be a super parameter • lib/src/learning/widgets/phonic_fox.dart:11:9 • use_super_parameters
+   info • Invalid use of a private type in a public API • lib/src/learning/widgets/phonic_fox.dart:14:3 • library_private_types_in_public_api
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/widgets/phonic_fox.dart:95:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/widgets/phonic_fox.dart:97:54 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/widgets/phonic_fox.dart:112:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/widgets/phonic_fox.dart:114:52 • deprecated_member_use
+   info • Parameter 'key' could be a super parameter • lib/src/learning/widgets/sticker_reward_overlay.dart:9:9 • use_super_parameters
+   info • Invalid use of a private type in a public API • lib/src/learning/widgets/sticker_reward_overlay.dart:16:3 • library_private_types_in_public_api
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/learning/widgets/sticker_reward_overlay.dart:74:41 • deprecated_member_use
+   info • Don't invoke 'print' in production code • lib/src/school/repositories/school_repository.dart:83:7 • avoid_print
+   info • Parameter 'key' could be a super parameter • lib/src/school/screens/classroom_detail_screen.dart:10:9 • use_super_parameters
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/school/screens/classroom_detail_screen.dart:115:53 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/school/screens/classroom_detail_screen.dart:145:48 • deprecated_member_use
+   info • Parameter 'key' could be a super parameter • lib/src/school/screens/teacher_dashboard_screen.dart:9:9 • use_super_parameters
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/school/screens/teacher_dashboard_screen.dart:106:44 • deprecated_member_use
+   info • Parameter 'key' could be a super parameter • lib/src/school/widgets/join_class_dialog.dart:7:9 • use_super_parameters
+   info • Invalid use of a private type in a public API • lib/src/school/widgets/join_class_dialog.dart:10:3 • library_private_types_in_public_api
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/school/widgets/join_class_dialog.dart:67:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/src/school/widgets/join_class_dialog.dart:73:63 • deprecated_member_use
+   info • The type name 'Rounded_Corner_Border' isn't an UpperCamelCase identifier • lib/src/school/widgets/join_class_dialog.dart:102:7 • camel_case_types
+   info • Parameter 'borderRadius' could be a super parameter • lib/src/school/widgets/join_class_dialog.dart:103:9 • use_super_parameters
+   info • Parameter 'key' could be a super parameter • lib/src/tracking/screens/progress_dashboard.dart:5:9 • use_super_parameters
+warning • The value of the local variable 'accuracy' isn't used • lib/src/tracking/screens/progress_dashboard.dart:62:11 • unused_local_variable
+warning • The value of the local variable 'duration' isn't used • lib/src/tracking/screens/progress_dashboard.dart:63:11 • unused_local_variable
+
+62 issues found. (ran in 11.8s)
