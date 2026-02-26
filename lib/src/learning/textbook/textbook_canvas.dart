@@ -26,6 +26,7 @@ import 'components/interactive_vowel_stack.dart';
 import 'components/train_fill_in.dart';
 import 'components/color_by_code_fishing.dart';
 import 'components/word_circle_grid.dart';
+import 'components/bossy_r_comparison_table.dart';
 import 'components/picture_fill_in_grid.dart';
 import 'components/riddle_cvc.dart';
 import 'components/letter_drop_target.dart';
@@ -659,6 +660,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         ],
       );
     } else if (page['layout'] == 'lesson-with-sort') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+      
       return Column(
         children: [
           Expanded(
@@ -667,51 +670,41 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const TextBlock(
-                    text: "The letter c usually makes a hard /k/ sound, as in the word 'cake.' Sometimes, it makes a soft /s/ sound, as in the word 'slice.'",
-                    type: TextType.rule,
-                  ),
-                  const SizedBox(height: 16),
-                  const TextBlock(
-                    text: "Read these words aloud and sort them!",
-                    type: TextType.instruction,
-                  ),
-                  const SizedBox(height: 24),
-                  // Added a container to box the word bank to simulate the PDF's rounded box
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.blueGrey.shade800, width: 2),
-                    ),
-                    child: const TwoColumnSort(
-                      leftLabel: "Hard C",
-                      rightLabel: "Soft C",
-                      leftAnswers: ["cane", "cash", "fact"],
-                      rightAnswers: ["icy", "mice", "cent"],
-                      wordBank: ["cane", "icy", "mice", "cash", "cent", "fact"],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  const TextBlock(
-                    text: "Do you see a pattern? That's right, c makes a soft /s/ sound when the letter after it is an i, y, or e. In 'slice,' the letter after c is an e, so it is soft.",
-                    type: TextType.rule,
-                  ),
-                  const SizedBox(height: 16),
-                  const TextBlock(
-                    text: "Name each of these pictures—is the c hard or soft?",
-                    type: TextType.instruction,
-                  ),
-                  const SizedBox(height: 32),
-                  const ImageWriteInList(
-                    items: [
-                      {'icon': 'cat', 'blanks': 4, 'answer': 'hard'},
-                      {'icon': 'happy', 'blanks': 4, 'answer': 'soft'},
-                      {'icon': 'pencil', 'blanks': 4, 'answer': 'soft'},
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'lesson-text')
+                      for (final para in block['paragraphs']) ...[
+                        TextBlock(text: para, type: TextType.rule),
+                        const SizedBox(height: 16),
+                      ],
+                    if (block['type'] == 'instruction') ...[
+                      TextBlock(text: block['text'], type: TextType.instruction),
+                      const SizedBox(height: 24),
                     ],
-                  ),
-                  const SizedBox(height: 60), // bottom padding buffer
+                    if (block['type'] == 'two-column-sort') ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.blueGrey.shade800, width: 2),
+                        ),
+                        child: TwoColumnSort(
+                          leftLabel: block['leftLabel'] ?? 'Left',
+                          rightLabel: block['rightLabel'] ?? 'Right',
+                          leftAnswers: List<String>.from(block['options']?.where((o) => block['leftLabel'].contains('Hard') ? ['cane', 'cash', 'fact'].contains(o) : ['silo', 'made', 'she', 'halo'].contains(o)) ?? []),
+                          rightAnswers: List<String>.from(block['options']?.where((o) => block['leftLabel'].contains('Hard') ? ['icy', 'mice', 'cent'].contains(o) : ['fed', 'sand', 'tin', 'set', 'bit'].contains(o)) ?? []),
+                          wordBank: List<String>.from(block['options'] ?? []),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'image-write-in-list') ...[
+                      ImageWriteInList(
+                        items: List<Map<String, dynamic>>.from(block['items']),
+                      ),
+                      const SizedBox(height: 60),
+                    ]
+                  ]
                 ],
               ),
             ),
@@ -947,27 +940,44 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         ],
       );
     } else if (page['layout'] == 'lesson-with-circle-activity') {
-      List<Map<String, dynamic>> words = [];
-      try {
-        final contentList = page['content'] as List<dynamic>;
-        final circleBlock = contentList.firstWhere((e) => e['type'] == 'word-circle-grid', orElse: () => null);
-        if (circleBlock != null) {
-          words = List<Map<String, dynamic>>.from(circleBlock['words']);
-        }
-      } catch (e) {
-        // Fallback
-      }
+      final contentList = page['content'] as List<dynamic>? ?? [];
 
       return Column(
         children: [
-          const TextBlock(
-            text: "When a vowel is followed by the letter r, the vowel makes a new sound! Circle the words with a bossy r.",
-            type: TextType.instruction,
-          ),
-          const SizedBox(height: 32),
           Expanded(
-            child: WordCircleGrid(
-              words: words,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'lesson-text')
+                      for (final para in block['paragraphs']) ...[
+                        TextBlock(text: para, type: TextType.rule),
+                        const SizedBox(height: 16),
+                      ],
+                    if (block['type'] == 'instruction') ...[
+                      TextBlock(text: block['text'], type: TextType.instruction),
+                      const SizedBox(height: 16),
+                    ],
+                    if (block['type'] == 'comparison-table') ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: BossyRComparisonTable(
+                          rows: List<Map<String, dynamic>>.from(block['rows']),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                    if (block['type'] == 'word-circle-grid') ...[
+                      WordCircleGrid(
+                        words: List<Map<String, dynamic>>.from(block['words']),
+                      ),
+                      const SizedBox(height: 60), // Bottom padding buffer
+                    ]
+                  ]
+                ],
+              ),
             ),
           ),
         ],
@@ -986,15 +996,23 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
       return Column(
         children: [
-          const TextBlock(
-            text: "Look at the picture and fill in the missing bossy r sound (ar, er, ir, or, ur)!",
-            type: TextType.instruction,
-          ),
-          const SizedBox(height: 32),
           Expanded(
-            child: PictureFillInGrid(
-              entries: entries,
-              columns: 3,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                children: [
+                  const TextBlock(
+                    text: "Look at the picture and fill in the missing bossy r sound (ar, er, ir, or, ur)!",
+                    type: TextType.instruction,
+                  ),
+                  const SizedBox(height: 32),
+                  PictureFillInGrid(
+                    entries: entries,
+                    columns: 3,
+                  ),
+                  const SizedBox(height: 60), // Scroll buffer
+                ],
+              ),
             ),
           ),
         ],
@@ -1020,30 +1038,34 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       }
 
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const TextBlock(
-            text: "A. Write the CVC word that matches the picture.",
-            type: TextType.instruction,
-          ),
-          const SizedBox(height: 16),
           Expanded(
-            flex: 2,
-            child: PictureFillInGrid(
-              entries: gridEntries,
-              columns: 3,
-            ),
-          ),
-          const SizedBox(height: 32),
-          const TextBlock(
-            text: "B. Use the CVC words from part A to answer the riddles.",
-            type: TextType.instruction,
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            flex: 3,
-            child: RiddleCvc(
-              riddles: riddles,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const TextBlock(
+                    text: "A. Write the CVC word that matches the picture.",
+                    type: TextType.instruction,
+                  ),
+                  const SizedBox(height: 16),
+                  PictureFillInGrid(
+                    entries: gridEntries,
+                    columns: 3,
+                  ),
+                  const SizedBox(height: 32),
+                  const TextBlock(
+                    text: "B. Use the CVC words from part A to answer the riddles.",
+                    type: TextType.instruction,
+                  ),
+                  const SizedBox(height: 16),
+                  RiddleCvc(
+                    riddles: riddles,
+                  ),
+                  const SizedBox(height: 60), // Scroll Buffer
+                ],
+              ),
             ),
           ),
         ],

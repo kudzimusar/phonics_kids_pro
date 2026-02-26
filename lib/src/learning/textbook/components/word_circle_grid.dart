@@ -42,6 +42,8 @@ class _WordCircleGridState extends State<WordCircleGrid> {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.columns,
         childAspectRatio: 2.0, // Wide boxes for words

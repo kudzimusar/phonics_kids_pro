@@ -125,6 +125,42 @@ class TextbookDatabase {
       'layout': 'lesson-with-sort',
       'teacherNotes': 'The hard/soft C rule: before i, e, y → soft /s/. Before a, o, u, consonants → hard /k/.',
       'answerKey': 'cat = hard; face = soft; pencil = soft',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            'The letter c usually makes a hard /k/ sound, as in the word "cake." Sometimes, it makes a soft /s/ sound, as in the word "slice."',
+          ]
+        },
+        {
+          'type': 'instruction',
+          'text': "Read these words aloud and sort them!",
+        },
+        {
+          'type': 'two-column-sort',
+          'leftLabel': 'Hard C',
+          'rightLabel': 'Soft C',
+          'options': ["cane", "icy", "mice", "cash", "cent", "fact"],
+        },
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "Do you see a pattern? That's right, c makes a soft /s/ sound when the letter after it is an i, y, or e. In \"slice,\" the letter after c is an e, so it is soft.",
+          ]
+        },
+        {
+          'type': 'instruction',
+          'text': "Name each of these pictures—is the c hard or soft?",
+        },
+        {
+          'type': 'image-write-in-list',
+          'items': [
+            {'icon': 'cat', 'blanks': 2, 'answer': 'hard'},
+            {'icon': 'happy', 'blanks': 4, 'answer': 'soft'},
+            {'icon': 'pencil', 'blanks': 4, 'answer': 'soft'},
+          ]
+        }
+      ]
     },
     // A10
     {
@@ -186,65 +222,129 @@ class TextbookDatabase {
       'layout': 'train-fill-in',
       'teacherNotes': 'CVC blending with missing vowels.',
     },
-    // A16 / A17
+    // A16
     {
       'id': 'page-19',
       'type': 'activity',
-      'activityLabel': 'A16-A17',
-      'title': 'Vowel Fishing',
+      'activityLabel': 'A16',
+      'title': 'The Long Or Short Of It',
+      'layout': 'lesson-with-sort',
+      'teacherNotes': 'Focus: does the vowel say its name (long) or a different sound (short)?',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "Let's look at the difference between Long and Short vowels. Read the boxed examples aloud.",
+          ]
+        },
+        {
+          'type': 'two-column-sort',
+          'leftLabel': 'Long Vowel',
+          'rightLabel': 'Short Vowel',
+          'options': ['silo', 'fed', 'made', 'sand', 'she', 'tin', 'set', 'halo', 'bit']
+        }
+      ]
+    },
+    // A17
+    {
+      'id': 'page-20',
+      'type': 'activity',
+      'activityLabel': 'A17',
+      'title': 'More Vowel Fishing',
       'layout': 'color-by-code',
-      'teacherNotes': 'Identifying vowel sounds based on color codes.',
+      'teacherNotes': 'Extension of A16. Now covering O and U vowels plus Y as a vowel sound.',
       'content': [
         {
           'type': 'color-code-key',
           'codes': [
-            {'label': 'Short a', 'color': 'red'},
-            {'label': 'Short e', 'color': 'orange'},
-            {'label': 'Short i', 'color': 'yellow'},
-            {'label': 'Short o', 'color': 'green'},
-            {'label': 'Short u', 'color': 'blue'},
+            {'label': 'Long O', 'color': 'red'},
+            {'label': 'Short O', 'color': 'orange'},
+            {'label': 'Long U', 'color': 'green'},
+            {'label': 'Short U', 'color': 'yellow'},
+            {'label': 'Y As E', 'color': 'blue'},
+            {'label': 'Y As I', 'color': 'purple'},
           ]
         },
         {
           'type': 'fish-color-activity',
           'fish': [
-            {'word': 'cat', 'answer': 'red'},
-            {'word': 'bed', 'answer': 'orange'},
-            {'word': 'pig', 'answer': 'yellow'},
-            {'word': 'log', 'answer': 'green'},
-            {'word': 'sun', 'answer': 'blue'},
-            {'word': 'hat', 'answer': 'red'},
+            {'word': 'mop', 'answer': 'orange'},
+            {'word': 'lady', 'answer': 'blue'},
+            {'word': 'fun', 'answer': 'yellow'},
+            {'word': 'music', 'answer': 'green'},
+            {'word': 'sum', 'answer': 'yellow'},
+            {'word': 'city', 'answer': 'blue'},
+            {'word': 'told', 'answer': 'red'},
+            {'word': 'pry', 'answer': 'purple'},
           ]
         }
       ]
     },
     // A18
     {
-      'id': 'page-20',
+      'id': 'page-21',
       'type': 'activity',
       'activityLabel': 'A18',
       'title': 'Bossy R',
       'layout': 'lesson-with-circle-activity',
-      'teacherNotes': 'Identifying bossy R words.',
+      'teacherNotes': 'R-controlled vowels. The R changes the vowel\'s sound entirely.',
       'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "As you've seen, vowels are often affected by the other letters around them. One thing that can change a vowel's sound is a bossy R! When a vowel is followed by the letter r, the vowel makes a new sound."
+          ],
+        },
+        {
+          'type': 'instruction',
+          'text': "Read these word pairs aloud and note the difference.",
+        },
+        {
+          'type': 'comparison-table',
+          'rows': [
+            {
+              'pair': ["cold", "cord"],
+              'imageDesc1': "Robot", 'imageId1': "robot",
+              'imageDesc2': "Cord", 'imageId2': "rope",
+            },
+            {
+              'pair': ["stamp", "star"],
+              'imageDesc1': "Stamp", 'imageId1': "stamp", // Uses stamp emoji
+              'imageDesc2': "Star", 'imageId2': "star",
+            },
+            {
+              'pair': ["bun", "burn"],
+              'imageDesc1': "Bun roll", 'imageId1': "bread", // Use bread emoji
+              'imageDesc2': "Fire", 'imageId2': "fire",
+            },
+          ]
+        },
+        {
+          'type': 'instruction',
+          'text': "Circle the words with a bossy r.",
+        },
         {
           'type': 'word-circle-grid',
           'words': [
+            {'word': 'make', 'answer': false},
+            {'word': 'ruler', 'answer': true},
+            {'word': 'purple', 'answer': true},
+            {'word': 'rain', 'answer': false},
+            {'word': 'alarm', 'answer': true},
+            {'word': 'rope', 'answer': false},
+            {'word': 'chair', 'answer': true},
+            {'word': 'puppy', 'answer': false},
+            {'word': 'girl', 'answer': true},
+            {'word': 'leapt', 'answer': false},
+            {'word': 'sport', 'answer': true},
             {'word': 'car', 'answer': true},
-            {'word': 'cat', 'answer': false},
-            {'word': 'bird', 'answer': true},
-            {'word': 'bat', 'answer': false},
-            {'word': 'fork', 'answer': true},
-            {'word': 'box', 'answer': false},
-            {'word': 'hurt', 'answer': true},
-            {'word': 'hut', 'answer': false},
           ]
         }
       ]
     },
     // A19
     {
-      'id': 'page-21',
+      'id': 'page-22',
       'type': 'activity',
       'activityLabel': 'A19',
       'title': 'Missing Bossy R',
@@ -254,18 +354,22 @@ class TextbookDatabase {
         {
           'type': 'picture-fill-in-grid',
           'entries': [
-            {'imageDesc': 'Car', 'imageId': 'car', 'partial': 'c__', 'answer': 'ar'},
-            {'imageDesc': 'Fern', 'imageId': 'plant', 'partial': 'f__n', 'answer': 'er'},
             {'imageDesc': 'Bird', 'imageId': 'bird', 'partial': 'b__d', 'answer': 'ir'},
-            {'imageDesc': 'Fork', 'imageId': 'spit', 'partial': 'f__k', 'answer': 'or'},
-            {'imageDesc': 'Hurt', 'imageId': 'bandaid', 'partial': 'h__t', 'answer': 'ur'},
+            {'imageDesc': 'Yarn', 'imageId': 'yarn', 'partial': 'y__n', 'answer': 'ar'},
+            {'imageDesc': 'Storm', 'imageId': 'storm', 'partial': 'st__m', 'answer': 'or'},
+            {'imageDesc': 'Earth', 'imageId': 'earth', 'partial': '__th', 'answer': 'ear'},
+            {'imageDesc': 'Fork', 'imageId': 'fork', 'partial': 'f__k', 'answer': 'or'},
+            {'imageDesc': 'Corn', 'imageId': 'corn', 'partial': 'c__n', 'answer': 'or'},
+            {'imageDesc': 'Chair', 'imageId': 'chair', 'partial': 'cha__', 'answer': 'ir'},
+            {'imageDesc': 'Bear', 'imageId': 'bear', 'partial': 'be__', 'answer': 'ar'},
+            {'imageDesc': 'Purse', 'imageId': 'purse', 'partial': 'p__se', 'answer': 'ur'},
           ]
         }
       ]
     },
     // A20
     {
-      'id': 'page-22',
+      'id': 'page-23',
       'type': 'activity',
       'activityLabel': 'A20',
       'title': 'Use Your CVCs',
@@ -275,17 +379,19 @@ class TextbookDatabase {
         {
           'type': 'cvc-picture-write',
           'entries': [
-            {'imageDesc': 'Crab', 'imageId': 'crab', 'partial': 'c_a_b', 'answer': 'crab'},
-            {'imageDesc': 'Frog', 'imageId': 'frog', 'partial': 'f_o_g', 'answer': 'frog'},
-            {'imageDesc': 'Plum', 'imageId': 'plum', 'partial': 'p_u_m', 'answer': 'plum'},
+            {'imageDesc': 'Hat', 'imageId': 'hat', 'partial': '_ _ _', 'answer': 'hat'},
+            {'imageDesc': 'Sun', 'imageId': 'sun', 'partial': '_ _ _', 'answer': 'sun'},
+            {'imageDesc': 'Bag', 'imageId': 'bag', 'partial': '_ _ _', 'answer': 'bag'},
           ]
         },
         {
           'type': 'riddle-cvc',
           'riddles': [
-            {'clue': 'I have a shell and claws. I hop sideways.', 'answer': 'crab'},
-            {'clue': 'I say ribbit. I jump high.', 'answer': 'frog'},
-            {'clue': 'I am a purple fruit.', 'answer': 'plum'},
+            {'clue': 'Rectangular storage container:', 'answer': 'box'},
+            {'clue': 'A glass you drink out of:', 'answer': 'cup'},
+            {'clue': 'The number that comes after nine:', 'answer': 'ten'},
+            {'clue': 'Flying mammal that likes caves:', 'answer': 'bat'},
+            {'clue': 'The opposite of lose:', 'answer': 'win'},
           ]
         }
       ]

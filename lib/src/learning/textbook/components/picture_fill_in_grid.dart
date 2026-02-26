@@ -39,9 +39,9 @@ class _PictureFillInGridState extends State<PictureFillInGrid> {
       padding: const EdgeInsets.all(16),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.columns,
-        childAspectRatio: 0.8, // Taller to fit image + text box
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 24,
+        childAspectRatio: 1.0, // More square to give graphics space
+        crossAxisSpacing: 20,
+        mainAxisSpacing: 20,
       ),
       itemCount: widget.entries.length,
       itemBuilder: (context, index) {
@@ -73,68 +73,73 @@ class _PictureFillInGridState extends State<PictureFillInGrid> {
             children: [
               // Image
               Expanded(
+                flex: 3,
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(4.0),
                   child: VectorGraphic(
                     assetName: entry['imageId'],
-                    size: 80,
+                    size: 140, // Increased from 80
                   ),
                 ),
               ),
               // Word Row (Prefix + Input + Suffix)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (prefix.isNotEmpty)
-                    Text(
-                      prefix,
-                      style: const TextStyle(
-                        fontFamily: 'SassoonPrimary', 
-                        fontSize: 28, 
-                        fontWeight: FontWeight.bold
+              Expanded(
+                flex: 2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (prefix.isNotEmpty)
+                      Text(
+                        prefix,
+                        style: const TextStyle(
+                          fontFamily: 'SassoonPrimary', 
+                          fontSize: 36, // Increased
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    
+                    // The Blank Input Box
+                    Container(
+                      width: 65, // Increased
+                      height: 50, // Increased
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: const BoxDecoration(
+                        border: Border(bottom: BorderSide(color: Colors.black87, width: 3)),
+                      ),
+                      child: TextField(
+                        textAlign: TextAlign.center,
+                        maxLength: 2, // Bossy R is usually 2 letters
+                        style: const TextStyle(
+                          fontSize: 36, // Increased
+                          fontWeight: FontWeight.bold, 
+                          fontFamily: 'SassoonPrimary', 
+                          color: Colors.blue
+                        ),
+                        decoration: const InputDecoration(
+                          counterText: "",
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.only(bottom: 8),
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            _answers[index] = val;
+                          });
+                        },
                       ),
                     ),
-                  
-                  // The Blank Input Box
-                  Container(
-                    width: 50,
-                    height: 40,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: const BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.black87, width: 2)),
-                    ),
-                    child: TextField(
-                      textAlign: TextAlign.center,
-                      maxLength: 2, // Bossy R is usually 2 letters
-                      style: const TextStyle(
-                        fontSize: 28, 
-                        fontWeight: FontWeight.bold, 
-                        fontFamily: 'SassoonPrimary', 
-                        color: Colors.blue
-                      ),
-                      decoration: const InputDecoration(
-                        counterText: "",
-                        border: InputBorder.none,
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          _answers[index] = val;
-                        });
-                      },
-                    ),
-                  ),
 
-                  if (suffix.isNotEmpty)
-                    Text(
-                      suffix,
-                      style: const TextStyle(
-                        fontFamily: 'SassoonPrimary', 
-                        fontSize: 28, 
-                        fontWeight: FontWeight.bold
+                    if (suffix.isNotEmpty)
+                      Text(
+                        suffix,
+                        style: const TextStyle(
+                          fontFamily: 'SassoonPrimary', 
+                          fontSize: 36, // Increased
+                          fontWeight: FontWeight.bold
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

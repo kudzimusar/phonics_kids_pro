@@ -138,6 +138,7 @@ class _VectorGraphicState extends State<VectorGraphic> with SingleTickerProvider
     if (lowerName.contains('sun')) return '☀️';
     if (lowerName.contains('hat')) return '🎩';
     if (lowerName.contains('log')) return '🪵';
+    if (lowerName.contains('green')) return '🟩';
     
     return '🌟'; // Default generic icon fallback
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'vector_graphic.dart';
 
 class HintOverlay extends StatelessWidget {
   final VoidCallback onHintDismissed;
@@ -75,9 +76,9 @@ class HintOverlay extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: ClipOval(
-                    child: Image.network(
-                      'https://img.icons8.com/fluency/96/fox.png',
-                      fit: BoxFit.cover,
+                    child: const VectorGraphic(
+                      assetName: 'fox',
+                      size: 64,
                     ),
                   ),
                 ),
