@@ -668,5 +668,254 @@ class TextbookDatabase {
         }
       ]
     },
+    // A29
+    {
+      'id': 'page-32',
+      'type': 'activity',
+      'activityLabel': 'A29',
+      'title': 'Practicing Consonant Blends',
+      'layout': 'reference-trace-grid',
+      'teacherNotes': 'Reference page for consonant blends. Students trace the blend in each word. Organized by blend family: bl/br, cl/cr, dr/fr, gl/gr, pl/pr, sl/sm, sp/st/str/spl.',
+      'content': [
+        {
+          'type': 'instruction',
+          'text': "Practice some common blends!"
+        },
+        {
+          'type': 'blend-example-grid',
+          'columns': 4,
+          'entries': [
+            {'word': "Block", 'blend': "bl", 'imageId': "blocks"},
+            {'word': "Branch", 'blend': "br", 'imageId': "branch"},
+            {'word': "Clam", 'blend': "cl", 'imageId': "clam"},
+            {'word': "Crow", 'blend': "cr", 'imageId': "crow"},
+            {'word': "Dragon", 'blend': "dr", 'imageId': "dragon"},
+            {'word': "Fruit", 'blend': "fr", 'imageId': "fruit"},
+            {'word': "Glitter", 'blend': "gl", 'imageId': "glitter"},
+            {'word': "Grapes", 'blend': "gr", 'imageId': "grapes"},
+            {'word': "Plane", 'blend': "pl", 'imageId': "plane"},
+            {'word': "Pretzel", 'blend': "pr", 'imageId': "pretzel"},
+            {'word': "Slug", 'blend': "sl", 'imageId': "slug"},
+            {'word': "Smoke", 'blend': "sm", 'imageId': "smoke"},
+            {'word': "Space", 'blend': "sp", 'imageId': "space"},
+            {'word': "Stove", 'blend': "st", 'imageId': "stove"},
+            {'word': "Strong", 'blend': "str", 'imageId': "strong"},
+            {'word': "Splash", 'blend': "spl", 'imageId': "splash"}
+          ]
+        }
+      ]
+    },
+    // A30
+    {
+      'id': 'page-33',
+      'type': 'activity',
+      'activityLabel': 'A30',
+      'title': 'A Blend Or A Digraph?',
+      'layout': 'identify-sort',
+      'teacherNotes': 'Critical distinction: BLEND = each letter makes its own sound (br, gr, sl, dr, tw, pl, scr). DIGRAPH = letters combined into ONE sound (ch, sh, th, wh, ph).',
+      'content': [
+        {
+          'type': 'instruction',
+          'text': "Sound out each word! Now look just at the underlined cluster — does it make one sound, or does each letter in the group make its own sound?"
+        },
+        {
+          'type': 'identify-grid',
+          'columns': 3,
+          'entries': [
+            {'word': "brag", 'underlined': "br", 'imageId': "brag", 'answer': "blend"},
+            {'word': "chips", 'underlined': "ch", 'imageId': "chips", 'answer': "digraph"},
+            {'word': "scrape", 'underlined': "scr", 'imageId': "scrape", 'answer': "blend"},
+            {'word': "shave", 'underlined': "sh", 'imageId': "shave", 'answer': "digraph"},
+            {'word': "grip", 'underlined': "gr", 'imageId': "grip", 'answer': "blend"},
+            {'word': "thump", 'underlined': "th", 'imageId': "thump", 'answer': "digraph"},
+            {'word': "slide", 'underlined': "sl", 'imageId': "slide2", 'answer': "blend"},
+            {'word': "drove", 'underlined': "dr", 'imageId': "car", 'answer': "blend"},
+            {'word': "when", 'underlined': "wh", 'imageId': "clock", 'answer': "digraph"},
+            {'word': "phone", 'underlined': "ph", 'imageId': "phone", 'answer': "digraph"},
+            {'word': "twig", 'underlined': "tw", 'imageId': "twig", 'answer': "blend"},
+            {'word': "plate", 'underlined': "pl", 'imageId': "plate", 'answer': "blend"}
+          ]
+        }
+      ]
+    },
+    // A31
+    {
+      'id': 'page-34',
+      'type': 'activity',
+      'activityLabel': 'A31',
+      'title': 'Pick A Balloon',
+      'layout': 'balloon-choice',
+      'teacherNotes': 'Students must sound out the complete word using each blend option to determine which one makes a real word. Encourage students to try both options aloud.',
+      'content': [
+        {
+          'type': 'instruction',
+          'text': "Each of these balloon bunches is missing a consonant blend! Color in the right balloon to finish the word."
+        },
+        {
+          'type': 'balloon-activity',
+          'rows': [
+            {
+              'blendChoices': ["fl", "sh"],
+              'endingBalloons': ["i", "n", "g"],
+              'answer': "fl",
+              'word': "fling"
+            },
+            {
+              'blendChoices': ["tw", "dr"],
+              'endingBalloons': ["a", "g", "o", "n"],
+              'answer': "dr",
+              'word': "dragon"
+            },
+            {
+              'blendChoices': ["scr", "pr"],
+              'endingBalloons': ["i", "m", "e"],
+              'answer': "pr",
+              'word': "prime"
+            },
+            {
+              'blendChoices': ["cl", "tr"],
+              'endingBalloons': ["a", "v", "e", "l"],
+              'answer': "tr",
+              'word': "travel"
+            }
+          ]
+        }
+      ]
+    },
+    // A32
+    {
+      'id': 'page-35',
+      'type': 'activity',
+      'activityLabel': 'A32',
+      'title': 'Consonant Blend Band-Aids',
+      'layout': 'matching-connect',
+      'teacherNotes': 'The "broken words" metaphor is engaging. Students repair words by matching the correct blend. Emphasize that the blend must sound natural when combined with the fragment.',
+      'answerKey': 'A32: skunk, wasp, slab, sheep, ugly, fruit',
+      'content': [
+        {
+          'type': 'instruction',
+          'text': "Oh no! These words are broken. Use the right band-aid to fix them."
+        },
+        {
+          'type': 'bandaid-matching',
+          'blends': ["sk", "sl", "fr", "gl", "cr", "sp"],
+          'fragments': [
+            {'partial': "unk", 'answer': "sk", 'word': "skunk"},
+            {'partial': "wa_", 'answer': "sp", 'word': "wasp"},
+            {'partial': "ab", 'answer': "sl", 'word': "slab"},
+            {'partial': "eep", 'answer': "sl", 'word': "sheep"},
+            {'partial': "u_y", 'answer': "gl", 'word': "ugly"},
+            {'partial': "uit", 'answer': "fr", 'word': "fruit"}
+          ]
+        }
+      ]
+    },
+    // A33
+    {
+      'id': 'page-36',
+      'type': 'activity',
+      'activityLabel': 'A33',
+      'title': 'Finish The Word',
+      'layout': 'picture-fill-in',
+      'teacherNotes': 'Students identify the consonant blend needed from the image. Encourage them to say the word aloud first, isolate the first two sounds, then write the blend.',
+      'content': [
+        {
+          'type': 'instruction',
+          'text': "Fill in the consonant blend."
+        },
+        {
+          'type': 'picture-blend-fill',
+          'columns': 3,
+          'entries': [
+            {'imageId': "gloves", 'partial': "__ove", 'answer': "gl", 'word': "glove"},
+            {'imageId': "sled", 'partial': "__ed", 'answer': "sl", 'word': "sled"},
+            {'imageId': "clam2", 'partial': "__am", 'answer': "cl", 'word': "clam"},
+            {'imageId': "table", 'partial': "ta__e", 'answer': "bl", 'word': "table"},
+            {'imageId': "brain", 'partial': "__ain", 'answer': "br", 'word': "brain"},
+            {'imageId': "agree", 'partial': "a__ee", 'answer': "gr", 'word': "agree"},
+            {'imageId': "flower2", 'partial': "__ower", 'answer': "fl", 'word': "flower"},
+            {'imageId': "snail", 'partial': "__ail", 'answer': "sn", 'word': "snail"},
+            {'imageId': "sparkle", 'partial': "__inkle", 'answer': "tw", 'word': "twinkle"}
+          ]
+        }
+      ]
+    },
+    // A34
+    {
+      'id': 'page-37',
+      'type': 'activity',
+      'activityLabel': 'A34',
+      'title': 'Defining Diphthongs',
+      'layout': 'lesson-with-examples',
+      'teacherNotes': 'Diphthongs are vowel glides — your mouth moves from one position to another within one syllable. Key diphthongs: oi/oy, ou/ow, oo (two sounds), aw/au, ew.',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "Sometimes, two vowels next to each other work together to make a diphthong. A diphthong is just one syllable! It starts with one vowel sound, and moves into another.",
+            'Look at the word "boy." The sound made by "oy" starts as a long /o/ sound, but moves into a long /ee/ sound. Say the words "boy" and "join" aloud, and hear the same sound! Those are examples of the same diphthong spelled two different ways, "oy" and "oi."',
+            "Read through the examples below aloud, and try to identify which short and long vowels are being voiced in each underlined diphthong, even when spelled differently."
+          ]
+        },
+        {
+          'type': 'sentence-table',
+          'rows': [
+            {
+              'text': "The author wrote a book on law.",
+              'imageId': "book2",
+              'diphthongs': ["aw", "oo"]
+            },
+            {
+              'text': "The cow makes a loud moo.",
+              'imageId': "cow",
+              'diphthongs': ["ow", "oo"]
+            },
+            {
+              'text': "Now we can go to my house.",
+              'imageId': "house2",
+              'diphthongs': ["ow", "ou"]
+            }
+          ]
+        },
+        {
+          'type': 'rule-box',
+          'text': 'Speaking of moos, the diphthong "oo" can make two different sounds out of the same spelling! Read the sentence aloud and notice the difference between the sounds.'
+        },
+        {
+          'type': 'example-sentence',
+          'text': "I put my foot into the boot.",
+          'imageId': "boot"
+        }
+      ]
+    },
+    // A35
+    {
+      'id': 'page-38',
+      'type': 'activity',
+      'activityLabel': 'A35',
+      'title': 'Diphthong Tracing',
+      'layout': 'tracing-table',
+      'teacherNotes': 'Students trace each diphthong to reinforce the spelling pattern. Note the aw/au pair (same sound), oi/oy pair (same sound), ou/ow pair (same sound), and oo (single spelling, two sounds).',
+      'content': [
+        {
+          'type': 'instruction',
+          'text': "Trace the diphthongs."
+        },
+        {
+          'type': 'diphthong-trace-table',
+          'columns': 2,
+          'rows': [
+            {'word': "straw", 'diphthong': "aw", 'imageId': "straw"},
+            {'word': "applause", 'diphthong': "au", 'imageId': "applause"},
+            {'word': "stew", 'diphthong': "ew", 'imageId': "stew"},
+            {'word': "kazoo", 'diphthong': "oo", 'imageId': "kazoo"},
+            {'word': "coin", 'diphthong': "oi", 'imageId': "coin"},
+            {'word': "joy", 'diphthong': "oy", 'imageId': "joy"},
+            {'word': "plow", 'diphthong': "ow", 'imageId': "plow"},
+            {'word': "cloud", 'diphthong': "ou", 'imageId': "cloud"}
+          ]
+        }
+      ]
+    }
   ];
 }

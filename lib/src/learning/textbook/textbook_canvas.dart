@@ -42,6 +42,11 @@ import 'components/sentence_find.dart';
 import 'components/circle_choice_grid.dart';
 import 'components/comparison_table_vertical.dart';
 import 'components/star_fill_activity.dart';
+import 'components/blend_example_grid.dart';
+import 'components/balloon_choice_activity.dart';
+import 'components/matching_connect_activity.dart';
+import 'components/sentence_table.dart';
+import 'components/diphthong_trace_table.dart';
 import 'utils/responsive_helper.dart';
 
 class TextbookCanvas extends StatefulWidget {
@@ -160,6 +165,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     }
     if (page['layout'] == 'circle-and-fill') {
       return 'Say the word out loud. Does it start like a snake /sh/ or a train /ch/?';
+    }
+    if (page['layout'] == 'reference-trace-grid') {
+      return 'Trace the letters that make the blend!';
+    }
+    if (page['layout'] == 'identify-sort' || page['layout'] == 'y-is-a-thief-sort') {
+      return 'Say the word slowly. Can you hear the sound?';
     }
     if (page['layout'] == 'sentence-find' || page['layout'] == 'lesson-with-find-activity') {
       return 'Look for letters working together! Remember, some sounds need 2 or 3 letters.';
@@ -863,29 +874,60 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         ],
       );
     } else if (page['layout'] == 'identify-sort') {
-      return Column(
-        children: [
-          const TextBlock(
-            text: "Sometimes, the letter Y is a consonant. Other times, it's a vowel and it can have two vowel sounds!",
-            type: TextType.rule,
-          ),
-          const SizedBox(height: 32),
-          const Expanded(
-            child: IdentifySort(
-              items: [
-                {'word': 'yes', 'emoji': '👍', 'answer': 'consonant'},
-                {'word': 'baby', 'emoji': '👶', 'answer': 'vowel'},
-                {'word': 'lawyer', 'emoji': '⚖️', 'answer': 'vowel'},
-                {'word': 'yellow', 'emoji': '☀️', 'answer': 'consonant'},
-                {'word': 'bicycle', 'emoji': '🚲', 'answer': 'vowel'},
-                {'word': 'happy', 'emoji': '😄', 'answer': 'vowel'},
-                {'word': 'monkey', 'emoji': '🐒', 'answer': 'vowel'},
-                {'word': 'year', 'emoji': '🗓️', 'answer': 'consonant'},
-              ],
+      if (page['activityLabel'] == 'A12') {
+        return Column(
+          children: [
+            const TextBlock(
+              text: "Sometimes, the letter Y is a consonant. Other times, it's a vowel and it can have two vowel sounds!",
+              type: TextType.rule,
             ),
-          ),
-        ],
-      );
+            const SizedBox(height: 32),
+            const Expanded(
+              child: IdentifySort(
+                items: [
+                  {'word': 'yes', 'emoji': '👍', 'answer': 'consonant'},
+                  {'word': 'baby', 'emoji': '👶', 'answer': 'vowel'},
+                  {'word': 'lawyer', 'emoji': '⚖️', 'answer': 'vowel'},
+                  {'word': 'yellow', 'emoji': '☀️', 'answer': 'consonant'},
+                  {'word': 'bicycle', 'emoji': '🚲', 'answer': 'vowel'},
+                  {'word': 'happy', 'emoji': '😄', 'answer': 'vowel'},
+                  {'word': 'monkey', 'emoji': '🐒', 'answer': 'vowel'},
+                  {'word': 'year', 'emoji': '🗓️', 'answer': 'consonant'},
+                ],
+              ),
+            ),
+          ],
+        );
+      } else {
+        // A30 dynamic rendering
+        final content = List<Map<String, dynamic>>.from(page['content'] ?? []);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: content.map((block) {
+            if (block['type'] == 'instruction') {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: TextBlock(
+                  text: block['text'] as String,
+                  type: TextType.instruction,
+                ),
+              );
+            }
+            if (block['type'] == 'identify-grid') {
+              return Expanded(
+                child: IdentifySort(
+                  items: List<Map<String, dynamic>>.from(block['entries']),
+                  useVectorGraphic: true,
+                  highlightKey: 'underlined',
+                  leftChoice: 'blend',
+                  rightChoice: 'digraph',
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }).toList(),
+        );
+      }
     } else if (page['layout'] == 'y-is-a-thief-sort') {
       return Column(
         children: [
@@ -1417,9 +1459,84 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
         ],
       );
-    } else if (page['layout'] == 'circle-and-fill') {
+    } else if (page['layout'] == 'reference-trace-grid') {
+      final content = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: content.map((block) {
+          if (block['type'] == 'instruction') {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: TextBlock(
+                text: block['text'] as String,
+                type: TextType.instruction,
+              ),
+            );
+          }
+          if (block['type'] == 'blend-example-grid') {
+            return Expanded(
+              child: SingleChildScrollView(
+                child: BlendExampleGrid(
+                  entries: List<Map<String, dynamic>>.from(block['entries']),
+                  columns: block['columns'] as int? ?? 4,
+                ),
+              ),
+            );
+          }
+          return null;
+        }).where((w) => w != null).cast<Widget>().toList(),
+      );
+    } else if (page['layout'] == 'balloon-choice') {
+      final content = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: content.map((block) {
+          if (block['type'] == 'instruction') {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: TextBlock(
+                text: block['text'] as String,
+                type: TextType.instruction,
+              ),
+            );
+          }
+          if (block['type'] == 'balloon-activity') {
+            return Expanded(
+              child: BalloonChoiceActivity(
+                rows: block['rows'] as List<dynamic>,
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        }).toList(),
+      );
+    } else if (page['layout'] == 'matching-connect') {
+      final content = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: content.map((block) {
+          if (block['type'] == 'instruction') {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: TextBlock(
+                text: block['text'] as String,
+                type: TextType.instruction,
+              ),
+            );
+          }
+          if (block['type'] == 'bandaid-matching') {
+            return Expanded(
+              child: MatchingConnectActivity(
+                leftItems: List<String>.from(block['blends']),
+                rightItems: List<Map<String, dynamic>>.from(block['fragments']),
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        }).toList(),
+      );
+    } else if (page['layout'] == 'lesson-with-examples') {
       final contentList = page['content'] as List<dynamic>? ?? [];
-
       return Column(
         children: [
           Expanded(
@@ -1434,6 +1551,72 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                         TextBlock(text: para, type: TextType.rule),
                         const SizedBox(height: 16),
                       ],
+                    if (block['type'] == 'sentence-table') ...[
+                      SentenceTable(
+                        rows: List<Map<String, dynamic>>.from(block['rows']),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'rule-box') ...[
+                      TextBlock(text: block['text'] as String, type: TextType.rule),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'example-sentence') ...[
+                      ExampleBox(
+                        imageId: block['imageId'] as String,
+                        text: block['text'] as String,
+                        explanation: null,
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'tracing-table') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'instruction') ...[
+                      TextBlock(text: block['text'], type: TextType.instruction),
+                      const SizedBox(height: 24),
+                    ],
+                    if (block['type'] == 'diphthong-trace-table') ...[
+                      DiphthongTraceTable(
+                        rows: List<Map<String, dynamic>>.from(block['rows']),
+                        columns: block['columns'] ?? 2,
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'circle-and-fill') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
                     if (block['type'] == 'circle-digraph') ...[
                       CircleChoiceGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
@@ -1445,13 +1628,47 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       TextBlock(text: block['text'], type: TextType.instruction),
                       const SizedBox(height: 24),
                     ],
-                    if (block['type'] == 'fill-in-digraph') ...[
+                    if (block['type'] == 'fill-in-digraph' || block['type'] == 'picture-blend-fill') ...[
                       PictureFillInGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
-                        columns: block['columns'] ?? 2,
+                        columns: block['columns'] ?? 3,
                       ),
                       const SizedBox(height: 60),
                     ]
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'fill-in-activity' || page['layout'] == 'picture-fill-in') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'lesson-text')
+                      for (final para in block['paragraphs']) ...[
+                        TextBlock(text: para, type: TextType.rule),
+                        const SizedBox(height: 16),
+                      ],
+                    if (block['type'] == 'fill-in-digraph' || block['type'] == 'picture-blend-fill') ...[
+                      PictureFillInGrid(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                        columns: block['columns'] ?? 3,
+                      ),
+                      const SizedBox(height: 60),
+                    ],
+                    if (block['type'] == 'instruction') ...[
+                      TextBlock(text: block['text'], type: TextType.instruction),
+                      const SizedBox(height: 24),
+                    ],
                   ]
                 ],
               ),
