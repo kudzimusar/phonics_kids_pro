@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class SentenceFind extends StatefulWidget {
   final List<Map<String, dynamic>> sentences;
   final bool numbered;
+  final bool hasDecoration;
 
   const SentenceFind({
     Key? key,
     required this.sentences,
     this.numbered = false,
+    this.hasDecoration = true,
   }) : super(key: key);
 
   @override
@@ -52,25 +54,12 @@ class _SentenceFindState extends State<SentenceFind> {
       itemBuilder: (context, sentenceIndex) {
         final sentenceData = widget.sentences[sentenceIndex];
         final text = sentenceData['text'] as String;
+        final answers = List<String>.from(sentenceData['answers'] ?? []);
         final words = _splitSentenceIntoWords(text);
 
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.blueGrey.shade200, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blueGrey.shade50,
-                offset: const Offset(0, 4),
-                blurRadius: 8,
-              )
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        final childRow = Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               if (widget.numbered || sentenceData.containsKey('number')) ...[
                 Container(
                   width: 48,
@@ -100,6 +89,26 @@ class _SentenceFindState extends State<SentenceFind> {
                     final wordIndex = entry.key;
                     final word = entry.value;
                     final isSelected = _selections[sentenceIndex]!.contains(wordIndex);
+                    
+                    final answers = List<String>.from(sentenceData['answers'] ?? []);
+                    final cleanWord = word.replaceAll(RegExp(r'[^\w\s]'), '').trim();
+                    final isCorrect = answers.any((a) => a.toLowerCase() == cleanWord.toLowerCase());
+
+                    Color bgColor = Colors.transparent;
+                    Color textColor = Colors.black87;
+                    IconData? overlayIcon;
+
+                    if (isSelected) {
+                      if (isCorrect) {
+                        bgColor = Colors.green.shade100;
+                        textColor = Colors.green.shade800;
+                        overlayIcon = Icons.check_circle;
+                      } else {
+                        bgColor = Colors.red.shade100;
+                        textColor = Colors.red.shade800;
+                        overlayIcon = Icons.cancel;
+                      }
+                    }
 
                     return GestureDetector(
                       onTap: () => _toggleWord(sentenceIndex, wordIndex),
@@ -107,20 +116,29 @@ class _SentenceFindState extends State<SentenceFind> {
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.yellow.shade200 : Colors.transparent,
+                          color: bgColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          word,
-                          style: TextStyle(
-                            fontFamily: 'SassoonPrimary',
-                            fontSize: 32,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                            decoration: isSelected ? TextDecoration.underline : TextDecoration.none,
-                            decorationColor: Colors.deepOrange,
-                            decorationThickness: 2,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              word,
+                              style: TextStyle(
+                                fontFamily: 'SassoonPrimary',
+                                fontSize: 32,
+                                fontWeight: FontWeight.w500,
+                                color: textColor,
+                                decoration: isSelected && isCorrect ? TextDecoration.underline : TextDecoration.none,
+                                decorationColor: Colors.green.shade600,
+                                decorationThickness: 2,
+                              ),
+                            ),
+                            if (overlayIcon != null) ...[
+                              const SizedBox(width: 4),
+                              Icon(overlayIcon, color: textColor, size: 24),
+                            ]
+                          ],
                         ),
                       ),
                     );
@@ -128,8 +146,28 @@ class _SentenceFindState extends State<SentenceFind> {
                 ),
               ),
             ],
-          ),
-        );
+          );
+
+        if (widget.hasDecoration) {
+          return Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.blueGrey.shade200, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blueGrey.shade50,
+                  offset: const Offset(0, 4),
+                  blurRadius: 8,
+                )
+              ],
+            ),
+            child: childRow,
+          );
+        } else {
+          return childRow;
+        }
       },
     );
   }

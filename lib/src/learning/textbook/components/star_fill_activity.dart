@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'vector_graphic.dart';
+import 'dart:math';
 import '../utils/responsive_helper.dart';
 
 class StarFillActivity extends StatefulWidget {
@@ -43,63 +43,70 @@ class _StarFillActivityState extends State<StarFillActivity> {
           tablet: 2, 
           desktop: 2
         ),
-        childAspectRatio: ResponsiveHelper.isMobile(context) ? 2.5 : 2.0,
-        crossAxisSpacing: 24,
-        mainAxisSpacing: 24,
+        childAspectRatio: ResponsiveHelper.isMobile(context) ? 2.8 : 2.5,
+        crossAxisSpacing: 32,
+        mainAxisSpacing: 32,
       ),
       itemCount: widget.entries.length,
       itemBuilder: (context, index) {
         final entry = widget.entries[index];
         final partial = entry['partial'] as String;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.amber.shade300, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.amber.shade100,
-                offset: const Offset(0, 4),
-                blurRadius: 8,
-              )
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        return SizedBox(
+          height: 140,
+          child: Stack(
             children: [
-              const VectorGraphic(assetName: 'star', size: 64),
-              const SizedBox(width: 16),
-              Text(
-                partial,
-                style: const TextStyle(
-                  fontFamily: 'FredokaOne',
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: ShootingStarPainter(),
                 ),
               ),
-              const SizedBox(width: 4),
-              SizedBox(
-                width: 80,
-                child: TextField(
-                  controller: _controllers[index],
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'FredokaOne',
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
-                  ),
-                  decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blueGrey.shade300, width: 4),
+              Positioned.fill(
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 140, // Match the star width
+                      child: Center(
+                        child: Text(
+                          partial,
+                          style: const TextStyle(
+                            fontFamily: 'SassoonPrimary',
+                            fontSize: 42,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
                     ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blueAccent, width: 4),
+                    Expanded(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 50.0, left: 10.0, bottom: 20.0), // pad for spikes and fit curve
+                          child: SizedBox(
+                            width: 100,
+                            child: TextField(
+                              controller: _controllers[index],
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontFamily: 'SassoonPrimary',
+                                fontSize: 42,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent,
+                              ),
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.blueGrey.shade300, width: 4),
+                                ),
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.blueAccent, width: 4),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],
@@ -108,4 +115,62 @@ class _StarFillActivityState extends State<StarFillActivity> {
       },
     );
   }
+}
+
+class ShootingStarPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    final borderPaint = Paint()
+      ..color = Colors.black87
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    // Draw tail
+    final tailPath = Path();
+    tailPath.moveTo(70, size.height * 0.25); // start near top of star
+    tailPath.quadraticBezierTo(size.width * 0.5, 0, size.width - 20, 20); // Top curve
+    // Spikes on the right
+    tailPath.lineTo(size.width - 40, size.height * 0.35);
+    tailPath.lineTo(size.width - 10, size.height * 0.5);
+    tailPath.lineTo(size.width - 40, size.height * 0.65);
+    tailPath.lineTo(size.width - 20, size.height - 20);
+    
+    // Bottom curve
+    tailPath.quadraticBezierTo(size.width * 0.5, size.height, 70, size.height * 0.75);
+    tailPath.close();
+
+    canvas.drawPath(tailPath, paint);
+    canvas.drawPath(tailPath, borderPaint);
+
+    // Draw 5-point star
+    final starPath = Path();
+    final double cx = 70;
+    final double cy = size.height / 2;
+    final double outerRadius = 60;
+    final double innerRadius = 26;
+    final int points = 5;
+    final double angle = (pi * 2) / points;
+
+    starPath.moveTo(cx, cy - outerRadius);
+    for (int i = 0; i < points; i++) {
+      starPath.lineTo(cx + cos(_angle(i, angle)) * outerRadius,
+          cy + sin(_angle(i, angle)) * outerRadius);
+      starPath.lineTo(cx + cos(_angle(i, angle) + angle / 2) * innerRadius,
+          cy + sin(_angle(i, angle) + angle / 2) * innerRadius);
+    }
+    starPath.close();
+
+    canvas.drawPath(starPath, paint);
+    canvas.drawPath(starPath, borderPaint);
+  }
+
+  double _angle(int index, double angle) {
+    return -pi / 2 + index * angle;
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

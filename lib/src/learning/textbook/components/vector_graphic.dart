@@ -69,8 +69,8 @@ class _VectorGraphicState extends State<VectorGraphic> with SingleTickerProvider
 
   Widget _buildGraphicContent() {
     // Priority 1: Check for PNG asset in common locations
-    // We'll use a simple name-to-path mapping
-    final String assetPath = 'assets/images/${widget.assetName}.png';
+    // Use lowercased name for case-insensitive matching in the asset bundle
+    final String assetPath = 'assets/images/${widget.assetName.toLowerCase()}.png';
     
     // Note: In a real app we'd use rootBundle to check existence, 
     // but for this prototype we'll assume the existence if named correctly.
@@ -165,6 +165,7 @@ class _VectorGraphicState extends State<VectorGraphic> with SingleTickerProvider
     if (lowerName.contains('sun')) return '☀️';
     if (lowerName.contains('hat')) return '🎩';
     if (lowerName.contains('log')) return '🪵';
+    if (lowerName.contains('mouth') || lowerName.contains('lip')) return '👄';
     if (lowerName.contains('green')) return '🟩';
     
     return '🌟'; // Default generic icon fallback

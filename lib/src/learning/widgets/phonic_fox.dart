@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rive/rive.dart';
 
 enum FoxExpression { idle, cheer, wrong }
 
@@ -19,10 +18,9 @@ class _PhonicFoxWidgetState extends State<PhonicFoxWidget>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   
-  // Rive State Machine components
-  SMITrigger? _successTrigger;
-  SMITrigger? _failTrigger;
-  Artboard? _riveArtboard;
+  // Rive State Machine components disabled due to package conflict
+  final dynamic _successTrigger = null;
+  final dynamic _failTrigger = null;
 
   @override
   void initState() {
@@ -37,28 +35,12 @@ class _PhonicFoxWidgetState extends State<PhonicFoxWidget>
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
-  void _onRiveInit(Artboard artboard) {
-    final controller = StateMachineController.fromArtboard(artboard, 'Fox State Machine');
-    if (controller != null) {
-      artboard.addController(controller);
-      _successTrigger = controller.findSMI('success_trigger');
-      _failTrigger = controller.findSMI('fail_trigger');
-    }
-  }
-
   @override
   void didUpdateWidget(covariant PhonicFoxWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.expression != oldWidget.expression &&
         widget.expression != FoxExpression.idle) {
       _controller.forward(from: 0.0);
-      
-      // Trigger Rive animation
-      if (widget.expression == FoxExpression.cheer) {
-        _successTrigger?.fire();
-      } else if (widget.expression == FoxExpression.wrong) {
-        _failTrigger?.fire();
-      }
     }
   }
 
@@ -141,22 +123,12 @@ class _PhonicFoxWidgetState extends State<PhonicFoxWidget>
                 )
               ],
             ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Fallback Icon (Visible until Rive loads or if file missing)
-                Icon(
-                  _icon,
-                  size: 80,
-                  color: _iconColor,
-                ),
-                // Rive Animation Layer
-                RiveAnimation.asset(
-                  'assets/rive/phonic_fox.riv',
-                  fit: BoxFit.contain,
-                  onInit: _onRiveInit,
-                ),
-              ],
+            child: Center(
+              child: Icon(
+                _icon,
+                size: 80,
+                color: _iconColor,
+              ),
             ),
           ),
         ],

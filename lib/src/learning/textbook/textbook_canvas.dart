@@ -158,6 +158,18 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     if (page['layout'] == 'fill-in-list') {
       return 'Use the picture to help you guess the missing sounds.';
     }
+    if (page['layout'] == 'circle-and-fill') {
+      return 'Say the word out loud. Does it start like a snake /sh/ or a train /ch/?';
+    }
+    if (page['layout'] == 'sentence-find' || page['layout'] == 'lesson-with-find-activity') {
+      return 'Look for letters working together! Remember, some sounds need 2 or 3 letters.';
+    }
+    if (page['layout'] == 'fill-in-star') {
+      return 'Use the letters from the word bank to finish the shooting stars!';
+    }
+    if (page['layout'] == 'lesson-with-spot') {
+      return 'Remember, in a consonant blend, you can hear BOTH consonant sounds!';
+    }
     return 'Try matching the first letter of the picture!';
   }
 
@@ -185,11 +197,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                image: _currentPageIndex == 15 // A15 check for pilot
+                image: (currentPage['activityLabel']?.toString().contains('A15') ?? false)
                   ? const DecorationImage(
                       image: AssetImage('assets/images/nursery_wall_texture.png'),
                       fit: BoxFit.cover,
-                      opacity: 0.3,
+                      opacity: 0.5,
                     )
                   : null,
               ),
@@ -1464,6 +1476,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                         imageId: block['imageId'] as String,
                         text: block['text'] as String,
                         explanation: block['note'] as String?,
+                        answers: block.containsKey('answers') ? List<String>.from(block['answers']) : null,
                       ),
                       const SizedBox(height: 32),
                     ],

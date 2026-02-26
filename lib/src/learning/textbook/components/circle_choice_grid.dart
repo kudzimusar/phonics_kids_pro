@@ -79,6 +79,27 @@ class _CircleChoiceGridState extends State<CircleChoiceGrid> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: choices.map((choice) {
                     final isSelected = choice == selectedChoice;
+                    final isCorrect = choice == entry['answer'];
+                    
+                    Color bgColor = Colors.blueGrey.shade50;
+                    Color borderColor = Colors.blueGrey.shade200;
+                    Color textColor = Colors.blueGrey.shade800;
+                    IconData? overlayIcon;
+                    
+                    if (isSelected) {
+                      if (isCorrect) {
+                        bgColor = Colors.green.shade400;
+                        borderColor = Colors.green.shade600;
+                        textColor = Colors.white;
+                        overlayIcon = Icons.check_circle;
+                      } else {
+                        bgColor = Colors.red.shade400;
+                        borderColor = Colors.red.shade600;
+                        textColor = Colors.white;
+                        overlayIcon = Icons.cancel;
+                      }
+                    }
+
                     return GestureDetector(
                       onTap: () => _selectChoice(index, choice),
                       child: AnimatedContainer(
@@ -86,24 +107,40 @@ class _CircleChoiceGridState extends State<CircleChoiceGrid> {
                         width: 64,
                         height: 64,
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.green.shade400 : Colors.blueGrey.shade50,
+                          color: bgColor,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isSelected ? Colors.green.shade600 : Colors.blueGrey.shade200,
+                            color: borderColor,
                             width: 3,
                           ),
                           boxShadow: isSelected
-                              ? [BoxShadow(color: Colors.green.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))]
+                              ? [BoxShadow(color: bgColor.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))]
                               : [],
                         ),
                         alignment: Alignment.center,
-                        child: Text(
-                          choice,
-                          style: TextStyle(
-                            fontFamily: 'FredokaOne',
-                            fontSize: 28,
-                            color: isSelected ? Colors.white : Colors.blueGrey.shade800,
-                          ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Text(
+                              choice,
+                              style: TextStyle(
+                                fontFamily: 'FredokaOne',
+                                fontSize: 28,
+                                color: textColor,
+                              ),
+                            ),
+                            if (overlayIcon != null)
+                              Positioned(
+                                right: -4,
+                                top: -4,
+                                child: Icon(
+                                  overlayIcon,
+                                  color: Colors.white,
+                                  size: 24,
+                                  shadows: const [Shadow(color: Colors.black26, blurRadius: 4)],
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     );

@@ -87,21 +87,34 @@ class TrigraphExamples extends StatelessWidget {
                   child: VectorGraphic(assetName: imageId, size: 90),
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontFamily: 'SassoonPrimary',
-                        fontSize: 36,
-                        fontWeight: FontWeight.w600,
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontFamily: 'SassoonPrimary',
+                            fontSize: 36,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          children: _buildHighlightedWord(word, trigraph),
+                        ),
                       ),
-                      children: _buildHighlightedWord(word, trigraph),
-                    ),
+                      const SizedBox(width: 16),
+                      Text(
+                        trigraph,
+                        style: const TextStyle(
+                          fontFamily: 'SassoonPrimary',
+                          fontSize: 36,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black26, // Tracing style simulation
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
             ],
           ),
         );

@@ -512,7 +512,7 @@ class TextbookDatabase {
       'title': 'Sh Or Ch?',
       'layout': 'circle-and-fill',
       'teacherNotes': 'Sh vs Ch: /sh/ is a hissing sound (snake), /ch/ is a choo-choo sound. Have students feel the difference in their mouth. Both are common digraphs in English.',
-      'answerKey': 'A24: sheep=sh, cheese=ch, cherry=ch, shark=sh // chalk, shell, chair, ships',
+      'answerKey': 'A24: sheep=sh, cheese=ch, cherry=ch, fish=sh // chalk, shell, chair, ships',
       'content': [
         {
           'type': 'lesson-text',
@@ -526,7 +526,7 @@ class TextbookDatabase {
             {'imageId': "sheep", 'choices': ["sh", "ch"], 'answer': "sh", 'word': "sheep"},
             {'imageId': "cheese", 'choices': ["sh", "ch"], 'answer': "ch", 'word': "cheese"},
             {'imageId': "cherries", 'choices': ["sh", "ch"], 'answer': "ch", 'word': "cherry"},
-            {'imageId': "shark", 'choices': ["sh", "ch"], 'answer': "sh", 'word': "shark"}
+            {'imageId': "fish", 'choices': ["sh", "ch"], 'answer': "sh", 'word': "fish"}
           ]
         },
         {
@@ -594,7 +594,8 @@ class TextbookDatabase {
           'type': 'example-box',
           'imageId': 'ship',
           'text': "On a ship, you can knit warm sweaters, watch for whales, or use a knife to carve wood.",
-          'note': "Underlined: ship, knit, sweaters, watch, whales, knife, wood"
+          'note': "Underlined: ship, knit, sweaters, watch, whales, knife, wood",
+          'answers': ["ship", "knit", "sweaters", "watch", "whales", "knife", "wood"]
         },
         {
           'type': 'sentence-find-numbered',
@@ -644,13 +645,26 @@ class TextbookDatabase {
         {
           'type': 'lesson-text',
           'paragraphs': [
-            "We learned that in digraphs, multiple letters work together to make one sound. Consonant blends are different! They are a group of letters that work together, but each letter keeps its own sound."
+            "In a consonant blend, multiple consonants work together to form part of a word.",
+            "We've already learned about digraphs, like 'sh' and 'th,' which can bring multiple consonants together to make one sound.",
+            "A consonant blend is different because each letter makes its own sound.",
+            "Read the words below out loud, a few times so you can hear the difference.",
+            "In chew there are only two sounds, /ch/ and /oo/, because it is made up of digraphs! Repeat the word and see how 'c' and 'h' become 'ch'.",
+            "In flew there are three sounds, /f/, /l/, and /oo/! 'Ew' is still a digraph, but 'f' and 'l' each make their own sounds. This is how you can tell it is a consonant blend."
           ]
         },
         {
-          'type': 'example-box',
-          'imageId': 'blend', // We can use stop sign
-          'text': "Say the word stop. You can hear the s sound and the t sound. That’s a consonant blend!"
+          'type': 'instruction',
+          'text': "Spot The Blends"
+        },
+        {
+          'type': 'sentence-find-numbered',
+          'sentences': [
+            {'number': 0, 'imageId': 'bubbles', 'text': "I can get clean.", 'answers': ["clean"]},
+            {'number': 1, 'imageId': 'scarf', 'text': "Today I wore a scarf and a shirt with stripes.", 'answers': ["scarf", "stripes"]},
+            {'number': 2, 'imageId': 'frog', 'text': "I love frogs, but not snakes.", 'answers': ["frogs", "snakes"]},
+            {'number': 3, 'imageId': 'slide', 'text': "I like to play! I slide, climb trees, and splash around.", 'answers': ["play", "slide", "climb", "trees", "splash"]}
+          ]
         }
       ]
     },

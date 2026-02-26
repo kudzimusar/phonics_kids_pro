@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'vector_graphic.dart';
 import 'text_block.dart';
+import 'sentence_find.dart';
 
 class ExampleBox extends StatelessWidget {
   final String imageId;
   final String text;
   final String? explanation;
+  final List<String>? answers;
 
   const ExampleBox({
     Key? key,
     required this.imageId,
     required this.text,
     this.explanation,
+    this.answers,
   }) : super(key: key);
 
   @override
@@ -39,11 +42,17 @@ class ExampleBox extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextBlock(
-                  text: text,
-                  type: TextType.instruction,
-                  color: Colors.amber.shade900,
-                ),
+                if (answers != null && answers!.isNotEmpty)
+                  SentenceFind(
+                    sentences: [{'text': text, 'answers': answers}],
+                    hasDecoration: false,
+                  )
+                else
+                  TextBlock(
+                    text: text,
+                    type: TextType.instruction,
+                    color: Colors.amber.shade900,
+                  ),
                 if (explanation != null) ...[
                   const SizedBox(height: 12),
                   TextBlock(
