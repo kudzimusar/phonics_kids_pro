@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:rive/rive.dart';
 
 enum FoxExpression { idle, cheer, wrong }
 
 /// PhonicFoxWidget - the mascot character sitting in the bottom-right corner.
 /// Reacts to pronunciation results with animated transitions.
-/// When a Rive `.riv` file is available, the Icon block can be replaced with RiveAnimation.asset().
 class PhonicFoxWidget extends StatefulWidget {
   final FoxExpression expression;
 
@@ -18,6 +18,11 @@ class _PhonicFoxWidgetState extends State<PhonicFoxWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  
+  // Rive State Machine components
+  SMITrigger? _successTrigger;
+  SMITrigger? _failTrigger;
+  Artboard? _riveArtboard;
 
   @override
   void initState() {
@@ -32,12 +37,28 @@ class _PhonicFoxWidgetState extends State<PhonicFoxWidget>
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
+  void _onRiveInit(Artboard artboard) {
+    final controller = StateMachineController.fromArtboard(artboard, 'Fox State Machine');
+    if (controller != null) {
+      artboard.addController(controller);
+      _successTrigger = controller.findSMI('success_trigger');
+      _failTrigger = controller.findSMI('fail_trigger');
+    }
+  }
+
   @override
   void didUpdateWidget(covariant PhonicFoxWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.expression != oldWidget.expression &&
         widget.expression != FoxExpression.idle) {
       _controller.forward(from: 0.0);
+      
+      // Trigger Rive animation
+      if (widget.expression == FoxExpression.cheer) {
+        _successTrigger?.fire();
+      } else if (widget.expression == FoxExpression.wrong) {
+        _failTrigger?.fire();
+      }
     }
   }
 
@@ -106,25 +127,37 @@ class _PhonicFoxWidgetState extends State<PhonicFoxWidget>
               ),
             ),
           Container(
-            width: 120,
-            height: 120,
+            width: 140,
+            height: 140,
             decoration: BoxDecoration(
               color: _iconColor.withOpacity(0.1),
               shape: BoxShape.circle,
               border: Border.all(color: _iconColor.withOpacity(0.3), width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: _iconColor.withOpacity(0.2),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                )
+              ],
             ),
-            child: Icon(
-              _icon,
-              size: 72,
-              color: _iconColor,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Fallback Icon (Visible until Rive loads or if file missing)
+                Icon(
+                  _icon,
+                  size: 80,
+                  color: _iconColor,
+                ),
+                // Rive Animation Layer
+                RiveAnimation.asset(
+                  'assets/rive/phonic_fox.riv',
+                  fit: BoxFit.contain,
+                  onInit: _onRiveInit,
+                ),
+              ],
             ),
-            // ── FUTURE Rive swap ──────────────────────────────────────────
-            // child: RiveAnimation.asset(
-            //   'assets/rive/phonic_fox.riv',
-            //   fit: BoxFit.cover,
-            //   stateMachines: const ['Fox State Machine'],
-            // ),
-            // ─────────────────────────────────────────────────────────────
           ),
         ],
       ),

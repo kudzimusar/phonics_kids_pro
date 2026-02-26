@@ -48,25 +48,52 @@ class _VectorGraphicState extends State<VectorGraphic> with SingleTickerProvider
             width: widget.size,
             height: widget.size,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.white.withOpacity(0.9),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.indigo.shade100, width: 2),
+              border: Border.all(color: Colors.white, width: 2.5),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.indigo.shade200.withOpacity(0.5),
-                  offset: const Offset(0, 6),
-                  blurRadius: 12,
+                  color: Colors.black.withOpacity(0.1),
+                  offset: const Offset(0, 8),
+                  blurRadius: 15,
                 ),
               ],
             ),
             alignment: Alignment.center,
-            child: Text(
-              _getEmojiForAsset(widget.assetName),
-              style: TextStyle(fontSize: widget.size * 0.55),
-            ),
+            child: _buildGraphicContent(),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildGraphicContent() {
+    // Priority 1: Check for PNG asset in common locations
+    // We'll use a simple name-to-path mapping
+    final String assetPath = 'assets/images/${widget.assetName}.png';
+    
+    // Note: In a real app we'd use rootBundle to check existence, 
+    // but for this prototype we'll assume the existence if named correctly.
+    // For now, we fallback to emoji if we can't find it.
+    
+    return ClipOval(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Text(
+            _getEmojiForAsset(widget.assetName),
+            style: TextStyle(fontSize: widget.size * 0.55),
+          ),
+          // Attempt to load image overlay
+          Image.asset(
+            assetPath,
+            width: widget.size * 0.8,
+            height: widget.size * 0.8,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+          ),
+        ],
+      ),
     );
   }
 

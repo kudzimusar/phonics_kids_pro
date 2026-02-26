@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'vector_graphic.dart';
+import 'squash_stretch.dart';
 
 class TrainFillIn extends StatefulWidget {
   final List<Map<String, dynamic>> trains;
-  /* Example train:
-    {
-      'imageDesc': 'Sun',
-      'imageId': 'img-sun',
-      'letters': ['S', '?', 'N'],
-      'answer': 'u',
-      'word': 'sun'
-    }
-  */
+  final VoidCallback? onComplete;
 
-  const TrainFillIn({Key? key, required this.trains}) : super(key: key);
+  const TrainFillIn({Key? key, required this.trains, this.onComplete}) : super(key: key);
 
   @override
   State<TrainFillIn> createState() => _TrainFillInState();
@@ -72,19 +65,24 @@ class _TrainFillInState extends State<TrainFillIn> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      _buildTrainEngine(letters[0]),
+                      SquashStretch(child: _buildTrainEngine(letters[0])),
                       _buildTrainConnector(),
-                      _buildTrainCar(
-                        isVowel: true, 
-                        currentAnswer: _answers[index],
-                        onChanged: (val) {
-                          setState(() {
-                            _answers[index] = val;
-                          });
-                        },
+                      SquashStretch(
+                        child: _buildTrainCar(
+                          isVowel: true, 
+                          currentAnswer: _answers[index],
+                          onChanged: (val) {
+                            setState(() {
+                              _answers[index] = val;
+                            });
+                            if (val.toLowerCase() == train['answer'].toString().toLowerCase()) {
+                              widget.onComplete?.call();
+                            }
+                          },
+                        ),
                       ),
                       _buildTrainConnector(),
-                      _buildTrainCaboose(letters[2]),
+                      SquashStretch(child: _buildTrainCaboose(letters[2])),
                     ],
                   ),
                 ],

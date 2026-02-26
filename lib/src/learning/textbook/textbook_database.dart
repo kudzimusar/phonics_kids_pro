@@ -396,5 +396,263 @@ class TextbookDatabase {
         }
       ]
     },
+    // A21
+    {
+      'id': 'page-24',
+      'type': 'activity',
+      'activityLabel': 'A21',
+      'title': 'Defining Digraphs',
+      'layout': 'lesson-reference',
+      'teacherNotes': 'Key digraphs to know: consonant digraphs (sh, ch, th, wh, ph, gh, kn, wr, ng) and vowel digraphs (ai, ee, oo, ea, oa, oi, ue). Each makes ONE sound.',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "A digraph is a group of multiple letters that work together to make one single sound! The letters can be consonants or vowels. Trace some examples.",
+          ],
+        },
+        {
+          'type': 'digraph-example-grid',
+          'entries': [
+            {'word': 'Wheel', 'digraph': 'wh', 'imageId': 'wheel'},
+            {'word': 'Photo', 'digraph': 'ph', 'imageId': 'photo'},
+            {'word': 'Shell', 'digraph': 'sh', 'imageId': 'shell'},
+            {'word': 'Cheese', 'digraph': 'ch', 'imageId': 'cheese'},
+            {'word': 'Path', 'digraph': 'th', 'imageId': 'path'},
+            {'word': 'Ghost', 'digraph': 'gh', 'imageId': 'ghost'},
+            {'word': 'Knight', 'digraph': 'kn', 'imageId': 'knight'},
+            {'word': 'Wing', 'digraph': 'ng', 'imageId': 'wing'},
+            {'word': 'Write', 'digraph': 'wr', 'imageId': 'write'},
+            {'word': 'Nail', 'digraph': 'ai', 'imageId': 'nail'},
+            {'word': 'Feet', 'digraph': 'ee', 'imageId': 'feet'},
+            {'word': 'Glue', 'digraph': 'ue', 'imageId': 'glue'},
+            {'word': 'Book', 'digraph': 'oo', 'imageId': 'book'},
+            {'word': 'Leaf', 'digraph': 'ea', 'imageId': 'leaf'},
+            {'word': 'Soap', 'digraph': 'oa', 'imageId': 'soap'},
+            {'word': 'Coins', 'digraph': 'oi', 'imageId': 'coins'},
+          ]
+        }
+      ]
+    },
+    // A22
+    {
+      'id': 'page-25',
+      'type': 'activity',
+      'activityLabel': 'A22',
+      'title': 'Spot A Digraph',
+      'layout': 'identify-underline',
+      'teacherNotes': 'Students identify digraphs within words. Chick has TWO digraphs: ch and ck. Practice finding digraphs at beginning, middle, and end of words.',
+      'answerKey': 'A22: bath, cash, beach, pick',
+      'content': [
+        {
+          'type': 'example-box',
+          'imageId': 'chick',
+          'text': "There are two digraphs in chick!",
+          'explanation': "The c and h come together to make one /ch/ sound, while the c and k combine to make a /k/ sound."
+        },
+        {
+          'type': 'instruction',
+          'text': "Which of these words has a digraph in it? Underline the digraph."
+        },
+        {
+          'type': 'word-list-activity',
+          'sets': [
+            {'words': ["try", "sad", "met", "bath", "core"], 'answers': ["bath"]},
+            {'words': ["cash", "man", "lid", "bun", "rods"], 'answers': ["cash"]},
+            {'words': ["harp", "beach", "fly", "make", "bar"], 'answers': ["beach"]},
+            {'words': ["color", "baby", "tip", "ways", "pick"], 'answers': ["pick"]}
+          ]
+        }
+      ]
+    },
+    // A23
+    {
+      'id': 'page-26',
+      'type': 'activity',
+      'activityLabel': 'A23',
+      'title': 'Trigraphs',
+      'layout': 'lesson-with-find-activity',
+      'teacherNotes': 'Trigraphs: tch (catch, match, watch), igh (light, bright, night), dge (bridge, fridge, edge), eau (beauty, bureau). These three-letter combinations make ONE sound.',
+      'answerKey': 'A23: bright, high, bureau, fridge, match, beautiful',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "Sometimes, three letters make one sound. These are a bit harder to use and not as common as digraphs. Say each word out loud, and notice how the trigraph makes just one sound."
+          ]
+        },
+        {
+          'type': 'trigraph-examples',
+          'entries': [
+            {'word': "Watch", 'trigraph': "tch", 'imageId': "watch"},
+            {'word': "Beauty", 'trigraph': "eau", 'imageId': "beauty"},
+            {'word': "Light", 'trigraph': "igh", 'imageId': "light"},
+            {'word': "Bridge", 'trigraph': "dge", 'imageId': "bridge"}
+          ]
+        },
+        {
+          'type': 'instruction',
+          'text': "Find the Trigraphs"
+        },
+        {
+          'type': 'sentence-find',
+          'sentences': [
+            {'text': "The sun is bright when it is high in the sky.", 'answers': ["bright", "high"]},
+            {'text': "I put my clothes back in the bureau and my food back in the fridge.", 'answers': ["bureau", "fridge"]},
+            {'text': "Today we match, and we look beautiful.", 'answers': ["match", "beautiful"]}
+          ]
+        }
+      ]
+    },
+    // A24
+    {
+      'id': 'page-27',
+      'type': 'activity',
+      'activityLabel': 'A24',
+      'title': 'Sh Or Ch?',
+      'layout': 'circle-and-fill',
+      'teacherNotes': 'Sh vs Ch: /sh/ is a hissing sound (snake), /ch/ is a choo-choo sound. Have students feel the difference in their mouth. Both are common digraphs in English.',
+      'answerKey': 'A24: sheep=sh, cheese=ch, cherry=ch, shark=sh // chalk, shell, chair, ships',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "The digraphs sh and ch sound similar. For each image, say its name and circle the correct digraph."
+          ]
+        },
+        {
+          'type': 'circle-digraph',
+          'entries': [
+            {'imageId': "sheep", 'choices': ["sh", "ch"], 'answer': "sh", 'word': "sheep"},
+            {'imageId': "cheese", 'choices': ["sh", "ch"], 'answer': "ch", 'word': "cheese"},
+            {'imageId': "cherries", 'choices': ["sh", "ch"], 'answer': "ch", 'word': "cherry"},
+            {'imageId': "shark", 'choices': ["sh", "ch"], 'answer': "sh", 'word': "shark"}
+          ]
+        },
+        {
+          'type': 'instruction',
+          'text': "Write in 'sh' or 'ch' to finish each word!"
+        },
+        {
+          'type': 'fill-in-digraph',
+          'entries': [
+            {'imageId': "chalk", 'partial': "__alk", 'answer': "ch", 'word': "chalk"},
+            {'imageId': "shell", 'partial': "__ell", 'answer': "sh", 'word': "shell"},
+            {'imageId': "chair", 'partial': "__air", 'answer': "ch", 'word': "chair"},
+            {'imageId': "ship", 'partial': "__ips", 'answer': "sh", 'word': "ships"}
+          ]
+        }
+      ]
+    },
+    // A25
+    {
+      'id': 'page-28',
+      'type': 'activity',
+      'activityLabel': 'A25',
+      'title': 'The Two Th Sounds',
+      'layout': 'lesson-with-sort',
+      'teacherNotes': 'Hard TH (voiced): they, the, this, that, there, father, mother. Soft TH (unvoiced): bath, math, moth, path, thorn, birthday. Put hand on throat — voiced TH vibrates.',
+      'answerKey': 'A25 Hard th: they, father, this, there | Soft th: bath, math, thorn, birthday',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "The digraph 'th' makes two sounds, one hard and one soft. See if you can tell them apart!"
+          ]
+        },
+        {
+          'type': 'comparison-table-vertical',
+          'rows': [
+            {'label': "Hard Th Sound", 'example': "Mother", 'imageId': "mother", 'explanation': "Voiced /th/ — tongue between teeth, voice on"},
+            {'label': "Soft Th Sound", 'example': "Moth", 'imageId': "moth", 'explanation': "Unvoiced /th/ — tongue between teeth, voice off"}
+          ]
+        },
+        {
+          'type': 'instruction',
+          'text': "Sort These Words:"
+        },
+        {
+          'type': 'two-column-sort',
+          'leftLabel': 'Hard Th',
+          'rightLabel': 'Soft Th',
+          'options': ["bath", "they", "father", "math", "thorn", "this", "birthday", "there"]
+        }
+      ]
+    },
+    // A26
+    {
+      'id': 'page-29',
+      'type': 'activity',
+      'activityLabel': 'A26',
+      'title': 'Find The Clusters!',
+      'subtitle': "Read these sentences and circle or underline all the digraphs and trigraphs.",
+      'layout': 'sentence-find',
+      'teacherNotes': 'Real sentences help students see digraphs in context. This bridges from isolated practice to reading. Circle all instances — some sentences have multiple digraphs.',
+      'answerKey': 'A26: birthday(th), month(th) | eight(igh) | There(th), chocolate(ch), cherries(ch)',
+      'content': [
+        {
+          'type': 'example-box',
+          'imageId': 'ship',
+          'text': "On a ship, you can knit warm sweaters, watch for whales, or use a knife to carve wood.",
+          'note': "Underlined: ship, knit, sweaters, watch, whales, knife, wood"
+        },
+        {
+          'type': 'sentence-find-numbered',
+          'sentences': [
+            {'number': 1, 'imageId': 'calendar', 'text': "My birthday is in a month!", 'answers': ["birthday", "month"]},
+            {'number': 2, 'imageId': 'cake', 'text': "I am going to be eight.", 'answers': ["eight"]},
+            {'number': 3, 'imageId': 'ice_cream', 'text': "There will be chocolate ice cream with cherries.", 'answers': ["There", "chocolate", "cherries"]}
+          ]
+        }
+      ]
+    },
+    // A27
+    {
+      'id': 'page-30',
+      'type': 'activity',
+      'activityLabel': 'A27',
+      'title': 'Shooting Stars',
+      'subtitle': "Fill in the digraph or trigraph to finish the word.",
+      'layout': 'fill-in-star',
+      'teacherNotes': 'Students complete words using the four digraph/trigraph options in the word bank. Bright = igh, Catch = tch, Wish = sh, Blue = ue.',
+      'answerKey': 'A27: Blue, Wish, Bright, Catch',
+      'content': [
+        {
+          'type': 'word-bank-box',
+          'words': ["igh", "ue", "sh", "tch"]
+        },
+        {
+          'type': 'star-fill-activity',
+          'entries': [
+            {'partial': "Bl", 'answer': "ue", 'word': "Blue"},
+            {'partial': "Wi", 'answer': "sh", 'word': "Wish"},
+            {'partial': "Br", 'answer': "igh", 'word': "Bright"},
+            {'partial': "Ca", 'answer': "tch", 'word': "Catch"}
+          ]
+        }
+      ]
+    },
+    // A28
+    {
+      'id': 'page-31',
+      'type': 'activity',
+      'activityLabel': 'A28',
+      'title': 'What Are Consonant Blends?',
+      'layout': 'lesson-with-spot',
+      'teacherNotes': 'Unlike digraphs (2 letters = 1 sound), consonant blends have 2 letters that each keep their own sound (b-l, s-t, f-r).',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "We learned that in digraphs, multiple letters work together to make one sound. Consonant blends are different! They are a group of letters that work together, but each letter keeps its own sound."
+          ]
+        },
+        {
+          'type': 'example-box',
+          'imageId': 'blend', // We can use stop sign
+          'text': "Say the word stop. You can hear the s sound and the t sound. That’s a consonant blend!"
+        }
+      ]
+    },
   ];
 }

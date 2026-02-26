@@ -33,6 +33,15 @@ import 'components/letter_drop_target.dart';
 import 'components/letter_bank.dart';
 import 'components/hint_overlay.dart';
 import 'components/pronunciation_button.dart';
+import 'components/particle_reward.dart';
+import 'components/digraph_example_grid.dart';
+import 'components/word_selection_list.dart';
+import 'components/example_box.dart';
+import 'components/trigraph_examples.dart';
+import 'components/sentence_find.dart';
+import 'components/circle_choice_grid.dart';
+import 'components/comparison_table_vertical.dart';
+import 'components/star_fill_activity.dart';
 import 'utils/responsive_helper.dart';
 
 class TextbookCanvas extends StatefulWidget {
@@ -53,6 +62,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
   int _currentPageIndex = 0;
   Timer? _hintTimer;
   bool _showHint = false;
+  bool _showCelebration = false;
   final Set<String> _usedLetters = {};
 
   @override
@@ -170,46 +180,68 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               _previousPage();
             }
           },
-          child: Container(
-            color: Colors.white, // The 'paper' color
-            child: Stack(
-              children: [
-                // 1. The main content layer
-                _buildPageContent(currentPage, constraints),
-                
-                // 2. Navigation arrows overlay
-                _buildNavigationOverlay(),
-
-                // 3. Letter Bank at the bottom
-                if (letters.isNotEmpty)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: LetterBank(
-                      letters: letters,
-                      usedLetters: _usedLetters,
+          child: SelectionArea(
+            focusNode: FocusNode(canRequestFocus: false),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: _currentPageIndex == 15 // A15 check for pilot
+                  ? const DecorationImage(
+                      image: AssetImage('assets/images/nursery_wall_texture.png'),
+                      fit: BoxFit.cover,
+                      opacity: 0.3,
+                    )
+                  : null,
+              ),
+              child: Stack(
+                children: [
+                  // 1. The main content layer
+                  _buildPageContent(currentPage, constraints),
+                  
+                  // 2. Navigation arrows overlay
+                  _buildNavigationOverlay(),
+  
+                  // 3. Letter Bank at the bottom
+                  if (letters.isNotEmpty)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: LetterBank(
+                        letters: letters,
+                        usedLetters: _usedLetters,
+                      ),
                     ),
+  
+                  // 4. Hint System Overlay (Conditional)
+                  if (_showHint)
+                    HintOverlay(
+                      hintText: _getHintForPage(currentPage),
+                      onHintDismissed: () => setState(() => _showHint = false),
+                    ),
+  
+                  // 5. Celebration Overlay
+                  ParticleReward(
+                    trigger: _showCelebration,
+                    onComplete: () => setState(() => _showCelebration = false),
                   ),
-
-                // 4. Hint System Overlay (Conditional)
-                if (_showHint)
-                  HintOverlay(
-                    hintText: _getHintForPage(currentPage),
-                    onHintDismissed: () => setState(() => _showHint = false),
-                  ),
-
-                // 5. Teacher Overlay (Conditional)
-                if (widget.teacherModeActive)
-                  TeacherOverlay(
-                    pageData: currentPage,
-                  ),
-              ],
+  
+                  // 6. Teacher Overlay (Conditional)
+                  if (widget.teacherModeActive)
+                    TeacherOverlay(
+                      pageData: currentPage,
+                    ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
+  }
+
+  void _triggerCelebration() {
+    setState(() => _showCelebration = true);
   }
 
   Widget _buildPageContent(Map<String, dynamic> page, BoxConstraints constraints) {
@@ -683,6 +715,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       TextBlock(text: block['text'], type: TextType.instruction),
                       const SizedBox(height: 24),
                     ],
+                    if (block['type'] == 'comparison-table-vertical') ...[
+                      ComparisonTableVertical(
+                        rows: List<Map<String, dynamic>>.from(block['rows']),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
                     if (block['type'] == 'two-column-sort') ...[
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -694,8 +732,24 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                         child: TwoColumnSort(
                           leftLabel: block['leftLabel'] ?? 'Left',
                           rightLabel: block['rightLabel'] ?? 'Right',
-                          leftAnswers: List<String>.from(block['options']?.where((o) => block['leftLabel'].contains('Hard') ? ['cane', 'cash', 'fact'].contains(o) : ['silo', 'made', 'she', 'halo'].contains(o)) ?? []),
-                          rightAnswers: List<String>.from(block['options']?.where((o) => block['leftLabel'].contains('Hard') ? ['icy', 'mice', 'cent'].contains(o) : ['fed', 'sand', 'tin', 'set', 'bit'].contains(o)) ?? []),
+                          leftAnswers: List<String>.from(block['options']?.where((o) {
+                            if (block['leftLabel'].contains('Hard Th')) {
+                              return ['they', 'father', 'this', 'there'].contains(o);
+                            } else if (block['leftLabel'].contains('Hard')) {
+                              return ['cane', 'cash', 'fact'].contains(o);
+                            } else {
+                              return ['silo', 'made', 'she', 'halo'].contains(o);
+                            }
+                          }) ?? []),
+                          rightAnswers: List<String>.from(block['options']?.where((o) {
+                            if (block['leftLabel'].contains('Hard Th')) {
+                              return ['bath', 'math', 'thorn', 'birthday'].contains(o);
+                            } else if (block['leftLabel'].contains('Hard')) {
+                              return ['icy', 'mice', 'cent'].contains(o);
+                            } else {
+                              return ['fed', 'sand', 'tin', 'set', 'bit'].contains(o);
+                            }
+                          }) ?? []),
                           wordBank: List<String>.from(block['options'] ?? []),
                         ),
                       ),
@@ -889,9 +943,10 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             type: TextType.instruction,
           ),
           const SizedBox(height: 32),
-          const Expanded(
+          Expanded(
             child: TrainFillIn(
-              trains: [
+              onComplete: _triggerCelebration,
+              trains: const [
                 {'imageDesc': 'Cap / hat', 'imageId': 'hat', 'letters': ['C', '?', 'P'], 'answer': 'a', 'word': 'cap'},
                 {'imageDesc': 'Log / wood', 'imageId': 'log', 'letters': ['L', '?', 'G'], 'answer': 'o', 'word': 'log'},
                 {'imageDesc': 'Sun', 'imageId': 'sun', 'letters': ['S', '?', 'N'], 'answer': 'u', 'word': 'sun'},
@@ -1230,6 +1285,282 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             type: TextType.h2,
             color: Colors.indigo,
             textAlign: TextAlign.center,
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'lesson-reference') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'lesson-text')
+                      for (final para in block['paragraphs']) ...[
+                        TextBlock(text: para, type: TextType.rule),
+                        const SizedBox(height: 16),
+                      ],
+                    if (block['type'] == 'digraph-example-grid') ...[
+                      const SizedBox(height: 16),
+                      DigraphExampleGrid(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                        columns: block['columns'] ?? 4,
+                      ),
+                      const SizedBox(height: 60), // Scroll buffer
+                    ]
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'identify-underline') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'example-box') ...[
+                      ExampleBox(
+                        imageId: block['imageId'] as String,
+                        text: block['text'] as String,
+                        explanation: block['explanation'] as String?,
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'instruction') ...[
+                      TextBlock(text: block['text'], type: TextType.instruction),
+                      const SizedBox(height: 24),
+                    ],
+                    if (block['type'] == 'word-list-activity') ...[
+                      WordSelectionList(
+                        sets: List<Map<String, dynamic>>.from(block['sets']),
+                      ),
+                      const SizedBox(height: 60),
+                    ]
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'lesson-with-find-activity') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'lesson-text')
+                      for (final para in block['paragraphs']) ...[
+                        TextBlock(text: para, type: TextType.rule),
+                        const SizedBox(height: 16),
+                      ],
+                    if (block['type'] == 'trigraph-examples') ...[
+                      TrigraphExamples(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'example-with-answer') ...[
+                      ExampleBox(
+                        imageId: 'fox', // Fallback Fox since A23 doesn't specify image
+                        text: block['example'] ?? "",
+                        explanation: "Answer: ${block['demonstrationAnswer']}",
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'instruction') ...[
+                      TextBlock(text: block['text'], type: TextType.instruction),
+                      const SizedBox(height: 24),
+                    ],
+                    if (block['type'] == 'sentence-find') ...[
+                      SentenceFind(
+                        sentences: List<Map<String, dynamic>>.from(block['sentences']),
+                      ),
+                      const SizedBox(height: 60),
+                    ]
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'circle-and-fill') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'lesson-text')
+                      for (final para in block['paragraphs']) ...[
+                        TextBlock(text: para, type: TextType.rule),
+                        const SizedBox(height: 16),
+                      ],
+                    if (block['type'] == 'circle-digraph') ...[
+                      CircleChoiceGrid(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                        columns: block['columns'] ?? 2,
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'instruction') ...[
+                      TextBlock(text: block['text'], type: TextType.instruction),
+                      const SizedBox(height: 24),
+                    ],
+                    if (block['type'] == 'fill-in-digraph') ...[
+                      PictureFillInGrid(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                        columns: block['columns'] ?? 2,
+                      ),
+                      const SizedBox(height: 60),
+                    ]
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'sentence-find') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'example-box') ...[
+                      ExampleBox(
+                        imageId: block['imageId'] as String,
+                        text: block['text'] as String,
+                        explanation: block['note'] as String?,
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'sentence-find-numbered') ...[
+                      SentenceFind(
+                        sentences: List<Map<String, dynamic>>.from(block['sentences']),
+                        numbered: true,
+                      ),
+                      const SizedBox(height: 60),
+                    ]
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'fill-in-star') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'word-bank-box') ...[
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey.shade50,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.blueGrey.shade300, width: 2),
+                        ),
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 48,
+                          runSpacing: 16,
+                          children: (block['words'] as List<dynamic>).map((word) {
+                            return Text(
+                              word as String,
+                              style: const TextStyle(
+                                fontFamily: 'FredokaOne',
+                                fontSize: 40,
+                                color: Colors.indigo,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                    if (block['type'] == 'star-fill-activity') ...[
+                      StarFillActivity(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                      ),
+                      const SizedBox(height: 60),
+                    ]
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (page['layout'] == 'lesson-with-spot') {
+      final contentList = page['content'] as List<dynamic>? ?? [];
+
+      return Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final block in contentList) ...[
+                    if (block['type'] == 'lesson-text')
+                      for (final para in block['paragraphs']) ...[
+                        TextBlock(text: para, type: TextType.rule),
+                        const SizedBox(height: 16),
+                      ],
+                    if (block['type'] == 'example-box') ...[
+                      ExampleBox(
+                        imageId: block['imageId'] ?? 'fox',
+                        text: block['text'] as String,
+                        explanation: block['note'] as String?,
+                      ),
+                      const SizedBox(height: 32),
+                    ]
+                  ]
+                ],
+              ),
+            ),
           ),
         ],
       );
