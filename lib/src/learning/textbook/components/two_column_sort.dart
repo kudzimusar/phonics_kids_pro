@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/responsive_helper.dart';
 
 class TwoColumnSort extends StatefulWidget {
   final String leftLabel;
@@ -33,6 +34,30 @@ class _TwoColumnSortState extends State<TwoColumnSort> {
 
   @override
   Widget build(BuildContext context) {
+    final leftColumn = _buildSortColumn(
+      label: widget.leftLabel,
+      items: _leftItems,
+      correctAnswers: widget.leftAnswers,
+      onAccept: (word) {
+        setState(() {
+          _bankItems.remove(word);
+          if (!_leftItems.contains(word)) _leftItems.add(word);
+        });
+      },
+    );
+
+    final rightColumn = _buildSortColumn(
+      label: widget.rightLabel,
+      items: _rightItems,
+      correctAnswers: widget.rightAnswers,
+      onAccept: (word) {
+        setState(() {
+          _bankItems.remove(word);
+          if (!_rightItems.contains(word)) _rightItems.add(word);
+        });
+      },
+    );
+
     return Column(
       children: [
         // Word Bank
@@ -55,38 +80,24 @@ class _TwoColumnSortState extends State<TwoColumnSort> {
         const SizedBox(height: 32),
 
         // Sorting Tables
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _buildSortColumn(
-                label: widget.leftLabel,
-                items: _leftItems,
-                correctAnswers: widget.leftAnswers,
-                onAccept: (word) {
-                  setState(() {
-                    _bankItems.remove(word);
-                    if (!_leftItems.contains(word)) _leftItems.add(word);
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 32),
-            Expanded(
-              child: _buildSortColumn(
-                label: widget.rightLabel,
-                items: _rightItems,
-                correctAnswers: widget.rightAnswers,
-                onAccept: (word) {
-                  setState(() {
-                    _bankItems.remove(word);
-                    if (!_rightItems.contains(word)) _rightItems.add(word);
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
+        if (ResponsiveHelper.isMobile(context))
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              leftColumn,
+              const SizedBox(height: 32),
+              rightColumn,
+            ],
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: leftColumn),
+              const SizedBox(width: 32),
+              Expanded(child: rightColumn),
+            ],
+          ),
       ],
     );
   }

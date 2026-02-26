@@ -33,6 +33,7 @@ import 'components/letter_drop_target.dart';
 import 'components/letter_bank.dart';
 import 'components/hint_overlay.dart';
 import 'components/pronunciation_button.dart';
+import 'utils/responsive_helper.dart';
 
 class TextbookCanvas extends StatefulWidget {
   final bool teacherModeActive;
@@ -155,76 +156,75 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     final currentPage = TextbookDatabase.pages[_currentPageIndex];
     final letters = _getLetterBankForPage(currentPage);
 
-    // We enforce a strict 4:3 aspect ratio.
-    return AspectRatio(
-      aspectRatio: 4 / 3,
-      child: GestureDetector(
-        onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity == null) return;
-          // Swipe left (negative velocity) -> Next Page
-          if (details.primaryVelocity! < -300) {
-            _nextPage();
-          } 
-          // Swipe right (positive velocity) -> Previous Page
-          else if (details.primaryVelocity! > 300) {
-            _previousPage();
-          }
-        },
-        child: Container(
-          color: Colors.white, // The 'paper' color
-          child: ClipRect(
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: SizedBox(
-                width: 1024,
-                height: 768,
-                child: Stack(
-                  children: [
-                    // 1. The main content layer
-                    _buildPageContent(currentPage),
-                    
-                    // 2. Navigation arrows overlay
-                    _buildNavigationOverlay(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (details.primaryVelocity == null) return;
+            // Swipe left (negative velocity) -> Next Page
+            if (details.primaryVelocity! < -300) {
+              _nextPage();
+            } 
+            // Swipe right (positive velocity) -> Previous Page
+            else if (details.primaryVelocity! > 300) {
+              _previousPage();
+            }
+          },
+          child: Container(
+            color: Colors.white, // The 'paper' color
+            child: Stack(
+              children: [
+                // 1. The main content layer
+                _buildPageContent(currentPage, constraints),
+                
+                // 2. Navigation arrows overlay
+                _buildNavigationOverlay(),
 
-                    // 3. Letter Bank at the bottom
-                    if (letters.isNotEmpty)
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: LetterBank(
-                          letters: letters,
-                          usedLetters: _usedLetters,
-                        ),
-                      ),
+                // 3. Letter Bank at the bottom
+                if (letters.isNotEmpty)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: LetterBank(
+                      letters: letters,
+                      usedLetters: _usedLetters,
+                    ),
+                  ),
 
-                    // 4. Hint System Overlay (Conditional)
-                    if (_showHint)
-                      HintOverlay(
-                        hintText: _getHintForPage(currentPage),
-                        onHintDismissed: () => setState(() => _showHint = false),
-                      ),
+                // 4. Hint System Overlay (Conditional)
+                if (_showHint)
+                  HintOverlay(
+                    hintText: _getHintForPage(currentPage),
+                    onHintDismissed: () => setState(() => _showHint = false),
+                  ),
 
-                    // 5. Teacher Overlay (Conditional)
-                    if (widget.teacherModeActive)
-                      TeacherOverlay(
-                        pageData: currentPage,
-                      ),
-                  ],
-                ),
-              ),
+                // 5. Teacher Overlay (Conditional)
+                if (widget.teacherModeActive)
+                  TeacherOverlay(
+                    pageData: currentPage,
+                  ),
+              ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildPageContent(Map<String, dynamic> page) {
+  Widget _buildPageContent(Map<String, dynamic> page, BoxConstraints constraints) {
     final bool isSpecialPage = page['layout'] == 'cover' || page['layout'] == 'welcome';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveHelper.getResponsiveValue(
+          context: context,
+          mobile: 16.0,
+          tablet: 32.0,
+          desktop: 64.0,
+        ), 
+        vertical: 24.0
+      ),
       child: Column(
         children: [
           if (!isSpecialPage) ...[
@@ -242,7 +242,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                const SizedBox(width: 80), // Balance the LabelTag on the left
+                if (!ResponsiveHelper.isMobile(context))
+                  const SizedBox(width: 80), // Balance the LabelTag on larger screens only
               ],
             ),
             if (page['subtitle'] != null) ...[
@@ -261,7 +262,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               padding: EdgeInsets.only(
                 bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 0.0,
               ),
-              child: _buildSpecificLayout(page),
+              child: _buildSpecificLayout(page, constraints),
             ),
           ),
         ],
@@ -269,7 +270,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     );
   }
 
-  Widget _buildSpecificLayout(Map<String, dynamic> page) {
+  Widget _buildSpecificLayout(Map<String, dynamic> page, BoxConstraints constraints) {
     if (page['layout'] == 'alphabet-grid') {
       // Mock Data for A1 Alphabet Grid based on textbook-database.js
       final alphabet = [
@@ -302,8 +303,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       ];
 
       return GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4, // Wider boxes
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 4, desktop: 4), // Wider boxes
           childAspectRatio: 2.2, // Horizontal orientation
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
@@ -363,25 +364,21 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             type: TextType.instruction,
           ),
           const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 16,
             children: [
               PhonicsBox(text: 'C', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
-              const SizedBox(width: 8),
               PhonicsBox(text: 'A', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
-              const SizedBox(width: 8),
               PhonicsBox(text: 'S', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
-              const SizedBox(width: 8),
               PhonicsBox(text: 'T', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
-              const SizedBox(width: 32),
+              const SizedBox(width: 24),
               const Text("|", style: TextStyle(fontSize: 40, color: Colors.grey)),
-              const SizedBox(width: 32),
+              const SizedBox(width: 24),
               PhonicsBox(text: 'c', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
-              const SizedBox(width: 8),
               PhonicsBox(text: 'a', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
-              const SizedBox(width: 8),
               PhonicsBox(text: 's', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
-              const SizedBox(width: 8),
               PhonicsBox(text: 't', isDashed: true, textColor: Colors.indigo.shade300, borderColor: Colors.indigo.shade200, backgroundColor: Colors.indigo.shade50),
             ],
           ),
@@ -394,7 +391,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           // Sound Box Grid
           Expanded(
             child: GridView.count(
-              crossAxisCount: 2,
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
               childAspectRatio: 3.5,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
@@ -410,59 +407,65 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       );
     } else if (page['layout'] == 'lesson-with-activity') {
       final words = ["plan", "run", "east", "bat", "hop", "long", "see", "mom"];
-      return Row(
+      final leftSide = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left side: Lesson & Fox
-          Expanded(
-            flex: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const TextBlock(
-                  text: "There are two kinds of letters in the alphabet. The letters a, e, i, o, u, and y are vowels. The other letters are consonants.",
-                  type: TextType.body,
-                ),
-                const SizedBox(height: 16),
-                const PhonicFoxNarrator(
-                  text: "When you make a vowel noise, your mouth and vocal chords are wide open!",
-                  state: FoxState.openMouth,
-                ),
-                const SizedBox(height: 16),
-                const TextBlock(
-                  text: "Go through the words below. Color the consonants in red and the vowels in blue. Try saying the words out loud!",
-                  type: TextType.instruction,
-                ),
-              ],
-            ),
+        children: const [
+          TextBlock(
+            text: "There are two kinds of letters in the alphabet. The letters a, e, i, o, u, and y are vowels. The other letters are consonants.",
+            type: TextType.body,
           ),
-          const SizedBox(width: 32),
-          // Right side: Activity Grid
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.amber.shade50,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.amber.shade200, width: 2),
-              ),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 2.5,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: words.length,
-                itemBuilder: (context, index) {
-                  return VowelConsonantWord(word: words[index]);
-                },
-              ),
-            ),
+          SizedBox(height: 16),
+          PhonicFoxNarrator(
+            text: "When you make a vowel noise, your mouth and vocal chords are wide open!",
+            state: FoxState.openMouth,
+          ),
+          SizedBox(height: 16),
+          TextBlock(
+            text: "Go through the words below. Color the consonants in red and the vowels in blue. Try saying the words out loud!",
+            type: TextType.instruction,
           ),
         ],
       );
+
+      final rightSide = Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.amber.shade50,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.amber.shade200, width: 2),
+        ),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
+            childAspectRatio: 2.5,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: words.length,
+          itemBuilder: (context, index) {
+            return VowelConsonantWord(word: words[index]);
+          },
+        ),
+      );
+
+      if (ResponsiveHelper.isMobile(context)) {
+        return Column(
+          children: [
+            leftSide,
+            const SizedBox(height: 24),
+            Expanded(child: rightSide),
+          ],
+        );
+      } else {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 1, child: leftSide),
+            const SizedBox(width: 32),
+            Expanded(flex: 1, child: rightSide),
+          ],
+        );
+      }
     } else if (page['layout'] == 'lesson-with-table-and-activity') {
       return Column(
         children: [
@@ -514,7 +517,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           // Placeholder for Fill in Grid
           Expanded(
             child: GridView.count(
-              crossAxisCount: 3,
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 3),
               childAspectRatio: 2.0,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
@@ -540,7 +543,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 32),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 3, // 3 Columns
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 3), // 3 Columns
               childAspectRatio: 0.65, // Taller cards
               crossAxisSpacing: 24,
               mainAxisSpacing: 24,
@@ -734,8 +737,9 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: Colors.blueGrey.shade800, width: 2),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text("Soft G = ", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'FredokaOne', color: Colors.blueGrey.shade900)),
                           const Text("Red", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'FredokaOne', color: Colors.red)),
@@ -749,7 +753,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   const SizedBox(height: 32),
                   // Ladybugs Grid
                   SizedBox(
-                    height: 500, // Fixed height for GridView inside ScrollView
+                    height: ResponsiveHelper.isMobile(context) ? 350 : 500, // Responsive height for GridView inside ScrollView
                     child: const ColorCodeActivity(
                       items: [
                         {'word': 'gym', 'answer': 'red'},
@@ -862,8 +866,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 32),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 2.0,
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
+              childAspectRatio: ResponsiveHelper.isMobile(context) ? 3.0 : 2.0,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: const [
                 InteractiveVowelStack(wordPart1: "c", wordPart2: "w", choices: ["a", "o", "u"], answer: "o", isSolved: true),
@@ -1008,7 +1012,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   const SizedBox(height: 32),
                   PictureFillInGrid(
                     entries: entries,
-                    columns: 3,
+                    columns: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 3),
                   ),
                   const SizedBox(height: 60), // Scroll buffer
                 ],
@@ -1052,7 +1056,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   const SizedBox(height: 16),
                   PictureFillInGrid(
                     entries: gridEntries,
-                    columns: 3,
+                    columns: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 3),
                   ),
                   const SizedBox(height: 32),
                   const TextBlock(
@@ -1080,8 +1084,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 32),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 2.5,
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
+              childAspectRatio: ResponsiveHelper.isMobile(context) ? 3.5 : 2.5,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
@@ -1106,8 +1110,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 32),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 3.0,
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
+              childAspectRatio: ResponsiveHelper.isMobile(context) ? 4.0 : 3.0,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
@@ -1131,8 +1135,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 32),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 3.0,
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
+              childAspectRatio: ResponsiveHelper.isMobile(context) ? 4.0 : 3.0,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
@@ -1156,8 +1160,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 32),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 3,
-              childAspectRatio: 2.0,
+              crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 3, desktop: 3),
+              childAspectRatio: ResponsiveHelper.isMobile(context) ? 3.0 : 2.0,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
@@ -1371,8 +1375,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         children: [
           VectorGraphic(assetName: icon, size: 48),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
             children: wordParts,
           ),
         ],

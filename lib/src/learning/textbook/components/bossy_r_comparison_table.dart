@@ -13,9 +13,10 @@ class BossyRComparisonTable extends StatelessWidget {
         color: Colors.white,
         border: Border.all(color: Colors.blueGrey.shade800, width: 2),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: rows.asMap().entries.map((entry) {
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: rows.asMap().entries.map((entry) {
           int index = entry.key;
           var row = entry.value;
           List<String> pair = List<String>.from(row['pair']);
@@ -57,6 +58,7 @@ class BossyRComparisonTable extends StatelessWidget {
             ),
           );
         }).toList(),
+        ),
       ),
     );
   }

@@ -37,6 +37,8 @@ class _PictureFillInGridState extends State<PictureFillInGrid> {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.columns,
         childAspectRatio: 1.0, // More square to give graphics space
