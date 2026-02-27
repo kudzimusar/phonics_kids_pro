@@ -82,6 +82,10 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
   bool _showCelebration = false;
   final Set<String> _usedLetters = {};
 
+  final ScrollController _contentScrollController = ScrollController();
+  bool _isReaderModeActive = false;
+  Timer? _autoScrollTimer;
+
   @override
   void initState() {
     super.initState();
@@ -97,6 +101,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
   @override
   void dispose() {
     _hintTimer?.cancel();
+    _autoScrollTimer?.cancel();
+    _contentScrollController.dispose();
     super.dispose();
   }
 
@@ -117,6 +123,16 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     });
   }
 
+  void _scrollToTop() {
+    if (_contentScrollController.hasClients) {
+      _contentScrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   void _nextPage() {
     if (_currentPageIndex < TextbookDatabase.pages.length - 1) {
       setState(() {
@@ -124,6 +140,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         _usedLetters.clear();
       });
       _resetHintTimer();
+      _scrollToTop();
     }
   }
 
@@ -134,6 +151,47 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         _usedLetters.clear();
       });
       _resetHintTimer();
+      _scrollToTop();
+    }
+  }
+  
+  void _toggleReaderMode() {
+    setState(() {
+      _isReaderModeActive = !_isReaderModeActive;
+    });
+    
+    if (_isReaderModeActive) {
+      _startAutoScroll();
+    } else {
+      _stopAutoScroll();
+    }
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (!_isReaderModeActive || !_contentScrollController.hasClients) {
+        timer.cancel();
+        return;
+      }
+      
+      final maxScroll = _contentScrollController.position.maxScrollExtent;
+      final currentScroll = _contentScrollController.offset;
+      
+      if (currentScroll < maxScroll) {
+        _contentScrollController.jumpTo(currentScroll + 1.0); // Smooth slow scroll
+      } else {
+        _stopAutoScroll();
+      }
+    });
+  }
+
+  void _stopAutoScroll() {
+    _autoScrollTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        _isReaderModeActive = false;
+      });
     }
   }
 
@@ -221,6 +279,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         _usedLetters.clear();
       });
       _resetHintTimer();
+      _scrollToTop();
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -273,13 +332,17 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                 const Divider(),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 4),
-                      childAspectRatio: 3.0,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                    ),
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    radius: const Radius.circular(8),
+                    thickness: 8,
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 4),
+                        childAspectRatio: 3.0,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
                     itemCount: TextbookDatabase.pages.length,
                     itemBuilder: (context, index) {
                       final page = TextbookDatabase.pages[index];
@@ -295,6 +358,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                             _usedLetters.clear();
                           });
                           _resetHintTimer();
+                          _scrollToTop();
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
@@ -353,8 +417,9 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                     },
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
           ),
         );
       },
@@ -385,13 +450,18 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                image: (currentPage['activityLabel']?.toString().contains('A15') ?? false)
+                image: (currentPage['layout'] == 'cover')
                   ? const DecorationImage(
-                      image: AssetImage('assets/images/nursery_wall_texture.png'),
+                      image: AssetImage('assets/images/cover_background.png'),
                       fit: BoxFit.cover,
-                      opacity: 0.5,
                     )
-                  : null,
+                  : (currentPage['activityLabel']?.toString().contains('A15') ?? false)
+                    ? const DecorationImage(
+                        image: AssetImage('assets/images/nursery_wall_texture.png'),
+                        fit: BoxFit.cover,
+                        opacity: 0.5,
+                      )
+                    : null,
               ),
               child: Stack(
                 children: [
@@ -421,6 +491,40 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                                 border: Border.all(color: Colors.grey.shade300, width: 2),
                               ),
                               child: const Icon(Icons.menu_book, color: Colors.indigo, size: 28),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // 2.7 Reader Mode Button (Faded)
+                  Positioned(
+                    top: 90, // Below the table of contents 16 + 50 + padding
+                    right: 80, 
+                    child: SafeArea(
+                      child: Opacity(
+                        opacity: _isReaderModeActive ? 1.0 : 0.6,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _toggleReaderMode,
+                            borderRadius: BorderRadius.circular(24),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: _isReaderModeActive ? Colors.green.shade100 : Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _isReaderModeActive ? Colors.green.shade500 : Colors.grey.shade300, 
+                                  width: 2
+                                ),
+                              ),
+                              child: Icon(
+                                _isReaderModeActive ? Icons.pause_circle_filled : Icons.play_circle_fill, 
+                                color: _isReaderModeActive ? Colors.green.shade700 : Colors.indigo, 
+                                size: 28
+                              ),
                             ),
                           ),
                         ),
@@ -566,7 +670,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         {'l': 'Zz', 'icon': 'zipper', 'w': 'Zipper'},
       ];
 
-      return GridView.builder(
+      return GridView.builder(controller: _contentScrollController, 
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 4, desktop: 4), // Wider boxes
           childAspectRatio: 2.2, // Horizontal orientation
@@ -654,7 +758,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 16),
           // Sound Box Grid
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
               childAspectRatio: 3.5,
               crossAxisSpacing: 16,
@@ -676,7 +780,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       if (blocks.isEmpty) {
         // Legacy hardcoded path for vowel/consonant page (no blocks)
         final words = ["plan", "run", "east", "bat", "hop", "long", "see", "mom"];
-        return SingleChildScrollView(
+        return SingleChildScrollView(controller: _contentScrollController, 
           padding: const EdgeInsets.only(bottom: 90),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -696,7 +800,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                 type: TextType.instruction,
               ),
               const SizedBox(height: 16),
-              GridView.builder(
+              GridView.builder(controller: _contentScrollController, 
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -714,7 +818,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       }
 
       // Data-driven: render blocks for A42, A46, etc.
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -926,7 +1030,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 16),
           // Placeholder for Fill in Grid
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 3),
               childAspectRatio: 2.0,
               crossAxisSpacing: 16,
@@ -952,7 +1056,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
           const SizedBox(height: 32),
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 3), // 3 Columns
               childAspectRatio: 0.65, // Taller cards
               crossAxisSpacing: 24,
@@ -1078,7 +1182,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1150,7 +1254,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1287,7 +1391,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1328,7 +1432,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
           const SizedBox(height: 32),
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
               childAspectRatio: ResponsiveHelper.isMobile(context) ? 3.0 : 2.0,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1413,7 +1517,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1465,7 +1569,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 children: [
@@ -1508,7 +1612,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1547,7 +1651,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
           const SizedBox(height: 32),
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
               childAspectRatio: ResponsiveHelper.isMobile(context) ? 3.5 : 2.5,
               crossAxisSpacing: 16,
@@ -1573,7 +1677,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
           const SizedBox(height: 32),
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
               childAspectRatio: ResponsiveHelper.isMobile(context) ? 4.0 : 3.0,
               crossAxisSpacing: 16,
@@ -1598,7 +1702,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
           const SizedBox(height: 32),
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
               childAspectRatio: ResponsiveHelper.isMobile(context) ? 4.0 : 3.0,
               crossAxisSpacing: 16,
@@ -1623,7 +1727,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
           const SizedBox(height: 32),
           Expanded(
-            child: GridView.count(
+            child: GridView.count(controller: _contentScrollController, 
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 3, desktop: 3),
               childAspectRatio: ResponsiveHelper.isMobile(context) ? 3.0 : 2.0,
               crossAxisSpacing: 16,
@@ -1645,34 +1749,102 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TextBlock(
-            text: page['title'] ?? 'Phonics Kids Pro',
-            type: TextType.h1,
-            color: Colors.indigo.shade800,
+          const SizedBox(height: 32),
+          Text(
+            page['title'] ?? 'Phonics Kids Pro',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: ResponsiveHelper.getResponsiveValue(context: context, mobile: 42, tablet: 72, desktop: 96),
+              color: Colors.white,
+              height: 1.1,
+              shadows: [
+                Shadow(offset: const Offset(3, 3), blurRadius: 4, color: Colors.indigo.shade900),
+                Shadow(offset: const Offset(-2, -2), blurRadius: 4, color: Colors.indigo.shade900),
+                const Shadow(offset: Offset(0, 3), blurRadius: 8, color: Colors.black54),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
-          TextBlock(
-            text: page['subtitle'] ?? 'Read By Age Four',
-            type: TextType.instruction,
-            color: Colors.orange.shade700,
+          Text(
+            page['subtitle'] ?? 'Read By Age Four',
             textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 64),
-          const VectorGraphic(assetName: 'fox', size: 160),
-          const SizedBox(height: 64),
-          TextBlock(
-            text: 'By ${page['author'] ?? 'Shadreck Kudzanai Musarurwa'}',
-            type: TextType.h2,
-            color: Colors.blueGrey.shade800,
-            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'FredokaOne',
+              fontSize: ResponsiveHelper.getResponsiveValue(context: context, mobile: 24, tablet: 40, desktop: 52),
+              color: Colors.amber.shade300,
+              shadows: const [
+                Shadow(offset: Offset(2, 2), blurRadius: 4, color: Colors.black87),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
-          TextBlock(
-            text: 'Published by ${page['publisher'] ?? 'SKM Publishers'}',
-            type: TextType.body,
-            color: Colors.blueGrey.shade600,
+          Text(
+            'with Phonics Fox',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'SassoonPrimary',
+              fontSize: ResponsiveHelper.getResponsiveValue(context: context, mobile: 18, tablet: 26, desktop: 32),
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: Colors.white,
+              shadows: const [
+                Shadow(offset: Offset(1, 1), blurRadius: 3, color: Colors.black87),
+              ],
+            ),
+          ),
+          const Spacer(),
+          TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0.95, end: 1.05),
+            duration: const Duration(seconds: 2),
+            curve: Curves.easeInOut,
+            builder: (context, scale, child) {
+              return Transform.scale(
+                scale: scale,
+                child: child,
+              );
+            },
+            child: VectorGraphic(
+              assetName: 'fox',
+              size: ResponsiveHelper.getResponsiveValue(context: context, mobile: 140, tablet: 200, desktop: 260),
+            ),
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, offset: Offset(0, 4), blurRadius: 8),
+              ],
+              border: Border.all(color: Colors.indigo.shade200, width: 3),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'By ${page['author'] ?? 'Shadreck Kudzanai Musarurwa'}',
+                  style: TextStyle(
+                    fontFamily: 'SassoonPrimary',
+                    fontSize: ResponsiveHelper.getResponsiveValue(context: context, mobile: 18, tablet: 24, desktop: 30),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey.shade900,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Published by ${page['publisher'] ?? 'SKM Publishers'}',
+                  style: TextStyle(
+                    fontFamily: 'SassoonPrimary',
+                    fontSize: ResponsiveHelper.getResponsiveValue(context: context, mobile: 14, tablet: 18, desktop: 22),
+                    color: Colors.blueGrey.shade700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -1685,7 +1857,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: GridView.builder(
+            child: GridView.builder(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 4),
@@ -1787,7 +1959,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1819,7 +1991,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1856,7 +2028,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1914,7 +2086,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           }
           if (block['type'] == 'blend-example-grid') {
             return Expanded(
-              child: SingleChildScrollView(
+              child: SingleChildScrollView(controller: _contentScrollController, 
                 child: BlendExampleGrid(
                   entries: List<Map<String, dynamic>>.from(block['entries']),
                   columns: block['columns'] as int? ?? 4,
@@ -1979,7 +2151,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2020,7 +2192,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2050,7 +2222,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2093,7 +2265,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2135,7 +2307,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2170,7 +2342,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2221,7 +2393,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       return Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(controller: _contentScrollController, 
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2322,7 +2494,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final gridBlock = blocks.firstWhere((b) => b['type'] == 'sentence-find-grid', orElse: () => {});
       final sentences = List<Map<String, dynamic>>.from(gridBlock['sentences'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2371,7 +2543,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final leftSide = List<String>.from(block['leftSide'] ?? []);
       final rightSide = List<Map<String, dynamic>>.from(block['rightSide'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
         child: BrokenHeartMatch(leftSide: leftSide, rightSide: rightSide),
       );
@@ -2383,7 +2555,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           .firstWhere((b) => b['type'] == 'lego-block-activity', orElse: () => {});
       final groups = List<Map<String, dynamic>>.from(block['groups'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
         child: LegoBlockBuilder(groups: groups),
       );
@@ -2398,7 +2570,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final entries = List<Map<String, dynamic>>.from(nameGridBlock['entries'] ?? []);
       final riddles = List<Map<String, dynamic>>.from(riddleBlock['riddles'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2431,7 +2603,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final entries = List<Map<String, dynamic>>.from(block['entries'] ?? []);
       final cols = (block['columns'] as int?) ?? 2;
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
         child: GluedSoundGrid(entries: entries, columns: cols),
       );
@@ -2447,7 +2619,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final words = List<Map<String, dynamic>>.from(gridBlock['words'] ?? []);
       final prompts = List<String>.from(freeBlock['prompts'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: ColorSortGrid(codes: codes, words: words, freePrompts: prompts),
       );
@@ -2459,7 +2631,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           .firstWhere((b) => b['type'] == 'prefix-equation', orElse: () => {});
       final entries = List<Map<String, dynamic>>.from(block['entries'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
         child: EquationBuilder(entries: entries, mode: 'prefix'),
       );
@@ -2474,7 +2646,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final entries = List<Map<String, dynamic>>.from(gridBlock['entries'] ?? []);
       final prompts = List<String>.from(freeBlock['prompts'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2524,7 +2696,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final promptBlock = blocks.firstWhere((b) => b['type'] == 'open-ended-prompt', orElse: () => {});
       final entries = List<Map<String, dynamic>>.from(fillBlock['entries'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2550,7 +2722,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           .firstWhere((b) => b['type'] == 'suffix-equation', orElse: () => {});
       final entries = List<Map<String, dynamic>>.from(block['entries'] ?? []);
 
-      return SingleChildScrollView(
+      return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
         child: EquationBuilder(entries: entries, mode: 'suffix'),
       );

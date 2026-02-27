@@ -10,6 +10,21 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 
 import 'src/core/config/app_config.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/gestures.dart';
+
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+      };
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics();
+  }
+}
 
 Future<void> initializeApp(Environment env) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +87,7 @@ class PhonicsKidsProApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
+      scrollBehavior: CustomScrollBehavior(),
       routerConfig: _router,
     );
   }

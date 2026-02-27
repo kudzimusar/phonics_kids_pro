@@ -16,13 +16,17 @@ Our mission is to make high-quality phonics education accessible, engaging, and 
 
 ---
 
-## 🚀 Key Features
+## 🚀 Key Features (Current Stage)
 
-- **Interactive Phonics Lessons**: Cover everything from basic letter sounds to complex blends.
-- **AI Pronunciation Feedback**: Utilizes Google Vertex AI (Gemini) to analyze and guide speech.
-- **Teacher & Parent Dashboards**: Detailed progress tracking and classroom management for schools.
-- **Rewards & Gamification**: Badge systems and interactive rewards to keep kids motivated.
-- **School Integration**: Specialized tiers for educational institutions to manage multiple classrooms.
+The application has recently undergone a major expansion to include a fully digitized textbook experience alongside the core lessons.
+
+- **Interactive Digital Textbook**: A fully digitized, interactive version of the curriculum (Textbook Canvas) allowing kids to trace, tap, and interact directly with the "pages."
+    - Features automated hint systems, gesture navigation (swipe to turn pages), and dynamic answer keys.
+- **Dynamic Learning Components**: Over 30 custom interactive widgets, including:
+    - *Lego Block Builder*, *Equation Builder*, *Word Grid Underline*, *Sentence Find*, and *Drag-and-Drop Letter Banks*.
+- **AI Pronunciation Feedback**: Utilizes Google Vertex AI (Gemini) to analyze and guide speech (Phonics Cast).
+- **Teacher Classroom Mode**: Hidden overlays that allow educators to quickly view answers, skip requirements, or project lessons to a smartboard.
+- **Progressive Web App (PWA) Support**: Fully optimized for web delivery. Can be installed directly from the browser or packaged via PWABuilder for the Google Play Store.
 
 ---
 
@@ -35,7 +39,7 @@ Phonics Kids Pro is built with a premium, scalable, and secure stack:
 - **AI Engine**: [Google Vertex AI / Gemini 1.5 Flash](https://cloud.google.com/vertex-ai)
 - **Payments**: [Stripe](https://stripe.com/) (Secure global payments)
 - **Animations**: [Rive](https://rive.app/) (High-performance vector animations)
-- **Typography**: Google Fonts (Inter, Madimi One)
+- **Typography**: Google Fonts (Fredoka One, Sassoon Primary, Inter)
 
 ---
 
@@ -56,7 +60,8 @@ graph TD
 
 ### Module Structure
 - `lib/src/auth`: User authentication, registration, and subscription gating.
-- `lib/src/learning`: Core phonics lessons, models, and AI scoring services.
+- `lib/src/learning/textbook`: The core engine for the new interactive digital textbook and its 30+ dynamic components.
+- `lib/src/learning`: Traditional phonics lessons, models, and AI scoring services.
 - `lib/src/school`: Classroom management, teacher dashboards, and school-specific logic.
 - `lib/src/core`: Common utilities, theme, and global configurations.
 - `lib/src/tracking`: Progress analytics and user activity monitoring.
@@ -66,8 +71,8 @@ graph TD
 ## 📱 Market & Accessibility
 
 - **Target Audience**: Children (3-8 years), Parents looking for home learning, and Teachers/Schools.
-- **Google Play & App Store**: Available on Android and iOS (Native performance).
-- **Web Support**: Optimized for web usage in classroom environments.
+- **Google Play (PWA/TWA)**: High-performance Trusted Web Activity optimized for Chrome OS and Android tablets.
+- **Web Support**: Optimized for zero-install web usage in classroom environments (Chromebooks).
 - **Global Reach**: Designed for international phonics standards.
 
 ---
@@ -118,7 +123,7 @@ Phonics Kids Pro is designed for high margins and scalability. Below is the proj
 2. Install dependencies: `flutter pub get`
 3. Configure Firebase: Run `flutterfire configure`
 4. Deploy Cloud Functions: `cd functions && npm install && firebase deploy --only functions`
-5. Run the app: `flutter run`
+5. Run the app: `flutter run -d chrome --web-renderer canvaskit` (Optimized for CanvasKit)
 
 ---
 
