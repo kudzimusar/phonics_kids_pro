@@ -922,6 +922,419 @@ class TextbookDatabase {
           ]
         }
       ]
-    }
+    },
+    // A36
+    {
+      'id': 'page-39',
+      'type': 'activity',
+      'activityLabel': 'A36',
+      'title': 'Find the Diphthongs',
+      'subtitle': 'Read through these sentences and mark all the diphthongs you can find.',
+      'layout': 'sentence-find-grid',
+      'teacherNotes': 'Context practice for diphthongs. Multiple diphthongs per sentence.',
+      'content': [
+        {
+          'type': 'example-sentence',
+          'text': 'Last August I saw a clown.',
+          'diphthongsMarked': ['au (August)', 'aw (saw)', 'ow (clown)'],
+        },
+        {
+          'type': 'sentence-find-grid',
+          'columns': 2,
+          'sentences': [
+            {
+              'imageId': 'owl',
+              'text': 'I have a toy owl.',
+              'answers': ['oy (toy)', 'ow (owl)'],
+              'highlight': ['toy', 'owl'],
+            },
+            {
+              'imageId': 'stew',
+              'text': 'I will boil some stew for dinner.',
+              'answers': ['oi (boil)', 'ew (stew)'],
+              'highlight': ['boil', 'stew'],
+            },
+            {
+              'imageId': 'fountain',
+              'text': 'The noise of the fountain is soothing.',
+              'answers': ['oi (noise)', 'ou (fountain)', 'oo (soothing)'],
+              'highlight': ['noise', 'fountain', 'soothing'],
+            },
+            {
+              'imageId': 'bowling',
+              'text': 'I enjoy bowling! My mother taught me how to play.',
+              'answers': ['oy (enjoy)', 'ow (bowling)', 'ow (how)'],
+              'highlight': ['enjoy', 'bowling', 'how'],
+            },
+          ],
+        },
+      ],
+    },
+    // A37
+    {
+      'id': 'page-40',
+      'type': 'activity',
+      'activityLabel': 'A37',
+      'title': 'Broken Hearts',
+      'subtitle': 'Link the incomplete word to its missing diphthong!',
+      'layout': 'broken-heart-match',
+      'teacherNotes': 'Matching activity connecting diphthong spelling patterns to words with missing vowels.',
+      'content': [
+        {
+          'type': 'heart-matching',
+          'leftSide': ['ou', 'oo', 'aw', 'ow'],
+          'rightSide': [
+            {'partial': 'r_m', 'answer': 'oo', 'word': 'room'},
+            {'partial': 'h_k', 'answer': 'oo', 'word': 'hook'},
+            {'partial': 's_r', 'answer': 'aw', 'word': 'saw'},
+            {'partial': 'gr_', 'answer': 'ow', 'word': 'grow'},
+          ],
+        },
+      ],
+    },
+    // A38
+    {
+      'id': 'page-41',
+      'type': 'activity',
+      'activityLabel': 'A38',
+      'title': 'Build the Word',
+      'subtitle': 'Write in the diphthong to finish the word!',
+      'layout': 'block-build',
+      'teacherNotes': 'Building block metaphor reinforces that diphthongs are the core vowel block holding the word together.',
+      'content': [
+        {
+          'type': 'lego-block-activity',
+          'groups': [
+            {'given': ['c'], 'given2': [], 'imageId': 'cow', 'answer': 'ow', 'word': 'cow'},
+            {'given': ['ar'], 'given2': ['nd'], 'imageId': 'recycle', 'answer': 'ou', 'word': 'around'},
+            {'given': ['fl'], 'given2': ['er'], 'imageId': 'flower', 'answer': 'ow', 'word': 'flower'},
+            {'given': ['sw'], 'given2': ['p'], 'imageId': 'bird', 'answer': 'oo', 'word': 'swoop'},
+            {'given': ['cr'], 'given2': ['l'], 'imageId': 'bear', 'answer': 'aw', 'word': 'crawl'},
+          ],
+        },
+      ],
+    },
+    // A39
+    {
+      'id': 'page-42',
+      'type': 'activity',
+      'activityLabel': 'A39',
+      'title': 'Hello! My name is...',
+      'subtitle': 'Name each picture with a diphthong word.',
+      'layout': 'dual-activity',
+      'teacherNotes': 'Students name pictures and solve riddles. All answers contain diphthongs.',
+      'content': [
+        {
+          'type': 'picture-name-grid',
+          'columns': 2,
+          'entries': [
+            {'imageId': 'paw', 'blanks': 3, 'answer': 'paw'},
+            {'imageId': 'toy', 'blanks': 3, 'answer': 'toy'},
+            {'imageId': 'soup', 'blanks': 4, 'answer': 'soup'},
+            {'imageId': 'foot', 'blanks': 4, 'answer': 'foot'},
+          ],
+        },
+        {
+          'type': 'section-divider',
+          'label': 'Diphthong Guessing Game',
+        },
+        {
+          'type': 'riddle-fill',
+          'instruction': 'Write in the word (with a diphthong) that answers each clue.',
+          'riddles': [
+            {'clue': "If you're really happy, you might jump for ___ ___ ___!", 'answer': 'joy'},
+            {'clue': "Someone might say 'shhh' if you make too much ___ ___ ___ ___.", 'answer': 'noise'},
+            {'clue': "Before you swallow food, you have to ___ ___ ___ ___ it.", 'answer': 'chew'},
+            {'clue': "One way to make art is to ___ ___ ___ ___ a picture with crayons.", 'answer': 'draw'},
+          ],
+        },
+      ],
+    },
+    // A40
+    {
+      'id': 'page-43',
+      'type': 'activity',
+      'activityLabel': 'A40',
+      'title': 'How To Put A Word Together',
+      'subtitle': "Let's apply some letters!",
+      'layout': 'glued-sounds-intro',
+      'teacherNotes': 'Glued sounds (welded sounds): am, an, ang, ing, ong, ung, ank, ink, onk, unk, all.',
+      'content': [
+        {
+          'type': 'glued-sounds-grid',
+          'columns': 2,
+          'entries': [
+            {'word': 'mall', 'gluedSound': 'all', 'imageId': 'mall'},
+            {'word': 'fan', 'gluedSound': 'an', 'imageId': 'fan'},
+            {'word': 'jam', 'gluedSound': 'am', 'imageId': 'jam'},
+            {'word': 'bang', 'gluedSound': 'ang', 'imageId': 'explosion'},
+            {'word': 'swing', 'gluedSound': 'ing', 'imageId': 'swing'},
+            {'word': 'long', 'gluedSound': 'ong', 'imageId': 'snake'},
+            {'word': 'lung', 'gluedSound': 'ung', 'imageId': 'lungs'},
+            {'word': 'bank', 'gluedSound': 'ank', 'imageId': 'bank'},
+            {'word': 'wink', 'gluedSound': 'ink', 'imageId': 'wink'},
+            {'word': 'monk', 'gluedSound': 'onk', 'imageId': 'monk'},
+          ],
+        },
+      ],
+    },
+    // A41
+    {
+      'id': 'page-44',
+      'type': 'activity',
+      'activityLabel': 'A41',
+      'title': 'Glued Sounds Color Sort',
+      'layout': 'color-sort-grid',
+      'teacherNotes': 'Glued sound sorting activity. Students color-code words by their glued sound ending.',
+      'content': [
+        {
+          'type': 'color-code-key',
+          'codes': [
+            {'label': 'am', 'color': 'Red'},
+            {'label': 'an', 'color': 'Blue'},
+            {'label': 'ink', 'color': 'Green'},
+            {'label': 'unk', 'color': 'Purple'},
+          ],
+        },
+        {
+          'type': 'word-color-sort-grid',
+          'columns': 4,
+          'words': [
+            {'word': 'hand', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'think', 'gluedSound': 'ink', 'answer': 'Green'},
+            {'word': 'sink', 'gluedSound': 'ink', 'answer': 'Green'},
+            {'word': 'stand', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'trunk', 'gluedSound': 'unk', 'answer': 'Purple'},
+            {'word': 'camera', 'gluedSound': 'am', 'answer': 'Red'},
+            {'word': 'skunk', 'gluedSound': 'unk', 'answer': 'Purple'},
+            {'word': 'champ', 'gluedSound': 'am', 'answer': 'Red'},
+            {'word': 'can', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'brand', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'man', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'wink', 'gluedSound': 'ink', 'answer': 'Green'},
+            {'word': 'fancy', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'flunk', 'gluedSound': 'unk', 'answer': 'Purple'},
+            {'word': 'bunk', 'gluedSound': 'unk', 'answer': 'Purple'},
+            {'word': 'lamp', 'gluedSound': 'am', 'answer': 'Red'},
+            {'word': 'sunk', 'gluedSound': 'unk', 'answer': 'Purple'},
+            {'word': 'ham', 'gluedSound': 'am', 'answer': 'Red'},
+            {'word': 'ramp', 'gluedSound': 'am', 'answer': 'Red'},
+            {'word': 'land', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'blink', 'gluedSound': 'ink', 'answer': 'Green'},
+            {'word': 'pink', 'gluedSound': 'ink', 'answer': 'Green'},
+            {'word': 'tan', 'gluedSound': 'an', 'answer': 'Blue'},
+            {'word': 'chunk', 'gluedSound': 'unk', 'answer': 'Purple'},
+          ],
+        },
+        {
+          'type': 'free-response-section',
+          'instruction': 'Use your colors to write another word for each sound:',
+          'prompts': ['am', 'ink', 'an', 'unk'],
+        },
+      ],
+    },
+    // A42
+    {
+      'id': 'page-45',
+      'type': 'activity',
+      'activityLabel': 'A42',
+      'title': 'What Is A Prefix?',
+      'layout': 'lesson-with-activity',
+      'teacherNotes': 'Key prefixes: re- (again), un- (not), dis- (not/opposite), non- (not), mis- (wrongly).',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "A prefix is a group of letters that gets added on to the beginning of a word. They change the meaning of the word you add them to, which is called the root word.",
+          ],
+        },
+        {
+          'type': 'example-box',
+          'imageId1': 'thumbsup',
+          'imageId2': 'thumbsdown',
+          'text': "Let's look at the verb 'like.' The opposite of 'like' is 'dislike.' It contains the whole word 'like,' but it means something totally different! This is because the prefix 'dis' is negative.",
+          'note': "'dis' is a negative prefix",
+        },
+        {
+          'type': 'word-examples',
+          'instruction': 'Here are some examples of words that have prefixes:',
+          'words': [
+            {'word': 'redo', 'prefix': 're'},
+            {'word': 'misbehave', 'prefix': 'mis'},
+            {'word': 'unlock', 'prefix': 'un'},
+          ],
+        },
+        {
+          'type': 'strip-prefix',
+          'instruction': 'Take the prefix off of some of these words, and see what you are left with:',
+          'entries': [
+            {'word': 'reread', 'root': 'read', 'prefix': 're'},
+            {'word': 'unhappy', 'root': 'happy', 'prefix': 'un'},
+            {'word': 'nonstick', 'root': 'stick', 'prefix': 'non'},
+            {'word': 'inequality', 'root': 'equality', 'prefix': 'in'},
+          ],
+        },
+      ],
+    },
+    // A43
+    {
+      'id': 'page-46',
+      'type': 'activity',
+      'activityLabel': 'A43',
+      'title': 'Change It Up!',
+      'subtitle': 'Write each word with the prefix provided and read its new definition.',
+      'layout': 'prefix-build',
+      'teacherNotes': 'Students combine prefixes with root words. The definition is given so students understand the meaning change.',
+      'content': [
+        {
+          'type': 'prefix-equation',
+          'entries': [
+            {'prefix': 'pre', 'root': 'cooked', 'definition': 'cooked in advance.', 'answer': 'precooked'},
+            {'prefix': 'pre', 'root': 'judged', 'definition': 'judged in advance.', 'answer': 'prejudged'},
+            {'prefix': 'tri', 'root': 'angle', 'definition': 'three angles.', 'answer': 'triangle'},
+            {'prefix': 'non', 'root': 'fiction', 'definition': 'not fiction.', 'answer': 'nonfiction'},
+            {'prefix': 'over', 'root': 'eat', 'definition': 'eat too much.', 'answer': 'overeat'},
+          ],
+        },
+      ],
+    },
+    // A44
+    {
+      'id': 'page-47',
+      'type': 'activity',
+      'activityLabel': 'A44',
+      'title': 'All The Nots',
+      'subtitle': 'Underline the parts of these words that act as negative prefixes!',
+      'layout': 'underline-activity',
+      'teacherNotes': 'Five not-prefixes: un-, im-, in-, non-, mis-.',
+      'content': [
+        {
+          'type': 'example-box',
+          'word': 'irregular',
+          'explanation': 'Means "not regular." When you take away the prefix, you get "regular!"',
+        },
+        {
+          'type': 'word-grid-underline',
+          'columns': 3,
+          'entries': [
+            {'word': 'unusual', 'prefix': 'un'},
+            {'word': 'impossible', 'prefix': 'im'},
+            {'word': 'injustice', 'prefix': 'in'},
+            {'word': 'nonsense', 'prefix': 'non'},
+            {'word': 'misunderstand', 'prefix': 'mis'},
+            {'word': 'unhappy', 'prefix': 'un'},
+            {'word': 'mistake', 'prefix': 'mis'},
+            {'word': 'nonfiction', 'prefix': 'non'},
+            {'word': 'informal', 'prefix': 'in'},
+          ],
+        },
+        {
+          'type': 'free-response-section',
+          'instruction': 'Rewrite all of the prefixes you found:',
+          'prompts': ['un', 'im', 'in', 'non', 'mis'],
+        },
+      ],
+    },
+    // A45
+    {
+      'id': 'page-48',
+      'type': 'activity',
+      'activityLabel': 'A45',
+      'title': 'Reread It',
+      'layout': 'prefix-fill',
+      'teacherNotes': 'The re- prefix means "again." Examples: rerun, rebuild, reopen, refill, reuse.',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            'Re- is a prefix that means "again," and sometimes means "over and over." Add re- to each root word to fit the definition provided.',
+          ],
+        },
+        {
+          'type': 'example-with-answer',
+          'definition': 'To wind again.',
+          'answer': 'rewind',
+        },
+        {
+          'type': 'fill-in-blanks',
+          'entries': [
+            {'definition': 'To play again.', 'answer': 'replay'},
+            {'definition': 'To do again.', 'answer': 'redo'},
+            {'definition': 'To search over and over.', 'answer': 'research'},
+            {'definition': 'To tie again.', 'answer': 'retie'},
+            {'definition': 'To tell again.', 'answer': 'retell'},
+          ],
+        },
+        {
+          'type': 'open-ended-prompt',
+          'text': 'What are some other things you can do over and over again? Try coming up with verbs and adding re- to the beginning. Is it a word you have heard before?',
+        },
+      ],
+    },
+    // A46
+    {
+      'id': 'page-49',
+      'type': 'activity',
+      'activityLabel': 'A46',
+      'title': 'What Is A Suffix?',
+      'layout': 'lesson-with-activity',
+      'teacherNotes': 'Key suffixes: -s/-es (plural), -ing, -ed, -er, -est, -ful, -less, -ly, -able, -tion.',
+      'content': [
+        {
+          'type': 'lesson-text',
+          'paragraphs': [
+            "A suffix is a group of letters that gets added on to the end of a word. They change the meaning of the root word, just like a prefix.",
+          ],
+        },
+        {
+          'type': 'example-box',
+          'imageId1': 'fox',
+          'imageId2': 'foxes',
+          'text': "Let's look at the verb 'fox.' If you have more than one fox, that's 'foxes.' It contains the word 'fox,' but it means something new! This is because the suffix 'es' makes something plural (more than one).",
+          'note': "'es' makes the word plural",
+        },
+        {
+          'type': 'word-examples',
+          'instruction': 'Here are some examples of words that have suffixes:',
+          'words': [
+            {'word': 'jumping', 'suffix': 'ing'},
+            {'word': 'louder', 'suffix': 'er'},
+            {'word': 'played', 'suffix': 'ed'},
+          ],
+        },
+        {
+          'type': 'strip-suffix',
+          'instruction': 'Take the suffix off of some of these words, and see what you are left with:',
+          'entries': [
+            {'word': 'helpful', 'root': 'help', 'suffix': 'ful'},
+            {'word': 'slowly', 'root': 'slow', 'suffix': 'ly'},
+            {'word': 'bravest', 'root': 'brave', 'suffix': 'st'},
+            {'word': 'sizeable', 'root': 'size', 'suffix': 'able'},
+          ],
+        },
+      ],
+    },
+    // A47
+    {
+      'id': 'page-50',
+      'type': 'activity',
+      'activityLabel': 'A47',
+      'title': 'New Words!',
+      'subtitle': 'Write each word with the suffix provided and read its new definition.',
+      'layout': 'suffix-build',
+      'teacherNotes': 'Students combine root words with suffixes.',
+      'content': [
+        {
+          'type': 'suffix-equation',
+          'entries': [
+            {'root': 'box', 'suffix': 'es', 'definition': 'more than one box.', 'answer': 'boxes'},
+            {'root': 'cold', 'suffix': 'est', 'definition': 'the most cold.', 'answer': 'coldest'},
+            {'root': 'point', 'suffix': 'ed', 'definition': 'pointing in the past tense.', 'answer': 'pointed'},
+            {'root': 'fear', 'suffix': 'less', 'definition': 'without fear.', 'answer': 'fearless'},
+            {'root': 'meaning', 'suffix': 'ful', 'definition': 'full of meaning.', 'answer': 'meaningful'},
+          ],
+        },
+      ],
+    },
   ];
 }

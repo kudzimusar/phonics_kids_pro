@@ -48,6 +48,15 @@ import 'components/matching_connect_activity.dart';
 import 'components/sentence_table.dart';
 import 'components/diphthong_trace_table.dart';
 import 'components/blend_fill_open_grid.dart';
+import 'components/sentence_find_grid.dart';
+import 'components/broken_heart_match.dart';
+import 'components/lego_block_builder.dart';
+import 'components/picture_name_grid.dart';
+import 'components/glued_sound_grid.dart';
+import 'components/color_sort_grid.dart';
+import 'components/equation_builder.dart';
+import 'components/word_grid_underline.dart';
+import 'components/definition_fill_list.dart';
 import 'utils/responsive_helper.dart';
 
 class TextbookCanvas extends StatefulWidget {
@@ -412,7 +421,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           );
         },
       );
-    } else if (page['layout'] == 'lesson-with-examples') {
+    } else if (page['layout'] == 'phonics-cast-layout') {
       return Column(
         children: [
           const TextBlock(
@@ -462,66 +471,212 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         ],
       );
     } else if (page['layout'] == 'lesson-with-activity') {
-      final words = ["plan", "run", "east", "bat", "hop", "long", "see", "mom"];
-      final leftSide = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          TextBlock(
-            text: "There are two kinds of letters in the alphabet. The letters a, e, i, o, u, and y are vowels. The other letters are consonants.",
-            type: TextType.body,
+      // Data-driven handler for A42 (What Is A Prefix?) and A46 (What Is A Suffix?)
+      // Also used for the original vowel/consonant page if no content blocks are provided.
+      final blocks = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      if (blocks.isEmpty) {
+        // Legacy hardcoded path for vowel/consonant page (no blocks)
+        final words = ["plan", "run", "east", "bat", "hop", "long", "see", "mom"];
+        return SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 90),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const TextBlock(
+                text: "There are two kinds of letters in the alphabet. The letters a, e, i, o, u, and y are vowels. The other letters are consonants.",
+                type: TextType.body,
+              ),
+              const SizedBox(height: 16),
+              const PhonicFoxNarrator(
+                text: "When you make a vowel noise, your mouth and vocal chords are wide open!",
+                state: FoxState.openMouth,
+              ),
+              const SizedBox(height: 16),
+              const TextBlock(
+                text: "Go through the words below. Color the consonants in red and the vowels in blue. Try saying the words out loud!",
+                type: TextType.instruction,
+              ),
+              const SizedBox(height: 16),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 2, desktop: 2),
+                  childAspectRatio: 2.5,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: words.length,
+                itemBuilder: (context, index) => VowelConsonantWord(word: words[index]),
+              ),
+            ],
           ),
-          SizedBox(height: 16),
-          PhonicFoxNarrator(
-            text: "When you make a vowel noise, your mouth and vocal chords are wide open!",
-            state: FoxState.openMouth,
-          ),
-          SizedBox(height: 16),
-          TextBlock(
-            text: "Go through the words below. Color the consonants in red and the vowels in blue. Try saying the words out loud!",
-            type: TextType.instruction,
-          ),
-        ],
-      );
-
-      final rightSide = Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.amber.shade50,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.amber.shade200, width: 2),
-        ),
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
-            childAspectRatio: 2.5,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: words.length,
-          itemBuilder: (context, index) {
-            return VowelConsonantWord(word: words[index]);
-          },
-        ),
-      );
-
-      if (ResponsiveHelper.isMobile(context)) {
-        return Column(
-          children: [
-            leftSide,
-            const SizedBox(height: 24),
-            Expanded(child: rightSide),
-          ],
-        );
-      } else {
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(flex: 1, child: leftSide),
-            const SizedBox(width: 32),
-            Expanded(flex: 1, child: rightSide),
-          ],
         );
       }
+
+      // Data-driven: render blocks for A42, A46, etc.
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: blocks.map<Widget>((block) {
+            final type = block['type'] as String;
+
+            if (type == 'lesson-text') {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List<String>.from(block['paragraphs'] ?? []).map((p) =>
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text(p, style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 22, color: Colors.black87)),
+                    )
+                  ).toList(),
+                ),
+              );
+            }
+
+            if (type == 'example-box') {
+              final text = block['text'] as String? ?? '';
+              final note = block['note'] as String? ?? block['emphasis'] as String? ?? '';
+              final imageId1 = block['imageId1'] as String? ?? block['imageId'] as String? ?? '';
+              final imageId2 = block['imageId2'] as String? ?? '';
+              return Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.indigo.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.indigo.shade200, width: 2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (imageId1.isNotEmpty || imageId2.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (imageId1.isNotEmpty) VectorGraphic(assetName: imageId1, size: 72),
+                            if (imageId2.isNotEmpty) ...[
+                              const SizedBox(width: 32),
+                              VectorGraphic(assetName: imageId2, size: 72),
+                            ],
+                          ],
+                        ),
+                      ),
+                    Text(text, style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 20, color: Colors.black87)),
+                    if (note.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.shade100,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          note,
+                          style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 18, fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: Colors.black87),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            }
+
+            if (type == 'word-examples') {
+              final instruction = block['instruction'] as String? ?? '';
+              final words = List<Map<String, dynamic>>.from(block['words'] ?? []);
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (instruction.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Text(instruction, style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 20, color: Colors.black54, fontStyle: FontStyle.italic)),
+                      ),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 10,
+                      children: words.map((w) {
+                        final word = w['word'] as String;
+                        final affix = (w['prefix'] as String?) ?? (w['suffix'] as String?) ?? '';
+                        final isPrefix = w.containsKey('prefix');
+                        final affixStart = isPrefix ? 0 : word.toLowerCase().lastIndexOf(affix.toLowerCase());
+                        return RichText(
+                          text: TextSpan(
+                            style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 28, color: Colors.black87),
+                            children: [
+                              if (isPrefix) TextSpan(
+                                text: affix,
+                                style: const TextStyle(color: Colors.indigo, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                              ),
+                              if (isPrefix) TextSpan(text: word.substring(affix.length)),
+                              if (!isPrefix && affixStart >= 0) TextSpan(text: word.substring(0, affixStart)),
+                              if (!isPrefix && affixStart >= 0) TextSpan(
+                                text: affix,
+                                style: const TextStyle(color: Colors.purple, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                              ),
+                              if (!isPrefix && affixStart < 0) TextSpan(text: word),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (type == 'strip-prefix' || type == 'strip-suffix') {
+              final instruction = block['instruction'] as String? ?? '';
+              final entries = List<Map<String, dynamic>>.from(block['entries'] ?? []);
+              final isPrefix = type == 'strip-prefix';
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (instruction.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(instruction, style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 20, color: Colors.black87)),
+                      ),
+                    ...entries.map((e) {
+                      final word = e['word'] as String;
+                      final root = e['root'] as String;
+                      final affix = (e['prefix'] as String?) ?? (e['suffix'] as String?) ?? (e['prefixStripped'] as String?) ?? '';
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Full word with affix highlighted
+                            _buildWordWithAffix(word, affix, isPrefix),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Icon(Icons.arrow_forward, color: Colors.indigo, size: 28),
+                            ),
+                            // Root word field
+                            _StripAnswerBox(answer: root),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              );
+            }
+
+            return const SizedBox.shrink();
+          }).toList(),
+        ),
+      );
     } else if (page['layout'] == 'lesson-with-table-and-activity') {
       return Column(
         children: [
@@ -1876,7 +2031,248 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         ],
       );
     }
-    
+
+    // ── A36: Find the Diphthongs ──────────────────────────────────────────
+    else if (page['layout'] == 'sentence-find-grid') {
+      final blocks = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      final exampleBlock = blocks.firstWhere((b) => b['type'] == 'example-sentence', orElse: () => {});
+      final gridBlock = blocks.firstWhere((b) => b['type'] == 'sentence-find-grid', orElse: () => {});
+      final sentences = List<Map<String, dynamic>>.from(gridBlock['sentences'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (exampleBlock.isNotEmpty) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade50,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.teal.shade200, width: 2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Example:', style: TextStyle(fontFamily: 'SassoonPrimary', fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
+                    const SizedBox(height: 6),
+                    Text(exampleBlock['text'] as String, style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 24, color: Colors.black87)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: List<String>.from(exampleBlock['diphthongsMarked'] ?? []).map((d) =>
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(color: Colors.teal.shade100, borderRadius: BorderRadius.circular(8)),
+                          child: Text(d, style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 16, color: Colors.teal)),
+                        )
+                      ).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            if (sentences.isNotEmpty)
+              SentenceFindGrid(sentences: sentences, columns: 2),
+          ],
+        ),
+      );
+    }
+
+    // ── A37: Broken Hearts ───────────────────────────────────────────────
+    else if (page['layout'] == 'broken-heart-match') {
+      final block = (List<Map<String, dynamic>>.from(page['content'] ?? []))
+          .firstWhere((b) => b['type'] == 'heart-matching', orElse: () => {});
+      final leftSide = List<String>.from(block['leftSide'] ?? []);
+      final rightSide = List<Map<String, dynamic>>.from(block['rightSide'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+        child: BrokenHeartMatch(leftSide: leftSide, rightSide: rightSide),
+      );
+    }
+
+    // ── A38: Build the Word (Lego Blocks) ────────────────────────────────
+    else if (page['layout'] == 'block-build') {
+      final block = (List<Map<String, dynamic>>.from(page['content'] ?? []))
+          .firstWhere((b) => b['type'] == 'lego-block-activity', orElse: () => {});
+      final groups = List<Map<String, dynamic>>.from(block['groups'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+        child: LegoBlockBuilder(groups: groups),
+      );
+    }
+
+    // ── A39: Hello! My name is… ──────────────────────────────────────────
+    else if (page['layout'] == 'dual-activity') {
+      final blocks = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      final nameGridBlock = blocks.firstWhere((b) => b['type'] == 'picture-name-grid', orElse: () => {});
+      final dividerBlock = blocks.firstWhere((b) => b['type'] == 'section-divider', orElse: () => {});
+      final riddleBlock = blocks.firstWhere((b) => b['type'] == 'riddle-fill', orElse: () => {});
+      final entries = List<Map<String, dynamic>>.from(nameGridBlock['entries'] ?? []);
+      final riddles = List<Map<String, dynamic>>.from(riddleBlock['riddles'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (entries.isNotEmpty) PictureNameGrid(entries: entries, columns: 2),
+            if (dividerBlock.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Center(
+                child: Text(
+                  dividerBlock['label'] ?? '',
+                  style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 22, fontWeight: FontWeight.bold, color: Colors.indigo),
+                ),
+              ),
+              const Divider(thickness: 2, height: 24),
+            ],
+            if (riddles.isNotEmpty)
+              RiddleFillList(
+                instruction: riddleBlock['instruction'] as String? ?? '',
+                riddles: riddles,
+              ),
+          ],
+        ),
+      );
+    }
+
+    // ── A40: Glued Sounds Intro Grid ─────────────────────────────────────
+    else if (page['layout'] == 'glued-sounds-intro') {
+      final block = (List<Map<String, dynamic>>.from(page['content'] ?? []))
+          .firstWhere((b) => b['type'] == 'glued-sounds-grid', orElse: () => {});
+      final entries = List<Map<String, dynamic>>.from(block['entries'] ?? []);
+      final cols = (block['columns'] as int?) ?? 2;
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+        child: GluedSoundGrid(entries: entries, columns: cols),
+      );
+    }
+
+    // ── A41: Color Sort Grid ─────────────────────────────────────────────
+    else if (page['layout'] == 'color-sort-grid') {
+      final blocks = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      final keyBlock = blocks.firstWhere((b) => b['type'] == 'color-code-key', orElse: () => {});
+      final gridBlock = blocks.firstWhere((b) => b['type'] == 'word-color-sort-grid', orElse: () => {});
+      final freeBlock = blocks.firstWhere((b) => b['type'] == 'free-response-section', orElse: () => {});
+      final codes = List<Map<String, dynamic>>.from(keyBlock['codes'] ?? []);
+      final words = List<Map<String, dynamic>>.from(gridBlock['words'] ?? []);
+      final prompts = List<String>.from(freeBlock['prompts'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+        child: ColorSortGrid(codes: codes, words: words, freePrompts: prompts),
+      );
+    }
+
+    // ── A43: Change It Up! (Prefix Build) ───────────────────────────────
+    else if (page['layout'] == 'prefix-build') {
+      final block = (List<Map<String, dynamic>>.from(page['content'] ?? []))
+          .firstWhere((b) => b['type'] == 'prefix-equation', orElse: () => {});
+      final entries = List<Map<String, dynamic>>.from(block['entries'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+        child: EquationBuilder(entries: entries, mode: 'prefix'),
+      );
+    }
+
+    // ── A44: All The Nots (Underline Activity) ───────────────────────────
+    else if (page['layout'] == 'underline-activity') {
+      final blocks = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      final exampleBlock = blocks.firstWhere((b) => b['type'] == 'example-box' && b.containsKey('word'), orElse: () => {});
+      final gridBlock = blocks.firstWhere((b) => b['type'] == 'word-grid-underline', orElse: () => {});
+      final freeBlock = blocks.firstWhere((b) => b['type'] == 'free-response-section', orElse: () => {});
+      final entries = List<Map<String, dynamic>>.from(gridBlock['entries'] ?? []);
+      final prompts = List<String>.from(freeBlock['prompts'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (exampleBlock.isNotEmpty) ...[
+              Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.orange.shade200, width: 2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      exampleBlock['word'] as String? ?? '',
+                      style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xFFE65100)),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      exampleBlock['explanation'] as String? ?? '',
+                      style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 20, color: Colors.black87),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            WordGridUnderline(
+              entries: entries,
+              columns: (gridBlock['columns'] as int?) ?? 3,
+              freeResponsePrompts: prompts,
+              freeResponseInstruction: freeBlock['instruction'] as String?,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // ── A45: Reread It (Prefix Fill) ─────────────────────────────────────
+    else if (page['layout'] == 'prefix-fill') {
+      final blocks = List<Map<String, dynamic>>.from(page['content'] ?? []);
+      final lessonBlock = blocks.firstWhere((b) => b['type'] == 'lesson-text', orElse: () => {});
+      final exampleBlock = blocks.firstWhere((b) => b['type'] == 'example-with-answer', orElse: () => {});
+      final fillBlock = blocks.firstWhere((b) => b['type'] == 'fill-in-blanks', orElse: () => {});
+      final promptBlock = blocks.firstWhere((b) => b['type'] == 'open-ended-prompt', orElse: () => {});
+      final entries = List<Map<String, dynamic>>.from(fillBlock['entries'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (lessonBlock.isNotEmpty)
+              ...List<String>.from(lessonBlock['paragraphs'] ?? []).map((p) =>
+                Padding(padding: const EdgeInsets.only(bottom: 16), child:
+                  Text(p, style: const TextStyle(fontFamily: 'SassoonPrimary', fontSize: 22, color: Colors.black87)))),
+            const SizedBox(height: 8),
+            DefinitionFillList(
+              entries: entries,
+              example: exampleBlock.isNotEmpty ? exampleBlock : null,
+              openEndedPrompt: promptBlock.isNotEmpty ? promptBlock['text'] as String? : null,
+            ),
+          ],
+        ),
+      );
+    }
+
+    // ── A47: New Words! (Suffix Build) ───────────────────────────────────
+    else if (page['layout'] == 'suffix-build') {
+      final block = (List<Map<String, dynamic>>.from(page['content'] ?? []))
+          .firstWhere((b) => b['type'] == 'suffix-equation', orElse: () => {});
+      final entries = List<Map<String, dynamic>>.from(block['entries'] ?? []);
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+        child: EquationBuilder(entries: entries, mode: 'suffix'),
+      );
+    }
+
     // Default Fallback
     return Center(
       child: TextBlock(
@@ -1884,6 +2280,24 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         type: TextType.body,
         textAlign: TextAlign.center,
       ),
+    );
+  }
+
+  Widget _buildWordWithAffix(String word, String affix, bool isPrefix) {
+    final lower = word.toLowerCase();
+    final lowerAffix = affix.toLowerCase();
+    final idx = isPrefix ? 0 : lower.lastIndexOf(lowerAffix);
+    const base = TextStyle(fontFamily: 'SassoonPrimary', fontSize: 26, color: Colors.black87, fontWeight: FontWeight.bold);
+    const accent = TextStyle(fontFamily: 'SassoonPrimary', fontSize: 26, color: Colors.indigo, fontWeight: FontWeight.bold, decoration: TextDecoration.underline);
+
+    return RichText(
+      text: TextSpan(style: base, children: [
+        if (isPrefix) TextSpan(text: word.substring(0, affix.length), style: accent),
+        if (isPrefix) TextSpan(text: word.substring(affix.length)),
+        if (!isPrefix && idx >= 0) TextSpan(text: word.substring(0, idx)),
+        if (!isPrefix && idx >= 0) TextSpan(text: word.substring(idx), style: accent),
+        if (!isPrefix && idx < 0) TextSpan(text: word),
+      ]),
     );
   }
 
@@ -2058,6 +2472,47 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Icon(icon, size: 40, color: Colors.indigo),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A tap-to-reveal answer box for strip-prefix and strip-suffix exercises.
+class _StripAnswerBox extends StatefulWidget {
+  final String answer;
+  const _StripAnswerBox({required this.answer});
+
+  @override
+  State<_StripAnswerBox> createState() => _StripAnswerBoxState();
+}
+
+class _StripAnswerBoxState extends State<_StripAnswerBox> {
+  bool _revealed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => setState(() => _revealed = !_revealed),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: _revealed ? Colors.green.shade100 : Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: _revealed ? Colors.green : Colors.grey.shade400,
+            width: 2,
+          ),
+        ),
+        child: Text(
+          _revealed ? widget.answer : 'tap to reveal',
+          style: TextStyle(
+            fontFamily: 'SassoonPrimary',
+            fontSize: 22,
+            fontWeight: _revealed ? FontWeight.bold : FontWeight.normal,
+            color: _revealed ? Colors.green.shade800 : Colors.grey,
           ),
         ),
       ),
