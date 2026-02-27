@@ -57,6 +57,8 @@ import 'components/color_sort_grid.dart';
 import 'components/equation_builder.dart';
 import 'components/word_grid_underline.dart';
 import 'components/definition_fill_list.dart';
+import 'pages/answer_key_page.dart';
+import 'pages/certificate_page.dart';
 import 'utils/responsive_helper.dart';
 
 class TextbookCanvas extends StatefulWidget {
@@ -194,6 +196,171 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     return 'Try matching the first letter of the picture!';
   }
 
+  void _jumpToAnswerKey(String activityLabel) {
+    // 1. Find the answer key page that contains this activityLabel
+    final RegExp labelRegex = RegExp(r'^' + RegExp.escape(activityLabel) + r'\.$');
+    
+    int targetPageIndex = -1;
+    for (int i = 0; i < TextbookDatabase.pages.length; i++) {
+      final p = TextbookDatabase.pages[i];
+      if (p['layout'] == 'answer-list') {
+        final content = p['content'] as List<dynamic>? ?? [];
+        if (content.any((item) {
+          final label = item['activityLabel'] as String? ?? '';
+          return labelRegex.hasMatch(label.trim()) || label.trim() == activityLabel || label.trim() == '$activityLabel.';
+        })) {
+          targetPageIndex = i;
+          break;
+        }
+      }
+    }
+
+    if (targetPageIndex != -1) {
+      setState(() {
+        _currentPageIndex = targetPageIndex;
+        _usedLetters.clear();
+      });
+      _resetHintTimer();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Jumped to Answer Key for $activityLabel"),
+          backgroundColor: Colors.indigo,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No answer key found for this page."),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _showTableOfContents() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.8,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Table of Contents',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'FredokaOne',
+                        color: Colors.indigo,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 30),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 4),
+                      childAspectRatio: 3.0,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    itemCount: TextbookDatabase.pages.length,
+                    itemBuilder: (context, index) {
+                      final page = TextbookDatabase.pages[index];
+                      final title = page['title'] ?? 'Page ${index + 1}';
+                      final label = page['activityLabel'] ?? '';
+                      final isCurrent = _currentPageIndex == index;
+                      
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          setState(() {
+                            _currentPageIndex = index;
+                            _usedLetters.clear();
+                          });
+                          _resetHintTimer();
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isCurrent ? Colors.indigo : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isCurrent ? Colors.indigo : Colors.grey.shade300,
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              if (isCurrent)
+                                BoxShadow(color: Colors.indigo.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                decoration: BoxDecoration(
+                                  color: isCurrent ? Colors.white.withOpacity(0.2) : Colors.indigo.shade50,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10),
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    label.isNotEmpty ? label : '${index + 1}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: isCurrent ? Colors.white : Colors.indigo,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Text(
+                                    title,
+                                    style: TextStyle(
+                                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
+                                      color: isCurrent ? Colors.white : Colors.black87,
+                                      fontSize: 14,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentPage = TextbookDatabase.pages[_currentPageIndex];
@@ -234,6 +401,33 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   // 2. Navigation arrows overlay
                   _buildNavigationOverlay(),
   
+                  // 2.5 Table of Contents Button (Faded)
+                  Positioned(
+                    top: 16,
+                    right: 80, // Safe zone, just misses the 80x80 teacher mode gesture detector
+                    child: SafeArea(
+                      child: Opacity(
+                        opacity: 0.6,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _showTableOfContents,
+                            borderRadius: BorderRadius.circular(24),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.grey.shade300, width: 2),
+                              ),
+                              child: const Icon(Icons.menu_book, color: Colors.indigo, size: 28),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
                   // 3. Letter Bank at the bottom
                   if (letters.isNotEmpty)
                     Positioned(
@@ -297,7 +491,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (page['activityLabel'] != null)
-                  LabelTag(label: page['activityLabel'] as String),
+                  GestureDetector(
+                    onDoubleTap: () {
+                      _jumpToAnswerKey(page['activityLabel'] as String);
+                    },
+                    child: LabelTag(label: page['activityLabel'] as String),
+                  ),
                 const SizedBox(width: 16),
                 if (page['title'] != null)
                   Expanded(
@@ -1477,6 +1676,90 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           ),
         ],
       );
+    } else if (page['layout'] == 'table-of-contents') {
+      final validPages = TextbookDatabase.pages.asMap().entries.where((entry) {
+        final l = entry.value['layout'];
+        return l != 'cover' && l != 'welcome' && l != 'table-of-contents';
+      }).toList();
+
+      return Column(
+        children: [
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 2, tablet: 3, desktop: 4),
+                childAspectRatio: 3.0,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: validPages.length,
+              itemBuilder: (context, i) {
+                final originalIndex = validPages[i].key;
+                final p = validPages[i].value;
+                final title = p['title'] ?? 'Page ${originalIndex + 1}';
+                final label = p['activityLabel'] ?? '';
+                
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      _currentPageIndex = originalIndex;
+                      _usedLetters.clear();
+                    });
+                    _resetHintTimer();
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300, width: 2),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.indigo.shade50,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              bottomLeft: Radius.circular(10),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              label.isNotEmpty ? label : '${originalIndex + 1}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.indigo,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                                fontSize: 14,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
     } else if (page['layout'] == 'welcome') {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -2271,6 +2554,43 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
         child: EquationBuilder(entries: entries, mode: 'suffix'),
       );
+    }
+
+    // ── Phase 7: Answer Keys ─────────────────────────────────────────────
+    else if (page['layout'] == 'answer-list') {
+      return AnswerKeyPage(
+        pageData: page,
+        onNavigateToPage: (String label) {
+          final int index = TextbookDatabase.pages.indexWhere((p) => p['activityLabel'] == label);
+          if (index != -1) {
+            setState(() {
+              _currentPageIndex = index;
+              _usedLetters.clear();
+            });
+            _resetHintTimer();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Jumped back to page $label"),
+                backgroundColor: Colors.indigo,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Page not found"),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+        },
+      );
+    }
+
+    // ── Phase 7: Certificate ─────────────────────────────────────────────
+    else if (page['layout'] == 'certificate') {
+      return CertificatePage(pageData: page);
     }
 
     // Default Fallback

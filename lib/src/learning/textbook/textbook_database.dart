@@ -34,6 +34,13 @@ class TextbookDatabase {
       'title': 'Welcome!',
       'layout': 'welcome',
     },
+    // TOC
+    {
+      'id': 'toc',
+      'type': 'toc',
+      'title': 'Table of Contents',
+      'layout': 'table-of-contents',
+    },
     // A1
     {
       'id': 'page-3',
@@ -1333,6 +1340,220 @@ class TextbookDatabase {
             {'root': 'fear', 'suffix': 'less', 'definition': 'without fear.', 'answer': 'fearless'},
             {'root': 'meaning', 'suffix': 'ful', 'definition': 'full of meaning.', 'answer': 'meaningful'},
           ],
+        },
+      ],
+    },
+    // ANSWER KEYS
+    {
+      'id': 'answer-key-110',
+      'type': 'answer-key',
+      'title': 'Activities Answer key',
+      'layout': 'answer-list',
+      'content': [
+        {'activityLabel': 'A1.', 'answer': '-'},
+        {'activityLabel': 'A2.', 'answer': '-'},
+        {'activityLabel': 'A3.', 'answer': 'plan, run, east, bat, hop, long, see, mom'},
+        {'activityLabel': 'A4.', 'answer': 'spill, carry, fuss, comment, puff // ball, dress, silly, mitt, fluffy, summer'},
+        {'activityLabel': 'A5.', 'answer': 'Cat, Dog, Pig, Green, Farm, Feet'},
+        {'activityLabel': 'A6.', 'answer': 'Bus, Ham, Fox, Jam, Pail'},
+        {'activityLabel': 'A7.', 'answer': 'Gift, Bird, Boat, Flag, Girl'},
+        {'activityLabel': 'A8.', 'answer': 'Tree, Flower, Moose, Umbrella, Octopus, Rainbow, Watermelon'},
+        {
+          'activityLabel': 'A9.',
+          'answer': 'cat, hard; face, soft; pencil, soft',
+          'hasTable': true,
+          'tableData': {
+            'headers': ['Hard C', 'Soft C'],
+            'rows': [
+              ['cane', 'icy'],
+              ['cash', 'mice'],
+              ['fact', 'cent'],
+            ],
+          },
+        },
+      ],
+    },
+    {
+      'id': 'answer-key-111',
+      'type': 'answer-key',
+      'title': 'Answer key',
+      'layout': 'answer-list',
+      'content': [
+        {
+          'activityLabel': 'A10.',
+          'answer': 'gym=red, gate=black, gem=red, rag=black, giant=red, age=red',
+          'hasA10Image': true,
+        },
+        {'activityLabel': 'A11.', 'answer': '-'},
+        {'activityLabel': 'A12.', 'answer': 'lawyer - consonant, yellow - consonant, bicycle - vowel, happy - vowel, monkey - vowel, year - consonant'},
+        {
+          'activityLabel': 'A13.',
+          'answer': '',
+          'hasTable': true,
+          'tableData': {
+            'headers': ['Long E Sound', 'Long I Sound'],
+            'rows': [
+              ['pretty', 'rely'],
+              ['windy', 'fly'],
+              ['candy', 'dry'],
+              ['puppy', 'fry'],
+              ['lazy', 'apply'],
+              ['kitty', 'cycle'],
+            ],
+          },
+        },
+        {'activityLabel': 'A14.', 'answer': 'bath, mug, wing, fish, shell, frog, map, tulip, bugs'},
+        {'activityLabel': 'A15.', 'answer': 'cap, log, sun, lip, bed'},
+      ],
+    },
+    {
+      'id': 'answer-key-112',
+      'type': 'answer-key',
+      'title': 'Answer key',
+      'layout': 'answer-list',
+      'content': [
+        {
+          'activityLabel': 'A16.',
+          'answer': 'silo=blue(Long I), fed=green(Short E), made=red(Long A), sand=orange(Short A), she=yellow(Long E), tin=purple(Short I), set=green(Short E), halo=red(Long A), bit=purple(Short I)',
+          'hasA16Image': true,
+        },
+        {
+          'activityLabel': 'A17.',
+          'answer': 'mop=orange, lady=blue, fun=yellow, music=green, sum=yellow, city=blue, told=red, pry=purple',
+          'hasA17Image': true,
+        },
+        {'activityLabel': 'A18.', 'answer': 'Circle: ruler, purple, alarm, chair, girl, sport, car'},
+        {'activityLabel': 'A19.', 'answer': 'bird, yarn, storm, finger, fork, corn, chair, bear, purse'},
+        {'activityLabel': 'A20.', 'answer': 'hat, sun, bag // box, cup, ten, bat, win'},
+        {'activityLabel': 'A21.', 'answer': '-'},
+      ],
+    },
+    {
+      'id': 'answer-key-113',
+      'type': 'answer-key',
+      'title': 'Answer key',
+      'layout': 'answer-list',
+      'content': [
+        {'activityLabel': 'A22.', 'answer': 'bath, cash, beach, pick'},
+        {'activityLabel': 'A23.', 'answer': 'The sun is bright when it is high in the sky. I put my clothes back in the bureau and my food back in the fridge. Today we match, and we look beautiful.'},
+        {'activityLabel': 'A24.', 'answer': 'sheep, cheese, cherry, shark // chalk, shell, chair, ships'},
+        {
+          'activityLabel': 'A25.',
+          'answer': '',
+          'hasTable': true,
+          'tableData': {
+            'headers': ['Hard th sound', 'Soft th sound'],
+            'rows': [
+              ['they', 'bath'],
+              ['father', 'math'],
+              ['this', 'thorn'],
+              ['there', 'birthday'],
+            ],
+          },
+        },
+        {'activityLabel': 'A26.', 'answer': 'My birthday is in a month! I am going to be eight. There will be chocolate ice cream with cherries.'},
+        {'activityLabel': 'A27.', 'answer': 'Blue, Wish, Bright, Catch'},
+        {'activityLabel': 'A28.', 'answer': 'Today I wore a scarf and a shirt with stripes. I love frogs, but not snakes. I like to play! I slide, climb trees, and splash around.'},
+        {'activityLabel': 'A29.', 'answer': '-'},
+        {'activityLabel': 'A30.', 'answer': 'brag - blend, chips - digraph, scrape - blend, shave - digraph, grip - blend, thump - digraph, slide - blend, drove - blend, when - digraph, phone - digraph, twig - blend, plate - blend'},
+        {'activityLabel': 'A31.', 'answer': 'fling, dragon, price, slime, travel'},
+        {'activityLabel': 'A32.', 'answer': 'skunk, wasp, slab, sheep, ugly, fruit'},
+      ],
+    },
+    {
+      'id': 'answer-key-114',
+      'type': 'answer-key',
+      'title': 'Answer key',
+      'layout': 'answer-list',
+      'content': [
+        {'activityLabel': 'A33.', 'answer': 'glove, sled, clam, table, brain, agree, flower, snail, twinkle'},
+        {'activityLabel': 'A34.', 'answer': '-'},
+        {'activityLabel': 'A35.', 'answer': '-'},
+        {'activityLabel': 'A36.', 'answer': 'I have a toy owl. I will boil some stew for dinner. The noise of the fountain is soothing. I enjoy bowling! My mother taught me how to play.'},
+        {'activityLabel': 'A37.', 'answer': 'room, hawk, sour, grow'},
+        {'activityLabel': 'A38.', 'answer': 'cow, around, flower, swoop, crawl'},
+        {'activityLabel': 'A39.', 'answer': 'paw, toys, soup, foot // joy, noise, chew, draw'},
+        {'activityLabel': 'A40.', 'answer': '-'},
+        {
+          'activityLabel': 'A41.',
+          'answer': '\nfree response',
+          'hasTable': true,
+          'tableData': {
+            'headers': ['', '', '', ''],
+            'rows': [
+              ['blue', 'green', 'green', 'blue'],
+              ['purple', 'red', 'purple', 'red'],
+              ['blue', 'blue', 'blue', 'green'],
+              ['blue', 'purple', 'purple', 'red'],
+              ['purple', 'red', 'red', 'blue'],
+              ['green', 'green', 'blue', 'purple'],
+            ]
+          },
+        },
+        {'activityLabel': 'A42.', 'answer': 'happy, stick, equality'},
+        {'activityLabel': 'A43.', 'answer': 'precooked, prejudged, triangle, nonfiction, overeat'},
+        {'activityLabel': 'A44.', 'answer': 'unusual, impossible, injustice, nonsense, misunderstand, unhappy, mistake, nonfiction, informal // un, im, in, non, mis'},
+      ],
+    },
+    {
+      'id': 'answer-key-115',
+      'type': 'answer-key',
+      'title': 'Answer key',
+      'layout': 'answer-list',
+      'content': [
+        {'activityLabel': 'A45.', 'answer': 'replay, redo, research, retie, retell'},
+        {'activityLabel': 'A46.', 'answer': 'slow, brave, size'},
+        {'activityLabel': 'A47.', 'answer': 'boxes, coldest, pointed, fearless, meaningful'},
+        {
+          'activityLabel': 'A48.',
+          'answer': 'Add -ing to the end of these verbs and rewrite them.\nbuy buying\nhelp helping\neat eating\nfly flying\nsee seeing\nrain raining',
+          'hasA48Image': true,
+        },
+        {
+          'activityLabel': 'A49.',
+          'answer': '',
+          'hasTable': true,
+          'tableData': {
+            'headers': ['A Person Who', 'More'],
+            'rows': [
+              ['driver', 'weirder'],
+              ['rider', 'tastier'],
+              ['writer', 'easier'],
+              ['player', 'flashier'],
+              ['sleeper', 'happier'],
+            ],
+          },
+        },
+        {'activityLabel': 'A50.', 'answer': 'cuter 2. smartest 3. nice 4. taller'},
+        {'activityLabel': 'A51.', 'answer': 'lawyer - suffix, predestine - prefix, trees - suffix, nicest - suffix, singer - suffix, untold - prefix, lightest - suffix, untrue - prefix'},
+      ],
+    },
+    // CONGRATULATIONS PAGE
+    {
+      'id': 'congratulations',
+      'type': 'certificate',
+      'title': 'CONGRATULATIONS!',
+      'layout': 'certificate',
+      'content': [
+        {
+          'type': 'message',
+          'text': 'Excellent work! I am sure that there were some obstacles along the way, but you persisted and finished the activities! Hooray!',
+        },
+        {
+          'type': 'acknowledgment',
+          'text': "I also want to give a HUGE THANKS to our staff at Kids Castle Press for making these books a reality. It wouldn't have been possible without them. Feel free to visit our website below to show them some love!",
+        },
+        {
+          'type': 'cta',
+          'text': "In addition, if you'd like us to send you more free content to print out, you can do so by visiting our website: www.kidscastlepress.com",
+        },
+        {
+          'type': 'review-request',
+          'text': "Lastly, if you like this book, would you be so kind as to drop me a review on Amazon? To add a cherry on top... You can email us for a chance to win a free physical copy of our next book: info@kidscastlepress.com\n\nDon't miss out as we won't be doing this forever... it's a limited time only!\n\nThank you very much!\n\nJennifer L. Trace",
+        },
+        {
+          'type': 'certificate',
+          'label': 'PHONICS PRO CERTIFICATE',
         },
       ],
     },
