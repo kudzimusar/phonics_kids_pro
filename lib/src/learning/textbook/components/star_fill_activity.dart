@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import '../utils/responsive_helper.dart';
 
+/// A27: Shooting Stars — fixed-direction star + ribbon tail
+/// Star is always on the LEFT, sweeping ribbon tail goes to the RIGHT.
+/// Matches the physical textbook layout exactly.
 class StarFillActivity extends StatefulWidget {
   final List<Map<String, dynamic>> entries;
 
@@ -13,6 +15,7 @@ class StarFillActivity extends StatefulWidget {
 
 class _StarFillActivityState extends State<StarFillActivity> {
   final Map<int, TextEditingController> _controllers = {};
+  final Map<int, bool> _correct = {};
 
   @override
   void initState() {
@@ -30,136 +33,176 @@ class _StarFillActivityState extends State<StarFillActivity> {
     super.dispose();
   }
 
+  void _checkAnswer(int index) {
+    final entry = widget.entries[index];
+    final answer = entry['answer'] as String;
+    final input = _controllers[index]!.text.trim().toLowerCase();
+    setState(() {
+      _correct[index] = input == answer.toLowerCase();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: ResponsiveHelper.getResponsiveGridCount(
-          context: context, 
-          mobile: 1, 
-          tablet: 2, 
-          desktop: 2
-        ),
-        childAspectRatio: ResponsiveHelper.isMobile(context) ? 2.8 : 2.5,
-        crossAxisSpacing: 32,
-        mainAxisSpacing: 32,
-      ),
-      itemCount: widget.entries.length,
-      itemBuilder: (context, index) {
+    return Column(
+      children: List.generate(widget.entries.length, (index) {
         final entry = widget.entries[index];
         final partial = entry['partial'] as String;
+        final isCorrect = _correct[index] == true;
 
-        return SizedBox(
-          height: 140,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: ShootingStarPainter(),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          child: SizedBox(
+            height: 130,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // The painted star + ribbon tail
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: ShootingStarPainter(isCorrect: isCorrect),
+                  ),
                 ),
-              ),
-              Positioned.fill(
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 140, // Match the star width
-                      child: Center(
-                        child: Text(
-                          partial,
-                          style: const TextStyle(
-                            fontFamily: 'SassoonPrimary',
-                            fontSize: 42,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                // Content overlay: partial text inside the star on the left
+                // Input box inside the ribbon on the right
+                Positioned.fill(
+                  child: Row(
+                    children: [
+                      // Star zone: partial text
+                      SizedBox(
+                        width: 110,
+                        child: Center(
+                          child: Text(
+                            partial,
+                            style: TextStyle(
+                              fontFamily: 'SassoonPrimary',
+                              fontSize: 38,
+                              fontWeight: FontWeight.bold,
+                              color: isCorrect ? Colors.green.shade800 : Colors.black87,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 50.0, left: 10.0, bottom: 20.0), // pad for spikes and fit curve
-                          child: SizedBox(
-                            width: 100,
-                            child: TextField(
-                              controller: _controllers[index],
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontFamily: 'SassoonPrimary',
-                                fontSize: 42,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueAccent,
-                              ),
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.blueGrey.shade300, width: 4),
+                      // Ribbon zone: text input for the answer
+                      Expanded(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 24.0, bottom: 8.0),
+                            child: SizedBox(
+                              width: 120,
+                              child: TextField(
+                                controller: _controllers[index],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'SassoonPrimary',
+                                  fontSize: 38,
+                                  fontWeight: FontWeight.bold,
+                                  color: isCorrect ? Colors.green.shade700 : Colors.blue.shade700,
                                 ),
-                                focusedBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.blueAccent, width: 4),
+                                decoration: InputDecoration(
+                                  hintText: '___',
+                                  hintStyle: TextStyle(
+                                    color: Colors.blueGrey.shade300,
+                                    fontSize: 32,
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: isCorrect ? Colors.green : Colors.blueGrey.shade300,
+                                      width: 3,
+                                    ),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.blue, width: 3),
+                                  ),
+                                  counterText: '',
                                 ),
+                                maxLength: 4,
+                                onChanged: (_) => _checkAnswer(index),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
-      },
+      }),
     );
   }
 }
 
+/// Paints: [★]——/comet ribbon——>[✦ spike]
+/// Star on the LEFT, ribbon sweeps to the RIGHT.
 class ShootingStarPainter extends CustomPainter {
+  final bool isCorrect;
+
+  const ShootingStarPainter({this.isCorrect = false});
+
   @override
   void paint(Canvas canvas, Size size) {
+    final fillColor = isCorrect ? Colors.green.shade100 : Colors.white;
+    final borderColor = isCorrect ? Colors.green.shade400 : Colors.black87;
+
     final paint = Paint()
-      ..color = Colors.white
+      ..color = fillColor
       ..style = PaintingStyle.fill;
     final borderPaint = Paint()
-      ..color = Colors.black87
+      ..color = borderColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
+      ..strokeWidth = 2.5;
 
-    // Draw tail
+    // ---- Draw the ribbon tail (sweeps from star to right with arrow spikes) ----
+    // Star center is at cx=100, cy=size.height/2
+    final double cy = size.height / 2;
+    final double starCX = 90.0;
+    final double tailStart = starCX + 10;   // where tail begins (right edge of star)
+    final double tailEnd = size.width - 20; // where tail ends
+    final double topY = cy - 28;
+    final double botY = cy + 28;
+
     final tailPath = Path();
-    tailPath.moveTo(70, size.height * 0.25); // start near top of star
-    tailPath.quadraticBezierTo(size.width * 0.5, 0, size.width - 20, 20); // Top curve
-    // Spikes on the right
-    tailPath.lineTo(size.width - 40, size.height * 0.35);
-    tailPath.lineTo(size.width - 10, size.height * 0.5);
-    tailPath.lineTo(size.width - 40, size.height * 0.65);
-    tailPath.lineTo(size.width - 20, size.height - 20);
-    
-    // Bottom curve
-    tailPath.quadraticBezierTo(size.width * 0.5, size.height, 70, size.height * 0.75);
+    // Top curve from star rightward
+    tailPath.moveTo(tailStart, cy - 20);
+    tailPath.quadraticBezierTo(size.width * 0.4, topY, tailEnd - 30, topY + 4);
+    // Right spike cluster
+    tailPath.lineTo(tailEnd, cy - 16);
+    tailPath.lineTo(tailEnd - 20, cy);
+    tailPath.lineTo(tailEnd, cy + 16);
+    // Bottom curve back left to star
+    tailPath.quadraticBezierTo(size.width * 0.4, botY, tailStart, cy + 20);
     tailPath.close();
 
     canvas.drawPath(tailPath, paint);
     canvas.drawPath(tailPath, borderPaint);
 
-    // Draw 5-point star
-    final starPath = Path();
-    final double cx = 70;
-    final double cy = size.height / 2;
-    final double outerRadius = 60;
-    final double innerRadius = 26;
-    final int points = 5;
-    final double angle = (pi * 2) / points;
+    // ---- Draw the 5-point star on the left ----
+    final double cx = starCX;
+    final double outerRadius = 52.0;
+    final double innerRadius = 22.0;
+    const int points = 5;
+    const double startAngle = -pi / 2; // Top-pointing
+    final double angleStep = (pi * 2) / points;
 
-    starPath.moveTo(cx, cy - outerRadius);
+    final starPath = Path();
     for (int i = 0; i < points; i++) {
-      starPath.lineTo(cx + cos(_angle(i, angle)) * outerRadius,
-          cy + sin(_angle(i, angle)) * outerRadius);
-      starPath.lineTo(cx + cos(_angle(i, angle) + angle / 2) * innerRadius,
-          cy + sin(_angle(i, angle) + angle / 2) * innerRadius);
+      final outerAngle = startAngle + i * angleStep;
+      final innerAngle = outerAngle + angleStep / 2;
+
+      final ox = cx + cos(outerAngle) * outerRadius;
+      final oy = cy + sin(outerAngle) * outerRadius;
+      final ix = cx + cos(innerAngle) * innerRadius;
+      final iy = cy + sin(innerAngle) * innerRadius;
+
+      if (i == 0) {
+        starPath.moveTo(ox, oy);
+      } else {
+        starPath.lineTo(ox, oy);
+      }
+      starPath.lineTo(ix, iy);
     }
     starPath.close();
 
@@ -167,10 +210,7 @@ class ShootingStarPainter extends CustomPainter {
     canvas.drawPath(starPath, borderPaint);
   }
 
-  double _angle(int index, double angle) {
-    return -pi / 2 + index * angle;
-  }
-
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant ShootingStarPainter oldDelegate) =>
+      oldDelegate.isCorrect != isCorrect;
 }

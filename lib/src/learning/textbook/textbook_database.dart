@@ -777,6 +777,12 @@ class TextbookDatabase {
               'endingBalloons': ["a", "v", "e", "l"],
               'answer': "tr",
               'word': "travel"
+            },
+            {
+              'blendChoices': ["st", "sp"],
+              'endingBalloons': ["o", "r", "k"],
+              'answer': "st",
+              'word': "stork"
             }
           ]
         }

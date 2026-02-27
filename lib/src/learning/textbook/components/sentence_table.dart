@@ -1,69 +1,58 @@
 import 'package:flutter/material.dart';
 import 'vector_graphic.dart';
 
+/// SentenceTable for A34: Defining Diphthongs
+/// Matches the exact PDF layout — alternating rows where even rows are
+/// [text | image] and odd rows are [image | text], except row 1 which is
+/// [text | image]. This creates the staggered checkerboard look from page 37.
 class SentenceTable extends StatelessWidget {
   final List<Map<String, dynamic>> rows;
-  /* Example row:
-    {
-      'text': "The author wrote a book on law.",
-      'imageId': "book2",
-      'diphthongs': ["aw", "oo"]
-    }
-  */
 
   const SentenceTable({Key? key, required this.rows}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.blueGrey.shade100, width: 2),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          )
-        ],
-      ),
-      child: Column(
-        children: rows.map((row) {
-          final isLast = row == rows.last;
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: isLast 
-                  ? null 
-                  : Border(bottom: BorderSide(color: Colors.blueGrey.shade100, width: 2)),
+    return Table(
+      border: TableBorder.all(color: Colors.black87, width: 2),
+      columnWidths: const {
+        0: FlexColumnWidth(1),
+        1: FlexColumnWidth(1),
+      },
+      children: rows.asMap().entries.map((entry) {
+        final index = entry.key;
+        final row = entry.value;
+        final text = row['text'] as String;
+        final imageId = row['imageId'] as String;
+        final diphthongs = List<String>.from(row['diphthongs'] ?? []);
+
+        // Even index (0, 2, 4...): text LEFT, image RIGHT
+        // Odd index (1, 3, 5...): image LEFT, text RIGHT
+        final textIsLeft = index.isEven;
+
+        final textCell = TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: _buildHighlightedSentence(text, diphthongs),
+          ),
+        );
+
+        final imageCell = TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Center(
+              child: VectorGraphic(assetName: imageId, size: 80),
             ),
-            child: Row(
-              children: [
-                // Image
-                SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Center(
-                    child: VectorGraphic(
-                      assetName: row['imageId'] as String,
-                      size: 80,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 24),
-                // Sentence
-                Expanded(
-                  child: _buildHighlightedSentence(
-                    row['text'] as String, 
-                    List<String>.from(row['diphthongs'] ?? []),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
+          ),
+        );
+
+        return TableRow(
+          children: textIsLeft
+              ? [textCell, imageCell]
+              : [imageCell, textCell],
+        );
+      }).toList(),
     );
   }
 
@@ -72,29 +61,25 @@ class SentenceTable extends StatelessWidget {
       return Text(
         sentence,
         style: const TextStyle(
-          fontSize: 32,
+          fontSize: 22,
           fontFamily: 'SassoonPrimary',
+          fontWeight: FontWeight.bold,
           color: Colors.black87,
         ),
       );
     }
 
-    // We build the TextSpans by searching for the target substrings.
-    // To handle multiple targets, we can use a regex approach.
-    // E.g., targets = ["aw", "oo"]. Pattern = "(aw|oo)"
-    
-    // Escape targets for regex
     final escapedTargets = targets.map((t) => RegExp.escape(t)).join('|');
     final regex = RegExp('($escapedTargets)', caseSensitive: false);
-    
     final matches = regex.allMatches(sentence);
-    
+
     if (matches.isEmpty) {
-       return Text(
+      return Text(
         sentence,
         style: const TextStyle(
-          fontSize: 32,
+          fontSize: 22,
           fontFamily: 'SassoonPrimary',
+          fontWeight: FontWeight.bold,
           color: Colors.black87,
         ),
       );
@@ -104,41 +89,38 @@ class SentenceTable extends StatelessWidget {
     int currentIndex = 0;
 
     for (final match in matches) {
-      // Add text before match
       if (match.start > currentIndex) {
         spans.add(TextSpan(
           text: sentence.substring(currentIndex, match.start),
-          style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.normal),
+          style: const TextStyle(color: Colors.black87),
         ));
       }
-
-      // Add match text
       spans.add(TextSpan(
         text: sentence.substring(match.start, match.end),
         style: const TextStyle(
-          color: Colors.redAccent, // Emphasize diphthongs
+          color: Color(0xFFD32F2F),
           fontWeight: FontWeight.bold,
           decoration: TextDecoration.underline,
-          decorationColor: Colors.redAccent,
+          decorationColor: Color(0xFFD32F2F),
+          decorationThickness: 2,
         ),
       ));
-
       currentIndex = match.end;
     }
 
-    // Add remaining text
     if (currentIndex < sentence.length) {
       spans.add(TextSpan(
         text: sentence.substring(currentIndex),
-        style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.normal),
+        style: const TextStyle(color: Colors.black87),
       ));
     }
 
     return RichText(
       text: TextSpan(
         style: const TextStyle(
-          fontSize: 32,
+          fontSize: 22,
           fontFamily: 'SassoonPrimary',
+          fontWeight: FontWeight.bold,
         ),
         children: spans,
       ),

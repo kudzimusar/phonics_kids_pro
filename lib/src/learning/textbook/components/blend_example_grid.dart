@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'vector_graphic.dart';
+import 'finger_trace_canvas.dart';
 import '../utils/responsive_helper.dart';
 
+/// A29: Practicing Consonant Blends
+/// Open, borderless layout matching the physical textbook.
+/// Each item: large image (open, no card container), underlined word below,
+/// faded blend beside it for tracing.
 class BlendExampleGrid extends StatelessWidget {
   final List<Map<String, dynamic>> entries;
   final int columns;
@@ -15,52 +20,62 @@ class BlendExampleGrid extends StatelessWidget {
   List<TextSpan> _buildHighlightedWord(String word, String blend) {
     final lowerWord = word.toLowerCase();
     final lowerBlend = blend.toLowerCase();
-    
+
     final startIndex = lowerWord.indexOf(lowerBlend);
     if (startIndex == -1) {
       return [TextSpan(text: word, style: const TextStyle(color: Colors.black87))];
     }
 
     final endIndex = startIndex + blend.length;
-    
+
     return [
       TextSpan(
         text: word.substring(0, startIndex),
-        style: const TextStyle(color: Colors.black87),
+        style: const TextStyle(
+          color: Colors.black87,
+          decoration: TextDecoration.underline,
+          decorationColor: Colors.black87,
+        ),
       ),
       TextSpan(
         text: word.substring(startIndex, endIndex),
-        style: TextStyle(
-          color: Colors.deepPurple.shade600,
+        style: const TextStyle(
+          color: Color(0xFF512DA8), // Deep purple blend highlight
           fontWeight: FontWeight.bold,
           decoration: TextDecoration.underline,
-          decorationColor: Colors.deepPurple.shade600,
-          decorationThickness: 2,
+          decorationColor: Color(0xFF512DA8),
+          decorationThickness: 3,
         ),
       ),
       TextSpan(
         text: word.substring(endIndex),
-        style: const TextStyle(color: Colors.black87),
+        style: const TextStyle(
+          color: Colors.black87,
+          decoration: TextDecoration.underline,
+          decorationColor: Colors.black87,
+        ),
       ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final crossAxisCount = ResponsiveHelper.getResponsiveGridCount(
+      context: context,
+      mobile: 2,
+      tablet: columns,
+      desktop: columns,
+    );
+
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: ResponsiveHelper.getResponsiveGridCount(
-          context: context, 
-          mobile: 2, 
-          tablet: columns, 
-          desktop: columns
-        ),
-        childAspectRatio: 0.85,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: 0.9,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
       ),
       itemCount: entries.length,
       itemBuilder: (context, index) {
@@ -69,46 +84,51 @@ class BlendExampleGrid extends StatelessWidget {
         final blend = entry['blend'] as String;
         final imageId = entry['imageId'] as String;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.deepPurple.shade100, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.deepPurple.shade50,
-                offset: const Offset(0, 4),
-                blurRadius: 8,
-              )
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: VectorGraphic(assetName: imageId, size: 80),
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Large image, open — no card container
+            Expanded(
+              flex: 3,
+              child: VectorGraphic(assetName: imageId, size: 100),
+            ),
+            // Word with blend underlined
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: const TextStyle(
+                  fontFamily: 'SassoonPrimary',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
                 ),
+                children: _buildHighlightedWord(word, blend),
               ),
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: RichText(
-                    text: TextSpan(
+            ),
+            // FingerTraceCanvas — real tracing target for the blend
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: SizedBox(
+                width: 80,
+                height: 36,
+                child: FingerTraceCanvas(
+                  inkColor: const Color(0xFF512DA8),
+                  strokeWidth: 8,
+                  showClearButton: false,
+                  child: Center(
+                    child: Text(
+                      blend,
                       style: const TextStyle(
                         fontFamily: 'SassoonPrimary',
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 22,
+                        color: Color(0x40512DA8),
                       ),
-                      children: _buildHighlightedWord(word, blend),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

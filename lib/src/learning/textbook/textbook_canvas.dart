@@ -47,6 +47,7 @@ import 'components/balloon_choice_activity.dart';
 import 'components/matching_connect_activity.dart';
 import 'components/sentence_table.dart';
 import 'components/diphthong_trace_table.dart';
+import 'components/blend_fill_open_grid.dart';
 import 'utils/responsive_helper.dart';
 
 class TextbookCanvas extends StatefulWidget {
@@ -315,7 +316,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(
-                bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 0.0,
+                bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 90.0,
               ),
               child: _buildSpecificLayout(page, constraints),
             ),
@@ -1628,8 +1629,15 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       TextBlock(text: block['text'], type: TextType.instruction),
                       const SizedBox(height: 24),
                     ],
-                    if (block['type'] == 'fill-in-digraph' || block['type'] == 'picture-blend-fill') ...[
+                    if (block['type'] == 'fill-in-digraph') ...[
                       PictureFillInGrid(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                        columns: block['columns'] ?? 3,
+                      ),
+                      const SizedBox(height: 60),
+                    ],
+                    if (block['type'] == 'picture-blend-fill') ...[
+                      BlendFillOpenGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
                         columns: block['columns'] ?? 3,
                       ),
@@ -1658,8 +1666,15 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                         TextBlock(text: para, type: TextType.rule),
                         const SizedBox(height: 16),
                       ],
-                    if (block['type'] == 'fill-in-digraph' || block['type'] == 'picture-blend-fill') ...[
+                    if (block['type'] == 'fill-in-digraph') ...[
                       PictureFillInGrid(
+                        entries: List<Map<String, dynamic>>.from(block['entries']),
+                        columns: block['columns'] ?? 3,
+                      ),
+                      const SizedBox(height: 60),
+                    ],
+                    if (block['type'] == 'picture-blend-fill') ...[
+                      BlendFillOpenGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
                         columns: block['columns'] ?? 3,
                       ),
@@ -1786,7 +1801,73 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                         explanation: block['note'] as String?,
                       ),
                       const SizedBox(height: 32),
-                    ]
+                    ],
+                    // A28: Spot The Blends label
+                    if (block['type'] == 'instruction') ...[
+                      Container(
+                        margin: const EdgeInsets.only(top: 16, bottom: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black87, width: 2),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          block['text'] as String,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontFamily: 'SassoonPrimary',
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    // A28: Numbered sentences with blend spotting
+                    if (block['type'] == 'sentence-find-numbered') ...[
+                      for (final sentence in (block['sentences'] as List<dynamic>)) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if ((sentence['number'] as int?) == 0)
+                                Expanded(
+                                  child: Text(
+                                    sentence['text'] as String,
+                                    style: const TextStyle(
+                                      fontFamily: 'SassoonPrimary',
+                                      fontSize: 18,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                )
+                              else ...[
+                                Text(
+                                  '${sentence['number']}. ',
+                                  style: const TextStyle(
+                                    fontFamily: 'SassoonPrimary',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    sentence['text'] as String,
+                                    style: const TextStyle(
+                                      fontFamily: 'SassoonPrimary',
+                                      fontSize: 18,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                    ],
                   ]
                 ],
               ),

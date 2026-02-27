@@ -168,6 +168,75 @@ class _VectorGraphicState extends State<VectorGraphic> with SingleTickerProvider
     if (lowerName.contains('mouth') || lowerName.contains('lip')) return '👄';
     if (lowerName.contains('green')) return '🟩';
     
+    // --- A21: Digraph words ---
+    if (lowerName.contains('wheel')) return '🚲';
+    if (lowerName.contains('photo')) return '📷';
+    if (lowerName.contains('shell')) return '🐚';
+    if (lowerName.contains('cheese')) return '🧀';
+    if (lowerName.contains('path')) return '🛤️';
+    if (lowerName.contains('ghost')) return '👻';
+    if (lowerName.contains('knight')) return '🏇';
+    if (lowerName.contains('wing')) return '🦅';
+    if (lowerName.contains('write') || lowerName.contains('pencil')) return '✏️';
+    if (lowerName.contains('nail')) return '🔨';
+    if (lowerName.contains('glue')) return '🧴';
+    if (lowerName.contains('book')) return '📚';
+    if (lowerName.contains('leaf')) return '🍃';
+    if (lowerName.contains('soap')) return '🧼';
+    if (lowerName.contains('coin')) return '🪙';
+    // --- A29: Consonant Blend words ---
+    if (lowerName.contains('block') || lowerName.contains('blocks')) return '🧱';
+    if (lowerName.contains('branch')) return '🌿';
+    if (lowerName.contains('clam')) return '🦪';
+    if (lowerName.contains('crow')) return '🐦‍⬛';
+    if (lowerName.contains('dragon')) return '🐉';
+    if (lowerName.contains('fruit')) return '🍇';
+    if (lowerName.contains('glitter')) return '✨';
+    if (lowerName.contains('grape')) return '🍇';
+    if (lowerName.contains('plane')) return '✈️';
+    if (lowerName.contains('pretzel')) return '🥨';
+    if (lowerName.contains('slug')) return '🐌';
+    if (lowerName.contains('smoke')) return '💨';
+    if (lowerName.contains('space')) return '🪐';
+    if (lowerName.contains('stove')) return '🍳';
+    if (lowerName.contains('strong') || lowerName.contains('muscle')) return '💪';
+    if (lowerName.contains('splash')) return '💦';
+    // --- A28: Spot the Blends words ---
+    if (lowerName.contains('bubble') || lowerName.contains('clean')) return '🫧';
+    if (lowerName.contains('scarf')) return '🧣';
+    if (lowerName.contains('slide')) return '🛝';
+    // --- A31: Balloon words ---
+    if (lowerName.contains('fling') || lowerName.contains('ring')) return '💍';
+    if (lowerName.contains('prime')) return '🔢';
+    if (lowerName.contains('travel')) return '🧳';
+    if (lowerName.contains('stork')) return '🦢';
+    // --- A33: Blend fill words ---
+    if (lowerName.contains('glove') || lowerName.contains('ove')) return '🧤';
+    if (lowerName.contains('snail')) return '🐌';
+    if (lowerName.contains('clock')) return '🕐';
+    if (lowerName.contains('flower')) return '🌸';
+    if (lowerName.contains('fly')) return '🪰';
+    if (lowerName.contains('sled')) return '🛷';
+    // --- A34/A35: Diphthong words ---
+    if (lowerName.contains('cow') || lowerName.contains('moo')) return '🐄';
+    if (lowerName.contains('owl')) return '🦉';
+    if (lowerName.contains('foot')) return '🦶';
+    if (lowerName.contains('boot')) return '🥾';
+    if (lowerName.contains('law') || lowerName.contains('author')) return '⚖️';
+    if (lowerName.contains('house')) return '🏠';
+    if (lowerName.contains('oil') || lowerName.contains('oi')) return '🫙';
+    if (lowerName.contains('boy') || lowerName.contains('toy')) return '🧸';
+    if (lowerName.contains('fawn') || lowerName.contains('aw')) return '🦌';
+    if (lowerName.contains('toad')) return '🐊';
+    if (lowerName.contains('hook')) return '🪝';
+    if (lowerName.contains('pool')) return '🏊';
+    if (lowerName.contains('moon')) return '🌕';
+    if (lowerName.contains('book')) return '📖';
+    if (lowerName.contains('cook')) return '🧑‍🍳';
+    if (lowerName.contains('wood')) return '🪵';
+    if (lowerName.contains('tooth') || lowerName.contains('teeth')) return '🦷';
+    if (lowerName.contains('soup')) return '🍲';
+
     return '🌟'; // Default generic icon fallback
   }
 }
