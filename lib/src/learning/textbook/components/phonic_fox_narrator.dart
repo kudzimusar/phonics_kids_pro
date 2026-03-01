@@ -24,6 +24,8 @@ class _PhonicFoxNarratorState extends State<PhonicFoxNarrator> {
       emoji = "🦊😮";
     } else if (widget.state == FoxState.success) {
       emoji = "🦊✨";
+    } else if (widget.state == FoxState.thinking) {
+      emoji = "🦊🤔";
     }
 
     return Container(
@@ -86,5 +88,6 @@ enum FoxState {
   idle,
   openMouth,
   success,
-  error
+  error,
+  thinking
 }

@@ -8,6 +8,7 @@ class ColorSortGrid extends StatefulWidget {
   final List<Map<String, dynamic>> words; // {word, gluedSound, answer}
   final String? instruction;
   final List<String> freePrompts;
+  final ValueChanged<bool>? onStatusChanged;
 
   const ColorSortGrid({
     Key? key,
@@ -15,6 +16,7 @@ class ColorSortGrid extends StatefulWidget {
     required this.words,
     this.instruction,
     this.freePrompts = const [],
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -63,6 +65,19 @@ class _ColorSortGridState extends State<ColorSortGrid> {
     setState(() {
       _selected[word] = nextIndex == colorLabels.length ? null : colorLabels[nextIndex];
     });
+
+    if (widget.onStatusChanged != null) {
+      bool allCorrect = true;
+      for (final wordData in widget.words) {
+        if (!_isCorrect(wordData)) {
+          allCorrect = false;
+          break;
+        }
+      }
+      if (allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   bool _isCorrect(Map<String, dynamic> wordData) {

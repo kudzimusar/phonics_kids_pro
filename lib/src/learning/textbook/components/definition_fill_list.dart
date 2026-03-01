@@ -9,12 +9,14 @@ class DefinitionFillList extends StatefulWidget {
   final List<Map<String, dynamic>> entries;
   final Map<String, dynamic>? example;
   final String? openEndedPrompt;
+  final ValueChanged<bool>? onStatusChanged;
 
   const DefinitionFillList({
     Key? key,
     required this.entries,
     this.example,
     this.openEndedPrompt,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -43,6 +45,19 @@ class _DefinitionFillListState extends State<DefinitionFillList> {
   void _check(int i) {
     final answer = widget.entries[i]['answer'] as String;
     setState(() => _results[i] = _controllers[i].text.toLowerCase().trim() == answer.toLowerCase());
+
+    if (widget.onStatusChanged != null) {
+      bool allCorrect = true;
+      for (int j = 0; j < widget.entries.length; j++) {
+        if (_results[j] != true) {
+          allCorrect = false;
+          break;
+        }
+      }
+      if (allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   @override

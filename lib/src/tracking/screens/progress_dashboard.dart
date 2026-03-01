@@ -6,39 +6,33 @@ class ParentProgressTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Learner Progress'),
-        backgroundColor: Colors.blue[800],
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('usage_logs')
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No learning data found.'));
-          }
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('usage_logs')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No learning data found.'));
+        }
 
-          return SingleChildScrollView(
-            child: PaginatedDataTable(
-              header: const Text("Student Progress Dashboard"),
-              rowsPerPage: 10,
-              columns: const [
-                DataColumn(label: Text('Date completed')),
-                DataColumn(label: Text('Skill ID')),
-                DataColumn(label: Text('Accuracy Score')),
-                DataColumn(label: Text('Time Spent (s)')),
-              ],
-              source: UsageDataSource(snapshot.data!.docs),
-            ),
-          );
-        },
-      ),
+        return SingleChildScrollView(
+          child: PaginatedDataTable(
+            header: const Text("Student Progress Dashboard"),
+            rowsPerPage: 10,
+            columns: const [
+              DataColumn(label: Text('Date completed')),
+              DataColumn(label: Text('Skill ID')),
+              DataColumn(label: Text('Accuracy Score')),
+              DataColumn(label: Text('Time Spent (s)')),
+            ],
+            source: UsageDataSource(snapshot.data!.docs),
+          ),
+        );
+      },
     );
   }
 }

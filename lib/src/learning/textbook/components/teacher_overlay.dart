@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class TeacherOverlay extends StatelessWidget {
   final Map<String, dynamic> pageData;
+  final VoidCallback? onJumpToAnswerKey;
 
-  const TeacherOverlay({Key? key, required this.pageData}) : super(key: key);
+  const TeacherOverlay({
+    Key? key, 
+    required this.pageData,
+    this.onJumpToAnswerKey,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +76,35 @@ class TeacherOverlay extends StatelessWidget {
                 const SizedBox(height: 16),
               ],
               if (pageData['answerKey'] != null) ...[
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: onJumpToAnswerKey,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade600,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.menu_book, color: Colors.white, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          "Go To Activity Key",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -86,7 +120,7 @@ class TeacherOverlay extends StatelessWidget {
                           Icon(Icons.check_circle, color: Colors.green, size: 16),
                           SizedBox(width: 6),
                           Text(
-                            "Answer Key",
+                            "Quick Reference",
                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
                           ),
                         ],
@@ -94,7 +128,7 @@ class TeacherOverlay extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         pageData['answerKey'] as String,
-                        style: const TextStyle(fontSize: 14, color: Colors.black87),
+                        style: const TextStyle(fontSize: 13, color: Colors.black87),
                       ),
                     ],
                   ),

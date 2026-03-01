@@ -7,6 +7,7 @@ class WordGridUnderline extends StatefulWidget {
   final int columns;
   final List<String> freeResponsePrompts;
   final String? freeResponseInstruction;
+  final ValueChanged<bool>? onStatusChanged;
 
   const WordGridUnderline({
     Key? key,
@@ -14,6 +15,7 @@ class WordGridUnderline extends StatefulWidget {
     this.columns = 3,
     this.freeResponsePrompts = const [],
     this.freeResponseInstruction,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -47,13 +49,19 @@ class _WordGridUnderlineState extends State<WordGridUnderline> {
     final after = word.substring(prefixLength);
 
     return GestureDetector(
-      onTap: () => setState(() {
-        if (_revealed.contains(word)) {
-          _revealed.remove(word);
-        } else {
-          _revealed.add(word);
+      onTap: () {
+        setState(() {
+          if (_revealed.contains(word)) {
+            _revealed.remove(word);
+          } else {
+            _revealed.add(word);
+          }
+        });
+
+        if (widget.onStatusChanged != null && _revealed.length == widget.entries.length) {
+          widget.onStatusChanged!(true);
         }
-      }),
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),

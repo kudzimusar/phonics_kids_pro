@@ -10,11 +10,13 @@ import 'dart:math' as math;
 class BrokenHeartMatch extends StatefulWidget {
   final List<String> leftSide;
   final List<Map<String, dynamic>> rightSide;
+  final ValueChanged<bool>? onStatusChanged;
 
   const BrokenHeartMatch({
     Key? key,
     required this.leftSide,
     required this.rightSide,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -64,6 +66,14 @@ class _BrokenHeartMatchState extends State<BrokenHeartMatch> {
       _correct[partial] = (_selectedLeft == answer);
       _selectedLeft = null;
     });
+
+    if (widget.onStatusChanged != null) {
+      final allMatched = _matches.length == widget.rightSide.length;
+      final allCorrect = _correct.values.every((v) => v == true);
+      if (allMatched && allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   void _reset() => setState(() {

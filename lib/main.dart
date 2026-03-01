@@ -11,6 +11,8 @@ import 'src/auth/services/user_service.dart';
 import 'src/auth/models/app_user.dart';
 import 'src/learning/textbook/textbook_screen.dart';
 import 'src/learning/screens/lesson_selection_screen.dart';
+import 'src/learning/screens/phonics_lesson_screen.dart';
+import 'src/learning/repositories/lesson_repository.dart';
 import 'src/learning/screens/sticker_book_screen.dart';
 import 'src/settings/screens/settings_screen.dart';
 import 'src/tracking/screens/progress_dashboard.dart';
@@ -23,6 +25,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'src/core/config/app_config.dart';
 import 'package:flutter/gestures.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'src/school/widgets/join_class_dialog.dart';
 
 // ── Scroll behaviour (all pointer kinds) ─────────────────────────────────────
 class CustomScrollBehavior extends MaterialScrollBehavior {
@@ -88,10 +91,43 @@ final GoRouter _router = GoRouter(
     // ── Lessons ────────────────────────────────────────────────────────────
     GoRoute(
       path: '/lessons',
-      builder: (_, __) => const _DashBackShell(
+      builder: (context, __) => _DashBackShell(
         title: 'Lessons',
-        child: LessonSelectionScreen(),
+        actions: [
+          IconButton(
+            tooltip: 'Join Class',
+            icon: const Icon(Icons.school_rounded, color: Colors.blueAccent),
+            // The method _showJoinClass would need to be accessible or logic moved
+            onPressed: () {
+              final userId = AuthService().currentUser?.uid ?? 'student_001';
+              showDialog(
+                context: context,
+                builder: (_) => JoinClassDialog(userId: userId),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: 'My Stickers',
+            icon: const Icon(Icons.auto_awesome_rounded,
+                color: Colors.blueAccent),
+            onPressed: () => context.push('/stickers'),
+          ),
+          IconButton(
+            tooltip: 'Upgrade to Pro',
+            icon: const Icon(Icons.star_rounded, color: Colors.amber),
+            onPressed: () => context.push('/subscription'),
+          ),
+        ],
+        child: const LessonSelectionScreen(),
       ),
+    ),
+    GoRoute(
+      path: '/lesson/:id',
+      builder: (_, state) {
+        final id = state.pathParameters['id'] ?? '';
+        final lesson = LessonRepository.getLessonById(id);
+        return PhonicsLessonScreen(lesson: lesson);
+      },
     ),
 
     // ── Sticker / Trophy Room ──────────────────────────────────────────────
@@ -175,8 +211,9 @@ class PhonicsKidsProApp extends StatelessWidget {
 class _DashBackShell extends StatelessWidget {
   final String title;
   final Widget child;
+  final List<Widget>? actions;
 
-  const _DashBackShell({required this.title, required this.child});
+  const _DashBackShell({required this.title, required this.child, this.actions});
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +223,7 @@ class _DashBackShell extends StatelessWidget {
         backgroundColor: const Color(0xFF0A1018),
         elevation: 0,
         leading: IconButton(
-          tooltip: 'Back to Dashboard',
+          tooltip: 'Back',
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.white70),
           onPressed: () {
             if (context.canPop()) {
@@ -201,10 +238,13 @@ class _DashBackShell extends StatelessWidget {
           style: GoogleFonts.fredoka(color: Colors.white, fontSize: 20),
         ),
         actions: [
+          if (actions != null) ...actions!,
           TextButton.icon(
-            icon: const Icon(Icons.home_rounded, color: Colors.white38, size: 18),
-            label: Text('Dashboard',
-                style: GoogleFonts.quicksand(color: Colors.white38, fontSize: 12)),
+            icon:
+                const Icon(Icons.home_rounded, color: Colors.white38, size: 18),
+            label: Text('Home',
+                style:
+                    GoogleFonts.quicksand(color: Colors.white38, fontSize: 12)),
             onPressed: () => context.go('/dashboard'),
           ),
         ],
@@ -228,16 +268,20 @@ class _ClassroomLoader extends StatelessWidget {
         if (!snap.hasData) {
           return const Scaffold(
               backgroundColor: Color(0xFF0F1923),
-              body: Center(child: CircularProgressIndicator(color: Color(0xFF00BCD4))));
+              body: Center(
+                  child: CircularProgressIndicator(color: Color(0xFF00BCD4))));
         }
         final classroom = snap.data;
         if (classroom == null) {
-          return _DashBackShell(
+          return const _DashBackShell(
             title: 'Classroom',
-            child: const Center(child: Text('Classroom not found.')),
+            child: Center(child: Text('Classroom not found.')),
           );
         }
-        return ClassroomDetailScreen(classroom: classroom);
+        return _DashBackShell(
+          title: 'Classroom Detail',
+          child: ClassroomDetailScreen(classroom: classroom),
+        );
       },
     );
   }

@@ -35,6 +35,18 @@ class _SettingsScreenState extends State<SettingsScreen>
       backgroundColor: const Color(0xFF0F1923),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A1018),
+        elevation: 0,
+        leading: IconButton(
+          tooltip: 'Back',
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white70),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/dashboard');
+            }
+          },
+        ),
         title: Text('Settings',
             style: GoogleFonts.fredoka(color: Colors.white, fontSize: 22)),
         bottom: TabBar(

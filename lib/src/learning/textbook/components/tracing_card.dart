@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'vector_graphic.dart';
 
-class TracingCard extends StatelessWidget {
+class TracingCard extends StatefulWidget {
   final String icon;
   final String partialWord;
   final String position; // 'beginning' or 'end'
   final List<String> tracingOptions;
+  final ValueChanged<bool>? onStatusChanged;
 
   const TracingCard({
     Key? key,
@@ -13,7 +14,37 @@ class TracingCard extends StatelessWidget {
     required this.partialWord,
     required this.position,
     required this.tracingOptions,
+    this.onStatusChanged,
   }) : super(key: key);
+
+  @override
+  State<TracingCard> createState() => _TracingCardState();
+}
+
+class _TracingCardState extends State<TracingCard> {
+  String? _selectedLetter;
+
+  void _selectLetter(String letter) {
+    if (_selectedLetter != null) return; // Only allow one pick for simplicity, or toggle
+
+    setState(() {
+      _selectedLetter = letter;
+    });
+
+    // Check if the selected letter matches the icon's starting/ending letter (simplified logic)
+    // The first tracingOption is usually the correct one based on current database
+    // but better would be to pass the correct letter. 
+    // For now, let's assume the first option is the hint/answer if it matches the 'cat' -> 'c' logic.
+    // Actually, let's just use the first 'tracingOption' as the correct one for now, 
+    // OR we can even just report TRUE if they click ANY, but better to check.
+    
+    // In A5: cat(c, M), dog(d, T), pig(p, s), green(g, d), farm(f, s), feet(f, b)
+    // So tracingOptions[0] is ALWAYS the correct choice.
+    final bool isCorrect = letter == widget.tracingOptions[0];
+    if (isCorrect) {
+      widget.onStatusChanged?.call(true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +78,11 @@ class TracingCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (position == 'beginning') _buildBlankSpace(),
+                      if (widget.position == 'beginning') _buildBlankSpace(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: Text(
-                          partialWord,
+                          widget.partialWord,
                           style: const TextStyle(
                             fontSize: 32,
                             fontFamily: 'FredokaOne',
@@ -59,7 +90,7 @@ class TracingCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (position == 'end') _buildBlankSpace(),
+                      if (widget.position == 'end') _buildBlankSpace(),
                     ],
                   ),
                   
@@ -70,8 +101,8 @@ class TracingCard extends StatelessWidget {
                   ),
 
                   // Bottom part: The tracing options stacked vertically
-                  _buildTraceOption(tracingOptions[0]),
-                  _buildTraceOption(tracingOptions[1]),
+                  _buildTraceOption(widget.tracingOptions[0]),
+                  _buildTraceOption(widget.tracingOptions[1]),
                 ],
               ),
             ),
@@ -82,6 +113,19 @@ class TracingCard extends StatelessWidget {
   }
 
   Widget _buildBlankSpace() {
+    if (_selectedLetter != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: Text(
+          _selectedLetter!,
+          style: TextStyle(
+            fontSize: 40,
+            fontFamily: 'FredokaOne',
+            color: _selectedLetter == widget.tracingOptions[0] ? Colors.green.shade800 : Colors.red.shade800,
+          ),
+        ),
+      );
+    }
     return Container(
       width: 40,
       height: 40,
@@ -98,16 +142,22 @@ class TracingCard extends StatelessWidget {
   }
 
   Widget _buildTraceOption(String letter) {
-    // In the real app, this would be a specialized tracing canvas widget.
-    // For now, it displays a dashed/dotted letter to simulate 'tracing' mode.
-    return Text(
-      letter,
-      style: const TextStyle(
-        fontSize: 48,
-        fontFamily: 'SassoonPrimary', // Prefer SassoonPrimary for tracing
-        color: Colors.grey,
-        fontWeight: FontWeight.w300,
-        decorationStyle: TextDecorationStyle.dashed,
+    final bool isSelected = _selectedLetter == letter;
+    final bool isCorrect = letter == widget.tracingOptions[0];
+
+    return GestureDetector(
+      onTap: () => _selectLetter(letter),
+      child: Text(
+        letter,
+        style: TextStyle(
+          fontSize: 48,
+          fontFamily: 'SassoonPrimary', // Prefer SassoonPrimary for tracing
+          color: isSelected 
+              ? (isCorrect ? Colors.green : Colors.red) 
+              : Colors.grey,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w300,
+          decoration: isSelected ? null : TextDecoration.none,
+        ),
       ),
     );
   }

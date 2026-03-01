@@ -7,11 +7,13 @@ import 'dart:math';
 class MatchingConnectActivity extends StatefulWidget {
   final List<String> leftItems; // e.g., blends "sk", "sl"
   final List<Map<String, dynamic>> rightItems; // {'partial': 'unk', 'answer': 'sk', 'word': 'skunk'}
+  final ValueChanged<bool>? onStatusChanged;
 
   const MatchingConnectActivity({
     Key? key,
     required this.leftItems,
     required this.rightItems,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -84,6 +86,10 @@ class _MatchingConnectActivityState extends State<MatchingConnectActivity> {
               setState(() {
                 _connections[_activeLeftIndex!] = i;
               });
+              
+              if (widget.onStatusChanged != null && _connections.length == widget.rightItems.length) {
+                widget.onStatusChanged!(true);
+              }
             }
             break;
           }

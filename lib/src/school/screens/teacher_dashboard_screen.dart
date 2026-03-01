@@ -4,7 +4,6 @@ import '../repositories/school_repository.dart';
 import '../models/classroom.dart';
 import 'classroom_detail_screen.dart';
 import '../../auth/services/auth_service.dart';
-
 import 'package:go_router/go_router.dart';
 
 class TeacherDashboardScreen extends StatelessWidget {
@@ -15,71 +14,58 @@ class TeacherDashboardScreen extends StatelessWidget {
     const bgColor = Color(0xFFF5F7FA);
     const primaryColor = Color(0xFF2D3E50);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        title: Text(
-          'Teacher Dashboard',
-          style: GoogleFonts.fredoka(color: primaryColor, fontSize: 24),
-        ),
-        actions: [
-          TextButton.icon(
-            icon: const Icon(Icons.menu_book_rounded, color: Colors.blueAccent),
-            label: Text('Preview Textbook', style: GoogleFonts.fredoka(color: Colors.blueAccent)),
-            onPressed: () => context.push('/textbook'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Colors.blueAccent),
-            onPressed: () => AuthService().signOut(),
-          ),
-        ],
-      ),
-      body: FutureBuilder<List<Classroom>>(
-        future: SchoolRepository().getTeacherClassrooms('teacher_001'), // Mock ID
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final classrooms = snapshot.data ?? [];
+    return Stack(
+      children: [
+        FutureBuilder<List<Classroom>>(
+          future:
+              SchoolRepository().getTeacherClassrooms('teacher_001'), // Mock ID
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final classrooms = snapshot.data ?? [];
 
-          return Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Your Classrooms',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Your Classrooms',
+                    style: GoogleFonts.quicksand(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: classrooms.length,
-                    itemBuilder: (context, index) {
-                      final classroom = classrooms[index];
-                      return _ClassroomCard(classroom: classroom);
-                    },
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: classrooms.length,
+                      itemBuilder: (context, index) {
+                        final classroom = classrooms[index];
+                        return _ClassroomCard(classroom: classroom);
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Logic to create new classroom
-        },
-        label: const Text('New Class'),
-        icon: const Icon(Icons.add_rounded),
-        backgroundColor: Colors.blueAccent,
-      ),
+                ],
+              ),
+            );
+          },
+        ),
+        Positioned(
+          bottom: 24,
+          right: 24,
+          child: FloatingActionButton.extended(
+            onPressed: () {
+              // Logic to create new classroom
+            },
+            label: const Text('New Class'),
+            icon: const Icon(Icons.add_rounded),
+            backgroundColor: Colors.blueAccent,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -95,12 +81,7 @@ class _ClassroomCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ClassroomDetailScreen(classroom: classroom),
-          ),
-        ),
+        onTap: () => context.push('/classrooms/${classroom.id}'),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(20.0),

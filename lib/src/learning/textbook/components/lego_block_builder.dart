@@ -9,8 +9,13 @@ import 'vector_graphic.dart';
 /// Images are shown large beside each row.
 class LegoBlockBuilder extends StatefulWidget {
   final List<Map<String, dynamic>> groups;
+  final ValueChanged<bool>? onStatusChanged;
 
-  const LegoBlockBuilder({Key? key, required this.groups}) : super(key: key);
+  const LegoBlockBuilder({
+    Key? key, 
+    required this.groups,
+    this.onStatusChanged,
+  }) : super(key: key);
 
   @override
   State<LegoBlockBuilder> createState() => _LegoBlockBuilderState();
@@ -40,6 +45,19 @@ class _LegoBlockBuilderState extends State<LegoBlockBuilder> {
       _results[i] = _controllers[i].text.toLowerCase().trim() == answer.toLowerCase();
       _focusedIndex = null;
     });
+
+    if (widget.onStatusChanged != null) {
+      bool allCorrect = true;
+      for (int j = 0; j < widget.groups.length; j++) {
+        if (_results[j] != true) {
+          allCorrect = false;
+          break;
+        }
+      }
+      if (allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   @override

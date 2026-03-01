@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class VectorGraphic extends StatefulWidget {
   final String assetName;
   final double size;
+  final bool showBubble;
 
   const VectorGraphic({
     Key? key,
     required this.assetName,
     this.size = 48,
+    this.showBubble = true,
   }) : super(key: key);
 
   @override
@@ -47,7 +49,7 @@ class _VectorGraphicState extends State<VectorGraphic> with SingleTickerProvider
           child: Container(
             width: widget.size,
             height: widget.size,
-            decoration: BoxDecoration(
+            decoration: widget.showBubble ? BoxDecoration(
               color: Colors.white.withOpacity(0.9),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2.5),
@@ -58,7 +60,7 @@ class _VectorGraphicState extends State<VectorGraphic> with SingleTickerProvider
                   blurRadius: 15,
                 ),
               ],
-            ),
+            ) : null,
             alignment: Alignment.center,
             child: _buildGraphicContent(),
           ),

@@ -5,7 +5,8 @@ class InteractiveVowelStack extends StatefulWidget {
   final String wordPart2;
   final List<String> choices;
   final String answer;
-  final bool isSolved; // e.g. the first one 'cow' is done for them
+  final bool isSolved;
+  final ValueChanged<bool>? onStatusChanged;
 
   const InteractiveVowelStack({
     Key? key,
@@ -14,6 +15,7 @@ class InteractiveVowelStack extends StatefulWidget {
     required this.choices,
     required this.answer,
     this.isSolved = false,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -32,16 +34,12 @@ class _InteractiveVowelStackState extends State<InteractiveVowelStack> {
   }
 
   void _handleTap(String choice) {
-    if (widget.isSolved) return; // Already solved
-    
+    if (widget.isSolved) return;
     if (choice == widget.answer) {
       setState(() {
         _selectedLetter = choice;
       });
-      // TODO: Success sound or Fox animation
-    } else {
-      // TODO: Error sound or Fox animation
-      // We could add a shake animation here, but for now just visual feedback
+      widget.onStatusChanged?.call(true);
     }
   }
 
@@ -72,8 +70,25 @@ class _InteractiveVowelStackState extends State<InteractiveVowelStack> {
               
               return GestureDetector(
                 onTap: () => _handleTap(choice),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(vertical: 6.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isCorrectSelected ? Colors.blue.shade100 : Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: isCorrectSelected ? Colors.blue.shade400 : Colors.grey.shade300,
+                      width: 2.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isCorrectSelected ? Colors.blue.withOpacity(0.2) : Colors.black12,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -84,24 +99,32 @@ class _InteractiveVowelStackState extends State<InteractiveVowelStack> {
                           fontSize: 48,
                           fontFamily: 'SassoonPrimary',
                           color: isCorrectSelected ? Colors.transparent : Colors.grey.shade400,
-                          // Use dashed or hollow font styling if available; here simulating with grey and outline
+                          fontWeight: FontWeight.bold,
                           shadows: isCorrectSelected ? null : [
-                            const Shadow(offset: Offset(-1, -1), color: Colors.blueGrey),
-                            const Shadow(offset: Offset(1, -1), color: Colors.blueGrey),
-                            const Shadow(offset: Offset(1, 1), color: Colors.blueGrey),
-                            const Shadow(offset: Offset(-1, 1), color: Colors.blueGrey),
+                            Shadow(offset: const Offset(-0.8, -0.8), color: Colors.blueGrey.shade200),
+                            Shadow(offset: const Offset(0.8, -0.8), color: Colors.blueGrey.shade200),
+                            Shadow(offset: const Offset(0.8, 0.8), color: Colors.blueGrey.shade200),
+                            Shadow(offset: const Offset(-0.8, 0.8), color: Colors.blueGrey.shade200),
                           ],
                         ),
                       ),
                       // Solid colored top layer when selected
                       if (isCorrectSelected)
-                        Text(
-                          choice,
-                          style: const TextStyle(
-                            fontSize: 48,
-                            fontFamily: 'SassoonPrimary',
-                            color: Colors.blue, // 'Filled in' color
-                            fontWeight: FontWeight.bold,
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.elasticOut,
+                          builder: (context, val, child) {
+                            return Transform.scale(scale: 0.8 + (0.2 * val), child: child);
+                          },
+                          child: Text(
+                            choice,
+                            style: TextStyle(
+                              fontSize: 48,
+                              fontFamily: 'SassoonPrimary',
+                              color: Colors.blue.shade800,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                     ],

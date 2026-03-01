@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:go_router/go_router.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -144,8 +145,15 @@ class _PhonicsLessonScreenState extends State<PhonicsLessonScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
+          tooltip: 'Back',
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.blueAccent),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/dashboard');
+            }
+          },
         ),
         title: Text(
           'Phonics Kids Pro',
@@ -156,12 +164,9 @@ class _PhonicsLessonScreenState extends State<PhonicsLessonScreen>
         ),
         actions: [
           IconButton(
-            tooltip: 'Upgrade',
+            tooltip: 'Upgrade to Pro',
             icon: const Icon(Icons.star_rounded, color: Colors.amber),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SubscriptionGateScreen()),
-            ),
+            onPressed: () => context.push('/subscription'),
           ),
           IconButton(
             tooltip: 'Sign out',

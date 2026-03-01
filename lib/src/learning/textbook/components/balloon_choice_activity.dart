@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class BalloonChoiceActivity extends StatefulWidget {
   // [{blendChoices: [fl, sh], endingBalloons: [i, n, g], answer: fl, word: fling}, ...]
   final List<dynamic> rows; 
+  final ValueChanged<bool>? onStatusChanged;
 
   const BalloonChoiceActivity({
     Key? key,
     required this.rows,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -21,6 +23,25 @@ class _BalloonChoiceActivityState extends State<BalloonChoiceActivity> {
     setState(() {
       _selections[rowIndex] = choice;
     });
+
+    if (widget.onStatusChanged != null) {
+      bool allCorrect = true;
+      if (_selections.length < widget.rows.length) {
+        allCorrect = false;
+      } else {
+        for (int i = 0; i < widget.rows.length; i++) {
+          final rowData = widget.rows[i];
+          final answer = rowData['answer'] as String;
+          if (_selections[i] != answer) {
+            allCorrect = false;
+            break;
+          }
+        }
+      }
+      if (allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   @override

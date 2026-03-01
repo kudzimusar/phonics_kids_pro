@@ -8,11 +8,6 @@ import 'components/phonics_box.dart';
 import 'components/phonic_fox_narrator.dart';
 import 'components/vowel_consonant_word.dart';
 import 'components/vector_graphic.dart';
-import 'components/vector_graphic.dart';
-import 'components/vector_graphic.dart';
-import 'components/tracing_card.dart';
-import 'components/daisy_chain.dart';
-import 'components/vector_graphic.dart';
 import 'components/tracing_card.dart';
 import 'components/daisy_chain.dart';
 import 'components/charm_bracelet.dart';
@@ -61,6 +56,7 @@ import 'pages/answer_key_page.dart';
 import 'pages/certificate_page.dart';
 import 'utils/responsive_helper.dart';
 import '../services/local_progress_service.dart';
+import '../notebook/notebook_overlay.dart';
 
 class TextbookCanvas extends StatefulWidget {
   final bool teacherModeActive;
@@ -78,6 +74,7 @@ class TextbookCanvas extends StatefulWidget {
 
 class _TextbookCanvasState extends State<TextbookCanvas> {
   int _currentPageIndex = 0;
+  late final PageController _pageController;
   Timer? _hintTimer;
   bool _showHint = false;
   bool _showCelebration = false;
@@ -90,27 +87,37 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
   final LocalProgressService _progressService = LocalProgressService();
   bool _isCurrentPageCleared = false;
   final Map<String, dynamic> _activityState = {};
+  bool _isNotebookActive = false;
 
   @override
   void initState() {
     super.initState();
+    // Resolve initial page index
     if (widget.initialPageId != null) {
       final index = TextbookDatabase.pages.indexWhere((p) => p['id'] == widget.initialPageId);
       if (index != -1) {
         _currentPageIndex = index;
       }
     }
+    
+    // Initialize PageController
+    _pageController = PageController(initialPage: _currentPageIndex);
+    
     _loadProgress();
     _resetHintTimer();
   }
 
   void _loadProgress() async {
+    setState(() {
+      _activityState.clear();
+      _usedLetters.clear();
+      _isCurrentPageCleared = false;
+    });
+    
     final page = TextbookDatabase.pages[_currentPageIndex];
     if (page['activityLabel'] != null) {
       final cleared = await _progressService.isActivityCleared(page['activityLabel'] as String);
       if (mounted) setState(() => _isCurrentPageCleared = cleared);
-    } else {
-      if (mounted) setState(() => _isCurrentPageCleared = false);
     }
   }
 
@@ -122,13 +129,85 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     });
     
     int completed = 0;
-    for (var value in _activityState.values) {
+    _activityState.forEach((key, value) {
       if (value == true) completed++;
-    }
+    });
     
-    if (completed >= requiredCount) {
+    debugPrint("Activity Progress: $completed / $requiredCount");
+
+    if (completed >= requiredCount && requiredCount > 0) {
       _triggerPageCleared();
     }
+  }
+
+  int _getCompletedCount() {
+    int count = 0;
+    _activityState.forEach((key, value) {
+      if (value == true) count++;
+    });
+    return count;
+  }
+
+  int _getRequiredCount() {
+    final page = TextbookDatabase.pages[_currentPageIndex];
+    if (page['activityLabel'] == null) return 0;
+
+    final layout = page['layout'];
+    
+    // 1. Check for hardcoded interactive widgets that report '1' when whole widget is done
+    final compoundLayouts = [
+      'lesson-with-sort', 
+      'lesson-with-color-sort',
+      'y-is-a-thief-sort',
+      'identify-sort',
+      'matching-connect',
+      'balloon-choice',
+      'block-build',
+      'broken-heart-match',
+      'color-by-code',
+      'fill-in-activity',
+      'circle-and-fill',
+      'color-sort-grid',
+      'dual-activity',
+      'matching-game',
+      'write-in-activity',
+    ];
+    if (compoundLayouts.contains(layout)) return 1;
+
+    // 2. Check for list-based layouts
+    if (layout == 'lesson-with-activity') return 8; // Custom A3
+    if (layout == 'lesson-with-table-and-activity') return 6; // Custom A4
+    if (layout == 'tracing-grid') return 6; // Custom A5
+    if (layout == 'fill-in-list') {
+      final content = page['content'] as List?;
+      if (content != null) {
+        final block = content.firstWhere((e) => e['type'] == 'word-circle-grid' || e['type'] == 'picture-fill-in-grid', orElse: () => null);
+        if (block != null && block['words'] != null) return (block['words'] as List).length;
+        if (block != null && block['entries'] != null) return (block['entries'] as List).length;
+      }
+      return 7; // Default for A8
+    }
+
+    // 3. Drill down into content for generic layouts
+    final content = page['content'] as List?;
+    if (content != null) {
+      int count = 0;
+      for (var block in content) {
+        if (block['type'] == 'two-column-sort') return 1;
+        if (block['type'] == 'identify-grid') return 1;
+        if (block['type'] == 'balloon-activity') return 1;
+        if (block['type'] == 'bandaid-matching') return 1;
+        if (block['type'] == 'word-grid-underline') return (block['entries'] as List?)?.length ?? 0;
+        if (block['type'] == 'fill-in-blanks') return (block['entries'] as List?)?.length ?? 0;
+        if (block['type'] == 'lego-block-activity') return 1;
+        if (block['type'] == 'heart-matching') return 1;
+        if (block['type'] == 'picture-name-grid') count += (block['entries'] as List?)?.length ?? 0;
+        if (block['type'] == 'riddle-fill') count += (block['riddles'] as List?)?.length ?? 0;
+      }
+      if (count > 0) return count;
+    }
+
+    return 0; // Reference or reading pages
   }
 
   void _triggerPageCleared() async {
@@ -148,6 +227,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     _hintTimer?.cancel();
     _autoScrollTimer?.cancel();
     _contentScrollController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -180,27 +260,19 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
   void _nextPage() {
     if (_currentPageIndex < TextbookDatabase.pages.length - 1) {
-      setState(() {
-        _currentPageIndex++;
-        _usedLetters.clear();
-        _activityState.clear();
-      });
-      _loadProgress();
-      _resetHintTimer();
-      _scrollToTop();
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOutQuart,
+      );
     }
   }
 
   void _previousPage() {
     if (_currentPageIndex > 0) {
-      setState(() {
-        _currentPageIndex--;
-        _usedLetters.clear();
-        _activityState.clear();
-      });
-      _loadProgress();
-      _resetHintTimer();
-      _scrollToTop();
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOutQuart,
+      );
     }
   }
   
@@ -323,12 +395,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     }
 
     if (targetPageIndex != -1) {
-      setState(() {
-        _currentPageIndex = targetPageIndex;
-        _usedLetters.clear();
-      });
-      _resetHintTimer();
-      _scrollToTop();
+      _pageController.animateToPage(
+        targetPageIndex,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -402,12 +473,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       return InkWell(
                         onTap: () {
                           Navigator.of(context).pop();
-                          setState(() {
-                            _currentPageIndex = index;
-                            _usedLetters.clear();
-                          });
-                          _resetHintTimer();
-                          _scrollToTop();
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOut,
+                          );
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
@@ -482,243 +552,421 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return GestureDetector(
-          onHorizontalDragEnd: (details) {
-            if (details.primaryVelocity == null) return;
-            // Swipe left (negative velocity) -> Next Page
-            if (details.primaryVelocity! < -300) {
-              _nextPage();
-            } 
-            // Swipe right (positive velocity) -> Previous Page
-            else if (details.primaryVelocity! > 300) {
-              _previousPage();
-            }
+        return SelectionArea(
+          focusNode: FocusNode(canRequestFocus: false),
+          contextMenuBuilder: (context, selectableRegionState) {
+            return AdaptiveTextSelectionToolbar.buttonItems(
+              anchors: selectableRegionState.contextMenuAnchors,
+              buttonItems: [
+                ...selectableRegionState.contextMenuButtonItems,
+                ContextMenuButtonItem(
+                  label: 'Send to Benjamin Fox',
+                  onPressed: () {
+                    final selectedText = selectableRegionState.processData.plainText;
+                    if (selectedText != null && selectedText.isNotEmpty) {
+                      NotebookService().saveEntry(
+                        NotebookEntry(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          moduleId: currentPage['id'] ?? 'unknown',
+                          type: NotebookEntryType.manual,
+                          content: selectedText,
+                          timestamp: DateTime.now(),
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Sent to Benjamin Notebook!')),
+                      );
+                    }
+                    selectableRegionState.hideToolbar();
+                  },
+                ),
+              ],
+            );
           },
-          child: SelectionArea(
-            focusNode: FocusNode(canRequestFocus: false),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                image: (currentPage['layout'] == 'cover')
-                  ? const DecorationImage(
-                      image: AssetImage('assets/images/cover_background.png'),
-                      fit: BoxFit.cover,
-                    )
-                  : (currentPage['activityLabel']?.toString().contains('A15') ?? false)
-                    ? const DecorationImage(
-                        image: AssetImage('assets/images/nursery_wall_texture.png'),
-                        fit: BoxFit.cover,
-                        opacity: 0.5,
-                      )
+          child: Stack(
+            children: [
+              // 0. The Layered Background (Static or Reactive)
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 800),
+                child: Container(
+                  key: ValueKey('bg-container-${currentPage['layout']}'),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    image: (currentPage['layout'] == 'cover')
+                      ? const DecorationImage(
+                          image: AssetImage('assets/images/cover_background.png'),
+                          fit: BoxFit.cover,
+                        )
+                      : (currentPage['activityLabel']?.toString().contains('A15') ?? false)
+                        ? const DecorationImage(
+                            image: AssetImage('assets/images/nursery_wall_texture.png'),
+                            fit: BoxFit.cover,
+                            opacity: 0.5,
+                          )
+                        : null,
+                  ),
+                ),
+              ),
+              
+              // 1. Interactive Page View Layer
+              PageView.builder(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: TextbookDatabase.pages.length,
+                onPageChanged: (index) {
+                  setState(() => _currentPageIndex = index);
+                  _loadProgress();
+                  _scrollToTop();
+                  _resetHintTimer();
+                },
+                itemBuilder: (context, index) {
+                  return _buildPageContent(TextbookDatabase.pages[index], constraints);
+                },
+              ),
+
+              // 2. Navigation Overlay Layer (Fixed positioned UI)
+              _buildNavigationOverlay(),
+
+              // 2.2 Notebook Button
+              Positioned(
+                top: 16,
+                right: 140, // Left of TOC 
+                child: SafeArea(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => setState(() => _isNotebookActive = true),
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey.shade300, width: 2),
+                        ),
+                        child: const Icon(Icons.edit_note_rounded, color: Colors.indigo, size: 28),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 2.5 TOC Button (Faded)
+              Positioned(
+                top: 16,
+                right: 80, 
+                child: SafeArea(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _showTableOfContents,
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey.shade300, width: 2),
+                        ),
+                        child: const Icon(Icons.menu_book_rounded, color: Colors.indigo, size: 28),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 2.7 Reader Mode Button (Faded)
+              Positioned(
+                top: 90, // Below the table of contents 16 + 50 + padding
+                right: 80, 
+                child: SafeArea(
+                  child: TextButton(
+                    onPressed: _toggleReaderMode,
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Opacity(
+                      opacity: _isReaderModeActive ? 1.0 : 0.6,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _isReaderModeActive ? Colors.green.shade100 : Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: _isReaderModeActive ? Colors.green.shade500 : Colors.grey.shade300, 
+                            width: 2
+                          ),
+                        ),
+                        child: Icon(
+                          _isReaderModeActive ? Icons.pause_circle_filled : Icons.play_circle_fill, 
+                          color: _isReaderModeActive ? Colors.green.shade700 : Colors.indigo, 
+                          size: 28
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // 3. Letter Bank at the bottom
+              if (letters.isNotEmpty)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: LetterBank(
+                    letters: letters,
+                    usedLetters: _usedLetters,
+                  ),
+                ),
+
+              // 4. Hint System Overlay (Conditional)
+              if (_showHint && currentPage['layout'] != 'certificate')
+                HintOverlay(
+                  hintText: _getHintForPage(currentPage),
+                  onHintDismissed: () => setState(() => _showHint = false),
+                ),
+
+              // 5. Celebration Overlay
+              ParticleReward(
+                trigger: _showCelebration,
+                onComplete: () => setState(() => _showCelebration = false),
+              ),
+
+              // 6. Teacher Overlay (Conditional)
+              if (widget.teacherModeActive)
+                TeacherOverlay(
+                  pageData: currentPage,
+                  onJumpToAnswerKey: currentPage['activityLabel'] != null 
+                    ? () => _jumpToAnswerKey(currentPage['activityLabel'] as String)
                     : null,
-              ),
-              child: Stack(
-                children: [
-                  // 1. The main content layer
-                  _buildPageContent(currentPage, constraints),
-                  
-                  // 2. Navigation arrows overlay
-                  _buildNavigationOverlay(),
-  
-                  // 2.5 Table of Contents Button (Faded)
-                  Positioned(
-                    top: 16,
-                    right: 80, // Safe zone, just misses the 80x80 teacher mode gesture detector
-                    child: SafeArea(
-                      child: Opacity(
-                        opacity: 0.6,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _showTableOfContents,
-                            borderRadius: BorderRadius.circular(24),
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey.shade300, width: 2),
-                              ),
-                              child: const Icon(Icons.menu_book, color: Colors.indigo, size: 28),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                ),
 
-                  // 2.7 Reader Mode Button (Faded)
-                  Positioned(
-                    top: 90, // Below the table of contents 16 + 50 + padding
-                    right: 80, 
-                    child: SafeArea(
-                      child: Opacity(
-                        opacity: _isReaderModeActive ? 1.0 : 0.6,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: _toggleReaderMode,
-                            borderRadius: BorderRadius.circular(24),
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: _isReaderModeActive ? Colors.green.shade100 : Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: _isReaderModeActive ? Colors.green.shade500 : Colors.grey.shade300, 
-                                  width: 2
-                                ),
-                              ),
-                              child: Icon(
-                                _isReaderModeActive ? Icons.pause_circle_filled : Icons.play_circle_fill, 
-                                color: _isReaderModeActive ? Colors.green.shade700 : Colors.indigo, 
-                                size: 28
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // 3. Letter Bank at the bottom
-                  if (letters.isNotEmpty)
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: LetterBank(
-                        letters: letters,
-                        usedLetters: _usedLetters,
-                      ),
-                    ),
-  
-                  // 4. Hint System Overlay (Conditional)
-                  if (_showHint && currentPage['layout'] != 'certificate')
-                    HintOverlay(
-                      hintText: _getHintForPage(currentPage),
-                      onHintDismissed: () => setState(() => _showHint = false),
-                    ),
-  
-                  // 5. Celebration Overlay
-                  ParticleReward(
-                    trigger: _showCelebration,
-                    onComplete: () => setState(() => _showCelebration = false),
-                  ),
-  
-                  // 6. Teacher Overlay (Conditional)
-                  if (widget.teacherModeActive)
-                    TeacherOverlay(
-                      pageData: currentPage,
-                    ),
-                ],
-              ),
-            ),
+              // 7. Benjamin Notebook Overlay
+              if (_isNotebookActive)
+                NotebookOverlay(
+                  moduleId: currentPage['id'] ?? 'unknown',
+                  onDismiss: () => setState(() => _isNotebookActive = false),
+                ),
+            ],
           ),
         );
       },
     );
   }
 
-  void _triggerCelebration() {
-    setState(() => _showCelebration = true);
-  }
-
   Widget _buildPageContent(Map<String, dynamic> page, BoxConstraints constraints) {
     final bool isSpecialPage = page['layout'] == 'cover' || page['layout'] == 'welcome' || page['layout'] == 'certificate';
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: ResponsiveHelper.getResponsiveValue(
-          context: context,
-          mobile: 16.0,
-          tablet: 32.0,
-          desktop: 64.0,
-        ), 
-        vertical: 24.0
-      ),
-      child: Column(
-        children: [
-          if (!isSpecialPage) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Material(
+      color: Colors.transparent, // Ensure the global background shows through
+      child: Padding(
+      padding: page['layout'] == 'certificate' 
+        ? EdgeInsets.zero 
+        : EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getResponsiveValue(
+              context: context,
+              mobile: 16.0,
+              tablet: 32.0,
+              desktop: 64.0,
+            ), 
+            vertical: 24.0
+          ),
+      child: Stack( // Changed from Column to Stack so the ClearedBanner can float
+          children: [
+            Column(
               children: [
-                if (page['activityLabel'] != null)
-                  GestureDetector(
-                    onDoubleTap: () {
-                      _jumpToAnswerKey(page['activityLabel'] as String);
-                    },
-                    child: LabelTag(label: page['activityLabel'] as String),
+                if (!isSpecialPage) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (page['activityLabel'] != null)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onDoubleTap: () {
+                                _jumpToAnswerKey(page['activityLabel'] as String);
+                              },
+                              child: LabelTag(label: page['activityLabel'] as String),
+                            ),
+                            if (!_isCurrentPageCleared) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.blue.shade200),
+                                ),
+                                child: Text(
+                                  "${_getCompletedCount()} / ${_getRequiredCount() > 0 ? _getRequiredCount() : '?'}",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue.shade700,
+                                    fontFamily: 'FredokaOne',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      const SizedBox(width: 16),
+                      if (page['title'] != null)
+                        Expanded(
+                          child: TextBlock(
+                            text: page['title'] as String,
+                            type: TextType.h1,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      if (!ResponsiveHelper.isMobile(context))
+                        const SizedBox(width: 120), // Balance the LabelTag + Progress on larger screens
+                    ],
                   ),
-                const SizedBox(width: 16),
-                if (page['title'] != null)
-                  Expanded(
-                    child: TextBlock(
-                      text: page['title'] as String,
-                      type: TextType.h1,
+                  if (page['subtitle'] != null) ...[
+                    const SizedBox(height: 8),
+                    TextBlock(
+                      text: page['subtitle'] as String,
+                      type: TextType.h2,
                       textAlign: TextAlign.center,
+                      color: Colors.grey.shade600,
                     ),
+                  ],
+                  const SizedBox(height: 24),
+                ],
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 16.0,
+                    ),
+                    child: _buildSpecificLayout(page, constraints),
                   ),
-                if (!ResponsiveHelper.isMobile(context))
-                  const SizedBox(width: 80), // Balance the LabelTag on larger screens only
+                ),
               ],
             ),
-            if (page['subtitle'] != null) ...[
-              const SizedBox(height: 8),
-              TextBlock(
-                text: page['subtitle'] as String,
-                type: TextType.h2,
-                textAlign: TextAlign.center,
-                color: Colors.grey.shade600,
+            if (_isCurrentPageCleared && page['activityLabel'] != null)
+              Positioned(
+                bottom: _getLetterBankForPage(page).isNotEmpty ? 130.0 : 20.0,
+                left: 16,
+                right: 16,
+                child: _buildClearedBanner(),
               ),
-            ],
-            const SizedBox(height: 24),
           ],
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 16.0,
-              ),
-              child: _buildSpecificLayout(page, constraints),
-            ),
-          ),
-          if (_isCurrentPageCleared && page['activityLabel'] != null)
-             _buildClearedBanner(),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildClearedBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      margin: EdgeInsets.only(
-        top: 8, 
-        bottom: _getLetterBankForPage(TextbookDatabase.pages[_currentPageIndex]).isNotEmpty ? 120.0 : 90.0
-      ),
-      decoration: BoxDecoration(
-        color: Colors.green.shade50,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.shade400, width: 2),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.stars, color: Colors.green.shade600, size: 32),
-          const SizedBox(width: 12),
-          Text(
-            "Task Cleared! Great job!",
-            style: TextStyle(
-              fontSize: ResponsiveHelper.isMobile(context) ? 20 : 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.green.shade700,
-              fontFamily: 'FredokaOne',
-            ),
+    final page = TextbookDatabase.pages[_currentPageIndex];
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.elasticOut,
+      builder: (ctx, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 50 * (1 - value)),
+          child: Opacity(
+            opacity: value.clamp(0.0, 1.0),
+            child: child,
           ),
-          const SizedBox(width: 12),
-          Icon(Icons.stars, color: Colors.green.shade600, size: 32),
-        ],
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.green.shade400, Colors.teal.shade500, Colors.green.shade600],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.green.shade200.withOpacity(0.5),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('🎉', style: TextStyle(fontSize: 28)),
+                  const SizedBox(width: 12),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "${page['activityLabel'] ?? 'Lesson'} Cleared!", 
+                        style: const TextStyle(
+                          fontFamily: 'FredokaOne',
+                          fontSize: 26,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        "All answers correct! Excellent work! 🌟",
+                        style: TextStyle(
+                          fontFamily: 'FredokaOne',
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('🎉', style: TextStyle(fontSize: 28)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: _nextPage,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "NEXT PAGE",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'FredokaOne',
+                          color: Colors.green.shade700,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Icon(Icons.arrow_forward_rounded, color: Colors.green.shade700, size: 24),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1124,12 +1372,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
-                _buildFillInCard("ba__", "ball", "ll"),
-                _buildFillInCard("dre__", "dress", "ss"),
-                _buildFillInCard("si__y", "silly", "ll"),
-                _buildFillInCard("mi__", "mitt", "tt"),
-                _buildFillInCard("flu__y", "fluffy", "ff"),
-                _buildFillInCard("su__er", "summer", "mm"),
+                _buildFillInCard(0, "ba__", "ball", "ll", 6),
+                _buildFillInCard(1, "dre__", "dress", "ss", 6),
+                _buildFillInCard(2, "si__y", "silly", "ll", 6),
+                _buildFillInCard(3, "mi__", "mitt", "tt", 6),
+                _buildFillInCard(4, "flu__y", "fluffy", "ff", 6),
+                _buildFillInCard(5, "su__er", "summer", "mm", 6),
               ],
             ),
           ),
@@ -1149,42 +1397,48 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               childAspectRatio: 0.65, // Taller cards
               crossAxisSpacing: 24,
               mainAxisSpacing: 24,
-              children: const [
+              children: [
                 TracingCard(
                   icon: "cat",
                   partialWord: "at",
                   position: "beginning",
-                  tracingOptions: ["c", "M"],
+                  tracingOptions: const ["c", "M"],
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 6),
                 ),
                 TracingCard(
                   icon: "dog",
                   partialWord: "og",
                   position: "beginning",
-                  tracingOptions: ["E", "D"], // Adjusted from reference image
+                  tracingOptions: const ["d", "T"],
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(1, c, 6),
                 ),
                 TracingCard(
                   icon: "pig",
                   partialWord: "ig",
                   position: "beginning",
-                  tracingOptions: ["W", "P"],
+                  tracingOptions: const ["p", "s"],
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(2, c, 6),
                 ),
                 TracingCard(
-                  icon: "flower", // Using plant/flower for green
-                  partialWord: "Gree",
-                  position: "end",
-                  tracingOptions: ["g", "n"],
+                  icon: "apple",
+                  partialWord: "reen",
+                  position: "beginning",
+                  tracingOptions: const ["g", "d"],
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(3, c, 6),
                 ),
                 TracingCard(
-                  icon: "farm",
-                  partialWord: "Far",
-                  position: "end",
-                  tracingOptions: ["h", "m"],
+                  icon: "ball",
+                  partialWord: "arm",
+                  position: "beginning",
+                  tracingOptions: const ["f", "s"],
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(4, c, 6),
                 ),
                 TracingCard(
-                  icon: "feet",
-                  partialWord: "Fee",
-                  position: "end",
-                  tracingOptions: ["t", "V"],
+                  icon: "cake",
+                  partialWord: "eet",
+                  position: "beginning",
+                  tracingOptions: const ["f", "b"],
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(5, c, 6),
                 ),
               ],
             ),
@@ -1539,13 +1793,19 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               crossAxisCount: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 2),
               childAspectRatio: ResponsiveHelper.isMobile(context) ? 3.0 : 2.0,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: const [
-                InteractiveVowelStack(wordPart1: "c", wordPart2: "w", choices: ["a", "o", "u"], answer: "o", isSolved: true),
-                InteractiveVowelStack(wordPart1: "b", wordPart2: "th", choices: ["e", "a", "i"], answer: "a"),
-                InteractiveVowelStack(wordPart1: "m", wordPart2: "g", choices: ["u", "o", "a"], answer: "u"),
-                InteractiveVowelStack(wordPart1: "f", wordPart2: "sh", choices: ["e", "i", "a"], answer: "i"),
-                InteractiveVowelStack(wordPart1: "fr", wordPart2: "g", choices: ["o", "e", "u"], answer: "o"),
-                InteractiveVowelStack(wordPart1: "s", wordPart2: "ck", choices: ["i", "o", "u"], answer: "o"),
+              children: [
+                // First one is solved as example — no callback needed
+                const InteractiveVowelStack(wordPart1: "c", wordPart2: "w", choices: ["a", "o", "u"], answer: "o", isSolved: true),
+                InteractiveVowelStack(wordPart1: "b", wordPart2: "th", choices: ["e", "a", "i"], answer: "a",
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(1, c, 5)),
+                InteractiveVowelStack(wordPart1: "m", wordPart2: "g", choices: ["u", "o", "a"], answer: "u",
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(2, c, 5)),
+                InteractiveVowelStack(wordPart1: "f", wordPart2: "sh", choices: ["e", "i", "a"], answer: "i",
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(3, c, 5)),
+                InteractiveVowelStack(wordPart1: "fr", wordPart2: "g", choices: ["o", "e", "u"], answer: "o",
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(4, c, 5)),
+                InteractiveVowelStack(wordPart1: "s", wordPart2: "ck", choices: ["i", "o", "u"], answer: "o",
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(5, c, 5)),
               ],
             ),
           ),
@@ -1764,12 +2024,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
-                _buildFillInCard("_ at", "cat", "C"),
-                _buildFillInCard("D o _", "dog", "g"),
-                _buildFillInCard("P i _", "pig", "g"),
-                _buildFillInCard("G r e e _", "green", "n"),
-                _buildFillInCard("F a r _", "farm", "m"),
-                _buildFillInCard("F e e _", "feet", "t"),
+                _buildFillInCard(0, "_ at", "cat", "C", 6),
+                _buildFillInCard(1, "D o _", "dog", "g", 6),
+                _buildFillInCard(2, "P i _", "pig", "g", 6),
+                _buildFillInCard(3, "G r e e _", "green", "n", 6),
+                _buildFillInCard(4, "F a r _", "farm", "m", 6),
+                _buildFillInCard(5, "F e e _", "feet", "t", 6),
               ],
             ),
           ),
@@ -1790,11 +2050,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
-                _buildFillInCard("_ u s", "🚌", "B"),
-                _buildFillInCard("H a _", "🍖", "m"),
-                _buildFillInCard("F o _", "🦊", "x"),
-                _buildFillInCard("J a _", "🍓", "m"),
-                _buildFillInCard("P a i _", "🪣", "l"),
+                _buildFillInCard(0, "_ u s", "🚌", "B", 5),
+                _buildFillInCard(1, "H a _", "🍖", "m", 5),
+                _buildFillInCard(2, "F o _", "🦊", "x", 5),
+                _buildFillInCard(3, "J a _", "🍓", "m", 5),
+                _buildFillInCard(4, "P a i _", "🪣", "l", 5),
               ],
             ),
           ),
@@ -1815,11 +2075,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
-                _buildFillInCard("G i f _", "🎁", "t"),
-                _buildFillInCard("B i r _", "🐦", "d"),
-                _buildFillInCard("B o _ t", "⛵", "a"),
-                _buildFillInCard("F l a _", "🚩", "g"),
-                _buildFillInCard("G i r _", "👧", "l"),
+                _buildFillInCard(0, "G i f _", "🎁", "t", 5),
+                _buildFillInCard(1, "B i r _", "🐦", "d", 5),
+                _buildFillInCard(2, "B o _ t", "⛵", "a", 5),
+                _buildFillInCard(3, "F l a _", "🚩", "g", 5),
+                _buildFillInCard(4, "G i r _", "👧", "l", 5),
               ],
             ),
           ),
@@ -1840,13 +2100,13 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: [
-                _buildFillInCard("Tr e _", "🌲", "e"),
-                _buildFillInCard("F l o w _ r", "🌺", "e"),
-                _buildFillInCard("M o _ s e", "🦌", "o"),
-                _buildFillInCard("U m b r _ l l a", "☂️", "e"),
-                _buildFillInCard("O c t o p _ s", "🐙", "u"),
-                _buildFillInCard("R a i n b _ w", "🌈", "o"),
-                _buildFillInCard("W a _ e r m e l o n", "🍉", "t"),
+                _buildFillInCard(0, "Tr e _", "🌲", "e", 7),
+                _buildFillInCard(1, "F l o w _ r", "🌺", "e", 7),
+                _buildFillInCard(2, "M o _ s e", "🦌", "o", 7),
+                _buildFillInCard(3, "U m b r _ l l a", "☂️", "e", 7),
+                _buildFillInCard(4, "O c t o p _ s", "🐙", "u", 7),
+                _buildFillInCard(5, "R a i n b _ w", "🌈", "o", 7),
+                _buildFillInCard(6, "W a _ e r m e l o n", "🍉", "t", 7),
               ],
             ),
           ),
@@ -1901,20 +2161,10 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             ),
           ),
           const Spacer(),
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0.95, end: 1.05),
-            duration: const Duration(seconds: 2),
-            curve: Curves.easeInOut,
-            builder: (context, scale, child) {
-              return Transform.scale(
-                scale: scale,
-                child: child,
-              );
-            },
-            child: VectorGraphic(
-              assetName: 'fox',
-              size: ResponsiveHelper.getResponsiveValue(context: context, mobile: 140, tablet: 200, desktop: 260),
-            ),
+          VectorGraphic(
+            assetName: 'fox',
+            size: ResponsiveHelper.getResponsiveValue(context: context, mobile: 140, tablet: 200, desktop: 260),
+            showBubble: false, // More professional, integrated look for cover
           ),
           const Spacer(),
           Container(
@@ -2223,6 +2473,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             return Expanded(
               child: BalloonChoiceActivity(
                 rows: block['rows'] as List<dynamic>,
+                onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
               ),
             );
           }
@@ -2248,6 +2499,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               child: MatchingConnectActivity(
                 leftItems: List<String>.from(block['blends']),
                 rightItems: List<Map<String, dynamic>>.from(block['fragments']),
+                onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
               ),
             );
           }
@@ -2664,7 +2916,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
       return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-        child: BrokenHeartMatch(leftSide: leftSide, rightSide: rightSide),
+        child: BrokenHeartMatch(
+          leftSide: leftSide, 
+          rightSide: rightSide,
+          onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
+        ),
       );
     }
 
@@ -2676,7 +2932,10 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
       return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-        child: LegoBlockBuilder(groups: groups),
+        child: LegoBlockBuilder(
+          groups: groups,
+          onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
+        ),
       );
     }
 
@@ -2689,12 +2948,18 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       final entries = List<Map<String, dynamic>>.from(nameGridBlock['entries'] ?? []);
       final riddles = List<Map<String, dynamic>>.from(riddleBlock['riddles'] ?? []);
 
+      final totalTasks = entries.length + riddles.length;
       return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (entries.isNotEmpty) PictureNameGrid(entries: entries, columns: 2),
+            if (entries.isNotEmpty) 
+              PictureNameGrid(
+                entries: entries, 
+                columns: 2,
+                onStatusChanged: (c) => _onActivityItemStatusChanged(nameGridBlock.hashCode, c, totalTasks),
+              ),
             if (dividerBlock.isNotEmpty) ...[
               const SizedBox(height: 24),
               Center(
@@ -2709,6 +2974,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               RiddleFillList(
                 instruction: riddleBlock['instruction'] as String? ?? '',
                 riddles: riddles,
+                onStatusChanged: (c) => _onActivityItemStatusChanged(riddleBlock.hashCode, c, totalTasks),
               ),
           ],
         ),
@@ -2740,7 +3006,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
       return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-        child: ColorSortGrid(codes: codes, words: words, freePrompts: prompts),
+        child: ColorSortGrid(
+          codes: codes, 
+          words: words, 
+          freePrompts: prompts,
+          onStatusChanged: (c) => _onActivityItemStatusChanged(gridBlock.hashCode, c, 1),
+        ),
       );
     }
 
@@ -2752,7 +3023,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
       return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-        child: EquationBuilder(entries: entries, mode: 'prefix'),
+        child: EquationBuilder(
+          entries: entries, 
+          mode: 'prefix',
+          onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
+        ),
       );
     }
 
@@ -2800,6 +3075,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               columns: (gridBlock['columns'] as int?) ?? 3,
               freeResponsePrompts: prompts,
               freeResponseInstruction: freeBlock['instruction'] as String?,
+              onStatusChanged: (c) => _onActivityItemStatusChanged(gridBlock.hashCode, c, entries.length),
             ),
           ],
         ),
@@ -2829,6 +3105,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               entries: entries,
               example: exampleBlock.isNotEmpty ? exampleBlock : null,
               openEndedPrompt: promptBlock.isNotEmpty ? promptBlock['text'] as String? : null,
+              onStatusChanged: (c) => _onActivityItemStatusChanged(fillBlock.hashCode, c, entries.length),
             ),
           ],
         ),
@@ -2843,7 +3120,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
 
       return SingleChildScrollView(controller: _contentScrollController, 
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-        child: EquationBuilder(entries: entries, mode: 'suffix'),
+        child: EquationBuilder(
+          entries: entries, 
+          mode: 'suffix',
+          onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
+        ),
       );
     }
 
@@ -2990,7 +3271,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     );
   }
 
-  Widget _buildFillInCard(String partial, String icon, String answer) {
+  Widget _buildFillInCard(int index, String partial, String icon, String answer, int count) {
     // Parse the partial string to find placeholders (e.g. "_" or "__")
     List<Widget> wordParts = [];
     final RegExp exp = RegExp(r'(__|_+)');
@@ -3015,6 +3296,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             setState(() {
               _usedLetters.add(letter);
             });
+            _onActivityItemStatusChanged(index, true, count);
           }
         },
       ));

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/pronunciation_service.dart';
+import '../../services/notebook_service.dart';
 
 class PronunciationButton extends StatefulWidget {
   final String targetWord;
@@ -45,9 +46,19 @@ class _PronunciationButtonState extends State<PronunciationButton> with SingleTi
       if (mounted) {
         widget.onResult?.call(result);
         
+        // Log mistake if accuracy is low
+        if (result.score < 0.70) {
+          NotebookService().logMistake(
+            moduleId: 'current_module', // This should be passed from parent
+            word: widget.targetWord,
+          );
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result.feedback),
+            content: Text(result.score < 0.70 
+              ? "You had trouble with '${widget.targetWord}'. Let's practice it in your notebook!"
+              : result.feedback),
             backgroundColor: result.isAccurate ? Colors.green : Colors.orange,
             behavior: SnackBarBehavior.floating,
           ),

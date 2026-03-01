@@ -10,8 +10,14 @@ import 'package:flutter/material.dart';
 class EquationBuilder extends StatefulWidget {
   final List<Map<String, dynamic>> entries;
   final String mode; // 'prefix' or 'suffix'
+  final ValueChanged<bool>? onStatusChanged;
 
-  const EquationBuilder({Key? key, required this.entries, required this.mode}) : super(key: key);
+  const EquationBuilder({
+    Key? key, 
+    required this.entries, 
+    required this.mode,
+    this.onStatusChanged,
+  }) : super(key: key);
 
   @override
   State<EquationBuilder> createState() => _EquationBuilderState();
@@ -37,6 +43,19 @@ class _EquationBuilderState extends State<EquationBuilder> {
   void _check(int i) {
     final answer = widget.entries[i]['answer'] as String;
     setState(() => _results[i] = _controllers[i].text.toLowerCase().trim() == answer.toLowerCase());
+
+    if (widget.onStatusChanged != null) {
+      bool allCorrect = true;
+      for (int j = 0; j < widget.entries.length; j++) {
+        if (_results[j] != true) {
+          allCorrect = false;
+          break;
+        }
+      }
+      if (allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   @override

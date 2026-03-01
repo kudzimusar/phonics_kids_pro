@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/classroom.dart';
 import '../models/student_profile.dart';
@@ -14,58 +15,43 @@ class ClassroomDetailScreen extends StatelessWidget {
     const bgColor = Color(0xFFF5F7FA);
     const primaryColor = Color(0xFF2D3E50);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        title: Text(
-          classroom.name,
-          style: GoogleFonts.fredoka(color: primaryColor),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: primaryColor),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: FutureBuilder<List<StudentProfile>>(
-        future: SchoolRepository().getClassroomStudents(classroom.id),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final students = snapshot.data ?? [];
+    return FutureBuilder<List<StudentProfile>>(
+      future: SchoolRepository().getClassroomStudents(classroom.id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final students = snapshot.data ?? [];
 
-          return Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ClassroomStatsHeader(students: students),
-                const SizedBox(height: 24),
-                Text(
-                  'Student Progress',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _ClassroomStatsHeader(students: students),
+              const SizedBox(height: 24),
+              Text(
+                'Student Progress',
+                style: GoogleFonts.quicksand(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
                 ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: students.length,
-                    itemBuilder: (context, index) {
-                      final student = students[index];
-                      return _StudentProgressTile(student: student);
-                    },
-                  ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: students.length,
+                  itemBuilder: (context, index) {
+                    final student = students[index];
+                    return _StudentProgressTile(student: student);
+                  },
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

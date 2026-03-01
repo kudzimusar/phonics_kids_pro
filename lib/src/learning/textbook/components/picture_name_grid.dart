@@ -7,8 +7,14 @@ import 'vector_graphic.dart';
 class PictureNameGrid extends StatefulWidget {
   final List<Map<String, dynamic>> entries;
   final int columns;
+  final ValueChanged<bool>? onStatusChanged;
 
-  const PictureNameGrid({Key? key, required this.entries, this.columns = 2}) : super(key: key);
+  const PictureNameGrid({
+    Key? key, 
+    required this.entries, 
+    this.columns = 2,
+    this.onStatusChanged,
+  }) : super(key: key);
 
   @override
   State<PictureNameGrid> createState() => _PictureNameGridState();
@@ -37,6 +43,19 @@ class _PictureNameGridState extends State<PictureNameGrid> {
   void _check(int i) {
     final answer = widget.entries[i]['answer'] as String;
     setState(() => _results[i] = _controllers[i].text.toLowerCase().trim() == answer.toLowerCase());
+
+    if (widget.onStatusChanged != null) {
+      bool allCorrect = true;
+      for (int j = 0; j < widget.entries.length; j++) {
+        if (_results[j] != true) {
+          allCorrect = false;
+          break;
+        }
+      }
+      if (allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   @override
@@ -167,8 +186,14 @@ class _PictureNameGridState extends State<PictureNameGrid> {
 class RiddleFillList extends StatefulWidget {
   final String instruction;
   final List<Map<String, dynamic>> riddles;
+  final ValueChanged<bool>? onStatusChanged;
 
-  const RiddleFillList({Key? key, required this.instruction, required this.riddles}) : super(key: key);
+  const RiddleFillList({
+    Key? key, 
+    required this.instruction, 
+    required this.riddles,
+    this.onStatusChanged,
+  }) : super(key: key);
 
   @override
   State<RiddleFillList> createState() => _RiddleFillListState();
@@ -194,6 +219,19 @@ class _RiddleFillListState extends State<RiddleFillList> {
   void _check(int i) {
     final answer = widget.riddles[i]['answer'] as String;
     setState(() => _results[i] = _controllers[i].text.toLowerCase().trim() == answer.toLowerCase());
+
+    if (widget.onStatusChanged != null) {
+      bool allCorrect = true;
+      for (int j = 0; j < widget.riddles.length; j++) {
+        if (_results[j] != true) {
+          allCorrect = false;
+          break;
+        }
+      }
+      if (allCorrect) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   @override

@@ -11,47 +11,32 @@ class StickerBookScreen extends StatelessWidget {
     const bgColor = Color(0xFFF9FBFB);
     const primaryColor = Color(0xFF37474F);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.blueAccent),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'My Sticker Book',
-          style: GoogleFonts.fredoka(color: primaryColor, fontSize: 24),
-        ),
-      ),
-      body: FutureBuilder<StickerBook>(
-        future: StickerRepository().getStickerBook('student_001'),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final unlockedIds = snapshot.data?.unlockedStickerIds ?? [];
-          final allStickers = StickerRepository.availableStickers;
+    return FutureBuilder<StickerBook>(
+      future: StickerRepository().getStickerBook('student_001'),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final unlockedIds = snapshot.data?.unlockedStickerIds ?? [];
+        final allStickers = StickerRepository.availableStickers;
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: allStickers.length,
-              itemBuilder: (context, index) {
-                final sticker = allStickers[index];
-                final isUnlocked = unlockedIds.contains(sticker.id);
-                return _StickerSlot(sticker: sticker, isUnlocked: isUnlocked);
-              },
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
             ),
-          );
-        },
-      ),
+            itemCount: allStickers.length,
+            itemBuilder: (context, index) {
+              final sticker = allStickers[index];
+              final isUnlocked = unlockedIds.contains(sticker.id);
+              return _StickerSlot(sticker: sticker, isUnlocked: isUnlocked);
+            },
+          ),
+        );
+      },
     );
   }
 }

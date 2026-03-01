@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'textbook_canvas.dart';
 
 class TextbookScreen extends StatefulWidget {
@@ -162,7 +163,14 @@ class _TextbookScreenState extends State<TextbookScreen> {
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.close, color: Colors.black87),
-                  onPressed: () => Navigator.of(context).pop(),
+                  tooltip: 'Close Textbook',
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/dashboard');
+                    }
+                  },
                 ),
               ),
             ),
