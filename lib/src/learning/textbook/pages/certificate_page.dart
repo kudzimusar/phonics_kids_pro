@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/local_progress_service.dart';
-import '../textbook/textbook_database.dart';
+import '../../services/local_progress_service.dart';
+import '../textbook_database.dart';
 import 'web_downloader.dart';
 
 class CertificatePage extends StatefulWidget {

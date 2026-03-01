@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'textbook_database.dart';
 import 'components/teacher_overlay.dart';
@@ -56,6 +57,8 @@ import 'pages/answer_key_page.dart';
 import 'pages/certificate_page.dart';
 import 'utils/responsive_helper.dart';
 import '../services/local_progress_service.dart';
+import '../services/notebook_service.dart';
+import '../models/notebook_entry.dart';
 import '../notebook/notebook_overlay.dart';
 
 class TextbookCanvas extends StatefulWidget {
@@ -561,8 +564,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                 ...selectableRegionState.contextMenuButtonItems,
                 ContextMenuButtonItem(
                   label: 'Send to Benjamin Fox',
-                  onPressed: () {
-                    final selectedText = selectableRegionState.processData.plainText;
+                  onPressed: () async {
+                    // Copy to clipboard first as SelectableRegionState doesn't expose the text directly
+                    selectableRegionState.copySelection(SelectionChangedCause.toolbar);
+                    final data = await Clipboard.getData(Clipboard.kTextPlain);
+                    final selectedText = data?.text;
+                    
                     if (selectedText != null && selectedText.isNotEmpty) {
                       NotebookService().saveEntry(
                         NotebookEntry(
@@ -573,9 +580,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                           timestamp: DateTime.now(),
                         ),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Sent to Benjamin Notebook!')),
-                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sent to Benjamin Notebook!')),
+                        );
+                      }
                     }
                     selectableRegionState.hideToolbar();
                   },

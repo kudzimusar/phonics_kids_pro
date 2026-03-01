@@ -59,7 +59,7 @@ class _TracingCardState extends State<TracingCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // 1. Vector Graphic
-          VectorGraphic(assetName: icon, size: 60),
+          VectorGraphic(assetName: widget.icon, size: 60),
           const SizedBox(height: 16),
           
           // 2. The Main Content Box (contains partial word and choices)

@@ -1,6 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../textbook/components/phonic_fox_narrator.dart';
+import '../textbook/components/vowel_consonant_word.dart';
+import '../services/notebook_service.dart';
+import '../models/notebook_entry.dart';
 
 class NotebookOverlay extends StatefulWidget {
   final String moduleId;
@@ -39,102 +41,218 @@ class _NotebookOverlayState extends State<NotebookOverlay> {
             ),
           ),
           
-          // 2. Drawing Canvas Layer
-          GestureDetector(
-            onPanStart: (details) {
-              setState(() {
-                _lines.add([
-                  DrawingPoint(
-                    offset: details.localPosition,
-                    paint: Paint()
-                      ..color = _selectedColor
-                      ..strokeWidth = _strokeWidth
-                      ..strokeCap = StrokeCap.round
-                      ..style = PaintingStyle.stroke,
-                  )
-                ]);
-              });
-            },
-            onPanUpdate: (details) {
-              setState(() {
-                _lines.last.add(
-                  DrawingPoint(
-                    offset: details.localPosition,
-                    paint: Paint()
-                      ..color = _selectedColor
-                      ..strokeWidth = _strokeWidth
-                      ..strokeCap = StrokeCap.round
-                      ..style = PaintingStyle.stroke,
-                  ),
-                );
-              });
-            },
-            child: Listener(
-              onPointerDown: (event) {
-                // Specialized handling for stylus vs touch if needed
-                if (event.kind == PointerDeviceKind.stylus) {
-                  // Adjust stroke width based on pressure if supported
-                  _strokeWidth = event.pressure * 10;
-                } else {
-                  _strokeWidth = 3.0; // Thick line for finger/mouse
-                }
-              },
-              child: CustomPaint(
-                painter: NotebookPainter(_lines),
-                size: Size.infinite,
-              ),
-            ),
-          ),
-
-          // 3. Toolbar & Mascot
-          Positioned(
-            top: 40,
-            left: 20,
-            right: 20,
-            child: Column(
-              children: [
-                Row(
+          Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 40, 20, 10),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.close, size: 30, color: Colors.indigo),
                       onPressed: widget.onDismiss,
                     ),
-                    Text(
+                    const Text(
                       'Benjamin Notebook',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'FredokaOne',
                         fontSize: 28,
                         color: Colors.indigo,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Row(
-                      children: [
-                        _buildColorButton(Colors.red),
-                        _buildColorButton(Colors.blue),
-                        _buildColorButton(Colors.black),
-                        const SizedBox(width: 10),
-                        IconButton(
-                          icon: const Icon(Icons.undo, color: Colors.indigo),
-                          onPressed: () {
-                            if (_lines.isNotEmpty) {
-                              setState(() => _lines.removeLast());
-                            }
-                          },
+                    _buildToolsSelection(),
+                  ],
+                ),
+              ),
+              
+              Expanded(
+                child: Row(
+                  children: [
+                    // Left Panel: Entry List
+                    Container(
+                      width: 320,
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.orange.shade100, width: 2),
+                      ),
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: PhonicFoxNarrator(
+                              text: "Let's master our mistakes!",
+                              state: FoxState.thinking,
+                            ),
+                          ),
+                          Expanded(
+                            child: StreamBuilder<List<NotebookEntry>>(
+                              stream: NotebookService().getEntriesForModule(widget.moduleId),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                                final entries = snapshot.data!;
+                                if (entries.isEmpty) {
+                                  return const Center(
+                                    child: Text(
+                                      "No entries yet.\nSend some from the textbook!",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  );
+                                }
+                                return ListView.builder(
+                                  padding: const EdgeInsets.all(12),
+                                  itemCount: entries.length,
+                                  itemBuilder: (context, index) => _buildEntryTile(entries[index]),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Right Panel: Drawing Canvas
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(0, 16, 16, 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.grey.shade300, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            )
+                          ],
                         ),
-                      ],
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(22),
+                          child: GestureDetector(
+                            onPanStart: (details) {
+                              setState(() {
+                                _lines.add([
+                                  DrawingPoint(
+                                    offset: details.localPosition,
+                                    paint: Paint()
+                                      ..color = _selectedColor
+                                      ..strokeWidth = _strokeWidth
+                                      ..strokeCap = StrokeCap.round
+                                      ..style = PaintingStyle.stroke,
+                                  )
+                                ]);
+                              });
+                            },
+                            onPanUpdate: (details) {
+                              setState(() {
+                                _lines.last.add(
+                                  DrawingPoint(
+                                    offset: details.localPosition,
+                                    paint: Paint()
+                                      ..color = _selectedColor
+                                      ..strokeWidth = _strokeWidth
+                                      ..strokeCap = StrokeCap.round
+                                      ..style = PaintingStyle.stroke,
+                                  ),
+                                );
+                              });
+                            },
+                            child: Listener(
+                              onPointerDown: (event) {
+                                if (event.kind == PointerDeviceKind.stylus) {
+                                  _strokeWidth = (event.pressure * 10).clamp(1.0, 10.0);
+                                } else {
+                                  _strokeWidth = 3.0; 
+                                }
+                              },
+                              child: CustomPaint(
+                                painter: NotebookPainter(_lines),
+                                size: Size.infinite,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                const PhonicFoxNarrator(
-                  text: "Let's master our mistakes together! Try re-writing the words you found difficult.",
-                  state: FoxState.thinking,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToolsSelection() {
+    return Row(
+      children: [
+        _buildColorButton(Colors.red),
+        _buildColorButton(Colors.blue),
+        _buildColorButton(Colors.black),
+        const SizedBox(width: 10),
+        IconButton(
+          icon: const Icon(Icons.undo, color: Colors.indigo),
+          onPressed: () {
+            if (_lines.isNotEmpty) {
+              setState(() => _lines.removeLast());
+            }
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete_sweep, color: Colors.redAccent),
+          onPressed: () => setState(() => _lines.clear()),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEntryTile(NotebookEntry entry) {
+    // Extract the word if it's a mistake entry like "Mistake in: word"
+    String textToShow = entry.content;
+    if (entry.type == NotebookEntryType.mistake && textToShow.startsWith('Mistake in: ')) {
+      textToShow = textToShow.replaceFirst('Mistake in: ', '');
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: entry.type == NotebookEntryType.mistake ? Colors.red.shade50 : Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: entry.type == NotebookEntryType.mistake ? Colors.red.shade200 : Colors.blue.shade200,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                entry.type == NotebookEntryType.mistake ? "Mistake" : "Cloned Text",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: entry.type == NotebookEntryType.mistake ? Colors.red.shade800 : Colors.blue.shade800,
+                ),
+              ),
+              Icon(
+                entry.type == NotebookEntryType.mistake ? Icons.warning_rounded : Icons.copy_rounded,
+                size: 16,
+                color: entry.type == NotebookEntryType.mistake ? Colors.red.shade400 : Colors.blue.shade400,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Use VowelConsonantWord for A3 Red/Blue logic
+          VowelConsonantWord(word: textToShow),
         ],
       ),
     );
