@@ -1,12 +1,25 @@
 {
-    "name": "phonics_kids_pro",
-    "short_name": "phonics_kids_pro",
+    "id": "/",
+    "name": "Phonics Kids Pro - Read Before Four",
+    "short_name": "PhonicsKids",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "display_override": [
+        "fullscreen",
+        "standalone",
+        "minimal-ui"
+    ],
+    "background_color": "#E1F5FE",
+    "theme_color": "#42A5F5",
+    "description": "Interactive Phonics Learning Powered by AI. Phonics Kids Pro is a state-of-the-art educational application designed to revolutionize how children learn to read and write.",
+    "orientation": "any",
+    "scope": "/",
+    "categories": [
+        "education",
+        "books",
+        "kids"
+    ],
+    "iarc_rating_id": "e58e3352-0941-477c-9b80-1a1a1a1a1a1a",
     "prefer_related_applications": false,
     "icons": [
         {
@@ -30,6 +43,29 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshots/lesson_selection.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Lesson Selection Screen"
+        },
+        {
+            "src": "screenshots/benjamin_notebook.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Benjamin Smart Notebook"
+        },
+        {
+            "src": "screenshots/phonics_cast.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Phonics Cast AI Feedback"
         }
     ]
 }
