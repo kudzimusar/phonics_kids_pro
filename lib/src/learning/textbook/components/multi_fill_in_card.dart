@@ -6,12 +6,14 @@ class MultiFillInCard extends StatefulWidget {
   final String icon;
   final String word; // e.g., "F_owe_"
   final List<String> targetLetters; // e.g., ["l", "r"]
+  final ValueChanged<bool>? onStatusChanged;
 
   const MultiFillInCard({
     Key? key,
     required this.icon,
     required this.word,
     required this.targetLetters,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -71,6 +73,10 @@ class _MultiFillInCardState extends State<MultiFillInCard> {
                     onDropResult: (success, letterStr) {
                       if (success) {
                         setState(() => _isFilledList[currentTargetIndex] = true);
+                        if (widget.onStatusChanged != null) {
+                          bool isComplete = _isFilledList.every((element) => element == true);
+                          widget.onStatusChanged!(isComplete);
+                        }
                       }
                     },
                   );

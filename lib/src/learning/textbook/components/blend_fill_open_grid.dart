@@ -8,11 +8,13 @@ import '../utils/responsive_helper.dart';
 class BlendFillOpenGrid extends StatefulWidget {
   final List<Map<String, dynamic>> entries;
   final int columns;
+  final ValueChanged<bool>? onStatusChanged;
 
   const BlendFillOpenGrid({
     Key? key,
     required this.entries,
     this.columns = 3,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -43,6 +45,12 @@ class _BlendFillOpenGridState extends State<BlendFillOpenGrid> {
     setState(() {
       _results[index] = _controllers[index].text.trim().toLowerCase() == answer.toLowerCase();
     });
+    
+    if (widget.onStatusChanged != null) {
+      if (_results.every((r) => r == true)) {
+        widget.onStatusChanged!(true);
+      }
+    }
   }
 
   @override

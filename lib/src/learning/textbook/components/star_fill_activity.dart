@@ -6,8 +6,9 @@ import 'dart:math';
 /// Matches the physical textbook layout exactly.
 class StarFillActivity extends StatefulWidget {
   final List<Map<String, dynamic>> entries;
+  final ValueChanged<bool>? onStatusChanged;
 
-  const StarFillActivity({Key? key, required this.entries}) : super(key: key);
+  const StarFillActivity({Key? key, required this.entries, this.onStatusChanged}) : super(key: key);
 
   @override
   State<StarFillActivity> createState() => _StarFillActivityState();
@@ -40,6 +41,17 @@ class _StarFillActivityState extends State<StarFillActivity> {
     setState(() {
       _correct[index] = input == answer.toLowerCase();
     });
+    
+    if (widget.onStatusChanged != null) {
+      bool isComplete = true;
+      for (int i = 0; i < widget.entries.length; i++) {
+        if (_correct[i] != true) {
+          isComplete = false;
+          break;
+        }
+      }
+      if (isComplete) widget.onStatusChanged!(true);
+    }
   }
 
   @override

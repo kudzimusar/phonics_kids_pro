@@ -5,11 +5,13 @@ import '../utils/responsive_helper.dart';
 class CircleChoiceGrid extends StatefulWidget {
   final List<Map<String, dynamic>> entries;
   final int columns;
+  final ValueChanged<bool>? onStatusChanged;
 
   const CircleChoiceGrid({
     Key? key,
     required this.entries,
     this.columns = 2,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -24,6 +26,17 @@ class _CircleChoiceGridState extends State<CircleChoiceGrid> {
     setState(() {
       _selections[entryIndex] = choice;
     });
+    
+    if (widget.onStatusChanged != null) {
+      bool isComplete = true;
+      for (int i = 0; i < widget.entries.length; i++) {
+        if (_selections[i] != widget.entries[i]['answer']) {
+          isComplete = false;
+          break;
+        }
+      }
+      if (isComplete) widget.onStatusChanged!(true);
+    }
   }
 
   @override

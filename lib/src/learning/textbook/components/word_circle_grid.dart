@@ -5,15 +5,17 @@ class WordCircleGrid extends StatefulWidget {
   /* Example word:
     {
       'word': 'make',
-      'hasBossyR': false,
+      'answer': false,
     }
   */
   final int columns;
+  final ValueChanged<bool>? onStatusChanged;
 
   const WordCircleGrid({
     Key? key,
     required this.words,
     this.columns = 4,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -34,6 +36,16 @@ class _WordCircleGridState extends State<WordCircleGrid> {
     setState(() {
       _circled[index] = !_circled[index];
     });
+    
+    if (widget.onStatusChanged != null) {
+      bool isComplete = true;
+      for (int i = 0; i < widget.words.length; i++) {
+        final expectedAnswer = widget.words[i]['answer'] as bool? ?? false;
+        if (expectedAnswer && !_circled[i]) isComplete = false;
+        if (!expectedAnswer && _circled[i]) isComplete = false;
+      }
+      if (isComplete) widget.onStatusChanged!(true);
+    }
     
     // Optional: play a drawing sound effect here
   }

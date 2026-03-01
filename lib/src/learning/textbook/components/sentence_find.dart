@@ -4,12 +4,14 @@ class SentenceFind extends StatefulWidget {
   final List<Map<String, dynamic>> sentences;
   final bool numbered;
   final bool hasDecoration;
+  final ValueChanged<bool>? onStatusChanged;
 
   const SentenceFind({
     Key? key,
     required this.sentences,
     this.numbered = false,
     this.hasDecoration = true,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -36,6 +38,37 @@ class _SentenceFindState extends State<SentenceFind> {
         _selections[sentenceIndex]!.add(wordIndex);
       }
     });
+    _checkCompletion();
+  }
+
+  void _checkCompletion() {
+    if (widget.onStatusChanged == null) return;
+    
+    bool allCorrect = true;
+    for (int i = 0; i < widget.sentences.length; i++) {
+        final sentenceData = widget.sentences[i];
+        final answers = List<String>.from(sentenceData['answers'] ?? []);
+        final words = _splitSentenceIntoWords(sentenceData['text'] as String);
+        
+        int correctSelected = 0;
+        int wrongSelected = 0;
+        
+        for (int w in _selections[i]!) {
+            final cleanWord = words[w].replaceAll(RegExp(r'[^\w\s]'), '').trim();
+            final isCorrect = answers.any((a) => a.toLowerCase() == cleanWord.toLowerCase());
+            if (isCorrect) correctSelected++;
+            else wrongSelected++;
+        }
+        
+        if (correctSelected < answers.length || wrongSelected > 0) {
+            allCorrect = false;
+            break;
+        }
+    }
+    
+    if (allCorrect) {
+        widget.onStatusChanged!(true);
+    }
   }
 
   List<String> _splitSentenceIntoWords(String sentence) {

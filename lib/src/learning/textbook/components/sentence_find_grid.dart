@@ -7,11 +7,13 @@ import 'vector_graphic.dart';
 class SentenceFindGrid extends StatefulWidget {
   final List<Map<String, dynamic>> sentences;
   final int columns;
+  final ValueChanged<bool>? onStatusChanged;
 
   const SentenceFindGrid({
     Key? key,
     required this.sentences,
     this.columns = 2,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -28,6 +30,18 @@ class _SentenceFindGridState extends State<SentenceFindGrid> {
     super.initState();
     _tappedWords = List.generate(widget.sentences.length, (_) => {});
     _checked = List.generate(widget.sentences.length, (_) => false);
+  }
+
+  void _checkCompletion() {
+    if (widget.onStatusChanged == null) return;
+    bool allChecked = true;
+    for (int i = 0; i < widget.sentences.length; i++) {
+       if (!_checked[i]) allChecked = false;
+    }
+    
+    if (allChecked) {
+       widget.onStatusChanged!(true);
+    }
   }
 
   @override
@@ -121,7 +135,10 @@ class _SentenceFindGridState extends State<SentenceFindGrid> {
                     Row(
                       children: [
                         GestureDetector(
-                          onTap: () => setState(() => _checked[i] = true),
+                          onTap: () {
+                            setState(() => _checked[i] = true);
+                            _checkCompletion();
+                          },
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                             decoration: BoxDecoration(

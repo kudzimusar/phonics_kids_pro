@@ -4,9 +4,9 @@ import 'squash_stretch.dart';
 
 class TrainFillIn extends StatefulWidget {
   final List<Map<String, dynamic>> trains;
-  final VoidCallback? onComplete;
+  final ValueChanged<bool>? onStatusChanged;
 
-  const TrainFillIn({Key? key, required this.trains, this.onComplete}) : super(key: key);
+  const TrainFillIn({Key? key, required this.trains, this.onStatusChanged}) : super(key: key);
 
   @override
   State<TrainFillIn> createState() => _TrainFillInState();
@@ -75,8 +75,16 @@ class _TrainFillInState extends State<TrainFillIn> {
                             setState(() {
                               _answers[index] = val;
                             });
-                            if (val.toLowerCase() == train['answer'].toString().toLowerCase()) {
-                              widget.onComplete?.call();
+                            
+                            if (widget.onStatusChanged != null) {
+                              bool isComplete = true;
+                              for (int i = 0; i < widget.trains.length; i++) {
+                                if (_answers[i].toLowerCase() != widget.trains[i]['answer'].toString().toLowerCase()) {
+                                  isComplete = false;
+                                  break;
+                                }
+                              }
+                              if (isComplete) widget.onStatusChanged!(true);
                             }
                           },
                         ),

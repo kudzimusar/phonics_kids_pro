@@ -7,6 +7,7 @@ class TwoColumnSort extends StatefulWidget {
   final List<String> leftAnswers;
   final List<String> rightAnswers;
   final List<String> wordBank;
+  final ValueChanged<bool>? onStatusChanged;
 
   const TwoColumnSort({
     Key? key,
@@ -15,6 +16,7 @@ class TwoColumnSort extends StatefulWidget {
     required this.leftAnswers,
     required this.rightAnswers,
     required this.wordBank,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -42,6 +44,9 @@ class _TwoColumnSortState extends State<TwoColumnSort> {
         setState(() {
           _bankItems.remove(word);
           if (!_leftItems.contains(word)) _leftItems.add(word);
+          if (_bankItems.isEmpty && widget.onStatusChanged != null) {
+            widget.onStatusChanged!(true);
+          }
         });
       },
     );
@@ -54,6 +59,9 @@ class _TwoColumnSortState extends State<TwoColumnSort> {
         setState(() {
           _bankItems.remove(word);
           if (!_rightItems.contains(word)) _rightItems.add(word);
+          if (_bankItems.isEmpty && widget.onStatusChanged != null) {
+            widget.onStatusChanged!(true);
+          }
         });
       },
     );

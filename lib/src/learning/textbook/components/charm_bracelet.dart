@@ -6,12 +6,14 @@ class CharmBraceletRow extends StatefulWidget {
   final String icon;
   final List<String> letters; // '?' represents the blank/target letter
   final List<String> targetLetters; // If multiple blanks, list them in order
+  final ValueChanged<bool>? onStatusChanged;
 
   const CharmBraceletRow({
     Key? key,
     required this.icon,
     required this.letters,
     required this.targetLetters,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -108,6 +110,10 @@ class _CharmBraceletRowState extends State<CharmBraceletRow> {
                               onDropResult: (success, letterStr) {
                                 if (success) {
                                   setState(() => _isFilledList[currentTargetIndex] = true);
+                                  if (widget.onStatusChanged != null) {
+                                    bool isComplete = _isFilledList.every((element) => element == true);
+                                    widget.onStatusChanged!(isComplete);
+                                  }
                                 }
                               },
                             )

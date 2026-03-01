@@ -84,4 +84,11 @@ class SchoolRepository {
       return false;
     }
   }
+  Future<Classroom?> getClassroomById(String classroomId) async {
+    try {
+      return mockClassrooms.firstWhere((c) => c.id == classroomId);
+    } catch (_) {
+      return null;
+    }
+  }
 }

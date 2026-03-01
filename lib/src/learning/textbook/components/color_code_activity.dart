@@ -3,8 +3,13 @@ import 'dart:math' as math;
 
 class ColorCodeActivity extends StatefulWidget {
   final List<Map<String, String>> items; // e.g. [{'word': 'gym', 'answer': 'red'}, ...]
+  final ValueChanged<bool>? onStatusChanged;
 
-  const ColorCodeActivity({Key? key, required this.items}) : super(key: key);
+  const ColorCodeActivity({
+    Key? key, 
+    required this.items,
+    this.onStatusChanged,
+  }) : super(key: key);
 
   @override
   State<ColorCodeActivity> createState() => _ColorCodeActivityState();
@@ -24,6 +29,17 @@ class _ColorCodeActivityState extends State<ColorCodeActivity> {
     setState(() {
       _colorStates[index] = (_colorStates[index] + 1) % 3;
     });
+    
+    if (widget.onStatusChanged != null) {
+      bool isComplete = true;
+      for (int i = 0; i < widget.items.length; i++) {
+        final answer = widget.items[i]['answer'];
+        final currentState = _colorStates[i];
+        if (answer == 'red' && currentState != 1) isComplete = false;
+        if (answer == 'black' && currentState != 2) isComplete = false;
+      }
+      if (isComplete) widget.onStatusChanged!(true);
+    }
   }
 
   @override

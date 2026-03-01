@@ -7,6 +7,8 @@ class IdentifySort extends StatefulWidget {
   final String rightChoice;
   final String highlightKey; // Key in the item map for what string to highlight
   final bool useVectorGraphic; 
+  final ValueChanged<bool>? onStatusChanged;
+  final Map<String, String>? answerKey; // Maps word to 'vowel'/'consonant' or left/right
 
   const IdentifySort({
     Key? key, 
@@ -15,6 +17,8 @@ class IdentifySort extends StatefulWidget {
     this.rightChoice = 'consonant',
     this.highlightKey = 'y',
     this.useVectorGraphic = false,
+    this.onStatusChanged,
+    this.answerKey,
   }) : super(key: key);
 
   @override
@@ -35,6 +39,25 @@ class _IdentifySortState extends State<IdentifySort> {
     setState(() {
       _selections[index] = choice;
     });
+    
+    if (widget.onStatusChanged != null) {
+      bool isComplete = true;
+      for (int i = 0; i < widget.items.length; i++) {
+        final word = widget.items[i]['word'] as String;
+        final selected = _selections[i];
+        if (selected == null) {
+          isComplete = false;
+          break;
+        }
+        if (widget.answerKey != null && widget.answerKey!.containsKey(word)) {
+          if (widget.answerKey![word] != selected) {
+            isComplete = false;
+            break;
+          }
+        }
+      }
+      if (isComplete) widget.onStatusChanged!(true);
+    }
   }
 
   @override

@@ -60,6 +60,7 @@ import 'components/definition_fill_list.dart';
 import 'pages/answer_key_page.dart';
 import 'pages/certificate_page.dart';
 import 'utils/responsive_helper.dart';
+import '../services/local_progress_service.dart';
 
 class TextbookCanvas extends StatefulWidget {
   final bool teacherModeActive;
@@ -85,6 +86,10 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
   final ScrollController _contentScrollController = ScrollController();
   bool _isReaderModeActive = false;
   Timer? _autoScrollTimer;
+  
+  final LocalProgressService _progressService = LocalProgressService();
+  bool _isCurrentPageCleared = false;
+  final Map<String, dynamic> _activityState = {};
 
   @override
   void initState() {
@@ -95,7 +100,47 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
         _currentPageIndex = index;
       }
     }
+    _loadProgress();
     _resetHintTimer();
+  }
+
+  void _loadProgress() async {
+    final page = TextbookDatabase.pages[_currentPageIndex];
+    if (page['activityLabel'] != null) {
+      final cleared = await _progressService.isActivityCleared(page['activityLabel'] as String);
+      if (mounted) setState(() => _isCurrentPageCleared = cleared);
+    } else {
+      if (mounted) setState(() => _isCurrentPageCleared = false);
+    }
+  }
+
+  void _onActivityItemStatusChanged(int index, bool isComplete, int requiredCount) {
+    if (_isCurrentPageCleared) return;
+    
+    setState(() {
+      _activityState[index.toString()] = isComplete;
+    });
+    
+    int completed = 0;
+    for (var value in _activityState.values) {
+      if (value == true) completed++;
+    }
+    
+    if (completed >= requiredCount) {
+      _triggerPageCleared();
+    }
+  }
+
+  void _triggerPageCleared() async {
+    setState(() {
+      _isCurrentPageCleared = true;
+      _showCelebration = true;
+    });
+    
+    final page = TextbookDatabase.pages[_currentPageIndex];
+    if (page['activityLabel'] != null) {
+      await _progressService.markActivityCleared(page['activityLabel'] as String);
+    }
   }
 
   @override
@@ -138,7 +183,9 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       setState(() {
         _currentPageIndex++;
         _usedLetters.clear();
+        _activityState.clear();
       });
+      _loadProgress();
       _resetHintTimer();
       _scrollToTop();
     }
@@ -149,7 +196,9 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
       setState(() {
         _currentPageIndex--;
         _usedLetters.clear();
+        _activityState.clear();
       });
+      _loadProgress();
       _resetHintTimer();
       _scrollToTop();
     }
@@ -545,7 +594,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                     ),
   
                   // 4. Hint System Overlay (Conditional)
-                  if (_showHint)
+                  if (_showHint && currentPage['layout'] != 'certificate')
                     HintOverlay(
                       hintText: _getHintForPage(currentPage),
                       onHintDismissed: () => setState(() => _showHint = false),
@@ -576,7 +625,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
   }
 
   Widget _buildPageContent(Map<String, dynamic> page, BoxConstraints constraints) {
-    final bool isSpecialPage = page['layout'] == 'cover' || page['layout'] == 'welcome';
+    final bool isSpecialPage = page['layout'] == 'cover' || page['layout'] == 'welcome' || page['layout'] == 'certificate';
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -628,11 +677,47 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(
-                bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 90.0,
+                bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 16.0,
               ),
               child: _buildSpecificLayout(page, constraints),
             ),
           ),
+          if (_isCurrentPageCleared && page['activityLabel'] != null)
+             _buildClearedBanner(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClearedBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(
+        top: 8, 
+        bottom: _getLetterBankForPage(TextbookDatabase.pages[_currentPageIndex]).isNotEmpty ? 120.0 : 90.0
+      ),
+      decoration: BoxDecoration(
+        color: Colors.green.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.green.shade400, width: 2),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.stars, color: Colors.green.shade600, size: 32),
+          const SizedBox(width: 12),
+          Text(
+            "Task Cleared! Great job!",
+            style: TextStyle(
+              fontSize: ResponsiveHelper.isMobile(context) ? 20 : 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade700,
+              fontFamily: 'FredokaOne',
+            ),
+          ),
+          const SizedBox(width: 12),
+          Icon(Icons.stars, color: Colors.green.shade600, size: 32),
         ],
       ),
     );
@@ -810,7 +895,10 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   mainAxisSpacing: 16,
                 ),
                 itemCount: words.length,
-                itemBuilder: (context, index) => VowelConsonantWord(word: words[index]),
+                itemBuilder: (context, index) => VowelConsonantWord(
+                  word: words[index],
+                  onStatusChanged: (isComplete) => _onActivityItemStatusChanged(index, isComplete, words.length),
+                ),
               ),
             ],
           ),
@@ -1114,12 +1202,12 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 64),
-              children: const [
-                DaisyChainRow(icon: "bus", letters: ["B", "u", "?"], targetLetter: "s"),
-                DaisyChainRow(icon: "ham", letters: ["?", "a", "m"], targetLetter: "h"),
-                DaisyChainRow(icon: "fox", letters: ["F", "o", "?"], targetLetter: "x"),
-                DaisyChainRow(icon: "jam", letters: ["?", "a", "m"], targetLetter: "j"),
-                DaisyChainRow(icon: "pail", letters: ["P", "a", "i", "?"], targetLetter: "l"),
+              children: [
+                DaisyChainRow(icon: "bus", letters: const ["B", "u", "?"], targetLetter: "s", onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 5)),
+                DaisyChainRow(icon: "ham", letters: const ["?", "a", "m"], targetLetter: "h", onStatusChanged: (c) => _onActivityItemStatusChanged(1, c, 5)),
+                DaisyChainRow(icon: "fox", letters: const ["F", "o", "?"], targetLetter: "x", onStatusChanged: (c) => _onActivityItemStatusChanged(2, c, 5)),
+                DaisyChainRow(icon: "jam", letters: const ["?", "a", "m"], targetLetter: "j", onStatusChanged: (c) => _onActivityItemStatusChanged(3, c, 5)),
+                DaisyChainRow(icon: "pail", letters: const ["P", "a", "i", "?"], targetLetter: "l", onStatusChanged: (c) => _onActivityItemStatusChanged(4, c, 5)),
               ],
             ),
           ),
@@ -1136,11 +1224,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 64),
-              children: const [
-                CharmBraceletRow(icon: "gift", letters: ["?", "i", "f", "t"], targetLetters: ["G"]),
-                CharmBraceletRow(icon: "bird", letters: ["?", "i", "r", "?"], targetLetters: ["B", "d"]),
-                CharmBraceletRow(icon: "flag", letters: ["?", "l", "a", "g"], targetLetters: ["F"]),
-                CharmBraceletRow(icon: "girl", letters: ["G", "i", "r", "?"], targetLetters: ["l"]),
+              children: [
+                CharmBraceletRow(icon: "gift", letters: const ["?", "i", "f", "t"], targetLetters: const ["G"], onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 4)),
+                CharmBraceletRow(icon: "bird", letters: const ["?", "i", "r", "?"], targetLetters: const ["B", "d"], onStatusChanged: (c) => _onActivityItemStatusChanged(1, c, 4)),
+                CharmBraceletRow(icon: "flag", letters: const ["?", "l", "a", "g"], targetLetters: const ["F"], onStatusChanged: (c) => _onActivityItemStatusChanged(2, c, 4)),
+                CharmBraceletRow(icon: "girl", letters: const ["G", "i", "r", "?"], targetLetters: const ["l"], onStatusChanged: (c) => _onActivityItemStatusChanged(3, c, 4)),
               ],
             ),
           ),
@@ -1157,20 +1245,20 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: const [
-                MultiFillInCard(icon: "tree", word: "T_ree", targetLetters: ["r"]),
-                SizedBox(height: 16),
-                MultiFillInCard(icon: "flower", word: "F_owe_", targetLetters: ["l", "r"]),
-                SizedBox(height: 16),
-                MultiFillInCard(icon: "moose", word: "_oo_e", targetLetters: ["M", "s"]),
-                SizedBox(height: 16),
-                MultiFillInCard(icon: "umbrella", word: "U_b_ella", targetLetters: ["m", "r"]),
-                SizedBox(height: 16),
-                MultiFillInCard(icon: "octopus", word: "O_to_u_", targetLetters: ["c", "p", "s"]),
-                SizedBox(height: 16),
-                MultiFillInCard(icon: "rainbow", word: "_ai_bo_", targetLetters: ["R", "n", "w"]),
-                SizedBox(height: 16),
-                MultiFillInCard(icon: "watermelon", word: "_a_er_e_on", targetLetters: ["W", "t", "m", "l"]),
+              children: [
+                MultiFillInCard(icon: "tree", word: "T_ree", targetLetters: const ["r"], onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 7)),
+                const SizedBox(height: 16),
+                MultiFillInCard(icon: "flower", word: "F_owe_", targetLetters: const ["l", "r"], onStatusChanged: (c) => _onActivityItemStatusChanged(1, c, 7)),
+                const SizedBox(height: 16),
+                MultiFillInCard(icon: "moose", word: "_oo_e", targetLetters: const ["M", "s"], onStatusChanged: (c) => _onActivityItemStatusChanged(2, c, 7)),
+                const SizedBox(height: 16),
+                MultiFillInCard(icon: "umbrella", word: "U_b_ella", targetLetters: const ["m", "r"], onStatusChanged: (c) => _onActivityItemStatusChanged(3, c, 7)),
+                const SizedBox(height: 16),
+                MultiFillInCard(icon: "octopus", word: "O_to_u_", targetLetters: const ["c", "p", "s"], onStatusChanged: (c) => _onActivityItemStatusChanged(4, c, 7)),
+                const SizedBox(height: 16),
+                MultiFillInCard(icon: "rainbow", word: "_ai_bo_", targetLetters: const ["R", "n", "w"], onStatusChanged: (c) => _onActivityItemStatusChanged(5, c, 7)),
+                const SizedBox(height: 16),
+                MultiFillInCard(icon: "watermelon", word: "_a_er_e_on", targetLetters: const ["W", "t", "m", "l"], onStatusChanged: (c) => _onActivityItemStatusChanged(6, c, 7)),
               ],
             ),
           ),
@@ -1233,6 +1321,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                             }
                           }) ?? []),
                           wordBank: List<String>.from(block['options'] ?? []),
+                          onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -1290,8 +1379,8 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   // Ladybugs Grid
                   SizedBox(
                     height: ResponsiveHelper.isMobile(context) ? 350 : 500, // Responsive height for GridView inside ScrollView
-                    child: const ColorCodeActivity(
-                      items: [
+                    child: ColorCodeActivity(
+                      items: const [
                         {'word': 'gym', 'answer': 'red'},
                         {'word': 'gate', 'answer': 'black'},
                         {'word': 'gem', 'answer': 'red'},
@@ -1299,6 +1388,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                         {'word': 'giant', 'answer': 'red'},
                         {'word': 'age', 'answer': 'red'},
                       ],
+                      onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 1),
                     ),
                   ),
                   const SizedBox(height: 60),
@@ -1341,9 +1431,9 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               type: TextType.rule,
             ),
             const SizedBox(height: 32),
-            const Expanded(
+            Expanded(
               child: IdentifySort(
-                items: [
+                items: const [
                   {'word': 'yes', 'emoji': '👍', 'answer': 'consonant'},
                   {'word': 'baby', 'emoji': '👶', 'answer': 'vowel'},
                   {'word': 'lawyer', 'emoji': '⚖️', 'answer': 'vowel'},
@@ -1353,6 +1443,17 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   {'word': 'monkey', 'emoji': '🐒', 'answer': 'vowel'},
                   {'word': 'year', 'emoji': '🗓️', 'answer': 'consonant'},
                 ],
+                answerKey: const {
+                  'yes': 'consonant',
+                  'baby': 'vowel',
+                  'lawyer': 'vowel',
+                  'yellow': 'consonant',
+                  'bicycle': 'vowel',
+                  'happy': 'vowel',
+                  'monkey': 'vowel',
+                  'year': 'consonant',
+                },
+                onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 1),
               ),
             ),
           ],
@@ -1380,6 +1481,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   highlightKey: 'underlined',
                   leftChoice: 'blend',
                   rightChoice: 'digraph',
+                  onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                 ),
               );
             }
@@ -1408,12 +1510,13 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.blueGrey.shade800, width: 2),
                     ),
-                    child: const TwoColumnSort(
+                    child: TwoColumnSort(
                       leftLabel: "Long E Sound",
                       rightLabel: "Long I Sound",
-                      leftAnswers: ["pretty", "windy", "candy", "puppy", "lazy", "kitty"],
-                      rightAnswers: ["rely", "fly", "dry", "fry", "apply", "cycle"],
-                      wordBank: ["rely", "pretty", "fly", "dry", "windy", "fry", "candy", "puppy", "apply", "cycle", "lazy", "kitty"],
+                      leftAnswers: const ["pretty", "windy", "candy", "puppy", "lazy", "kitty"],
+                      rightAnswers: const ["rely", "fly", "dry", "fry", "apply", "cycle"],
+                      wordBank: const ["rely", "pretty", "fly", "dry", "windy", "fry", "candy", "puppy", "apply", "cycle", "lazy", "kitty"],
+                      onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 1),
                     ),
                   ),
                   const SizedBox(height: 60),
@@ -1458,7 +1561,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
           const SizedBox(height: 32),
           Expanded(
             child: TrainFillIn(
-              onComplete: _triggerCelebration,
+              onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 1),
               trains: const [
                 {'imageDesc': 'Cap / hat', 'imageId': 'hat', 'letters': ['C', '?', 'P'], 'answer': 'a', 'word': 'cap'},
                 {'imageDesc': 'Log / wood', 'imageId': 'log', 'letters': ['L', '?', 'G'], 'answer': 'o', 'word': 'log'},
@@ -1544,6 +1647,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                     if (block['type'] == 'word-circle-grid') ...[
                       WordCircleGrid(
                         words: List<Map<String, dynamic>>.from(block['words']),
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60), // Bottom padding buffer
                     ]
@@ -1581,6 +1685,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   PictureFillInGrid(
                     entries: entries,
                     columns: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 3),
+                    onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 1),
                   ),
                   const SizedBox(height: 60), // Scroll buffer
                 ],
@@ -1625,6 +1730,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   PictureFillInGrid(
                     entries: gridEntries,
                     columns: ResponsiveHelper.getResponsiveGridCount(context: context, mobile: 1, tablet: 2, desktop: 3),
+                    onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 2),
                   ),
                   const SizedBox(height: 32),
                   const TextBlock(
@@ -1634,6 +1740,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                   const SizedBox(height: 16),
                   RiddleCvc(
                     riddles: riddles,
+                    onStatusChanged: (c) => _onActivityItemStatusChanged(1, c, 2),
                   ),
                   const SizedBox(height: 60), // Scroll Buffer
                 ],
@@ -2060,6 +2167,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                     if (block['type'] == 'sentence-find') ...[
                       SentenceFind(
                         sentences: List<Map<String, dynamic>>.from(block['sentences']),
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60),
                     ]
@@ -2232,6 +2340,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       CircleChoiceGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
                         columns: block['columns'] ?? 2,
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 32),
                     ],
@@ -2243,6 +2352,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       PictureFillInGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
                         columns: block['columns'] ?? 3,
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60),
                     ],
@@ -2250,6 +2360,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       BlendFillOpenGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
                         columns: block['columns'] ?? 3,
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60),
                     ]
@@ -2280,6 +2391,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       PictureFillInGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
                         columns: block['columns'] ?? 3,
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60),
                     ],
@@ -2287,6 +2399,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       BlendFillOpenGrid(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
                         columns: block['columns'] ?? 3,
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60),
                     ],
@@ -2326,6 +2439,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       SentenceFind(
                         sentences: List<Map<String, dynamic>>.from(block['sentences']),
                         numbered: true,
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60),
                     ]
@@ -2377,6 +2491,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                     if (block['type'] == 'star-fill-activity') ...[
                       StarFillActivity(
                         entries: List<Map<String, dynamic>>.from(block['entries']),
+                        onStatusChanged: (c) => _onActivityItemStatusChanged(block.hashCode, c, 1),
                       ),
                       const SizedBox(height: 60),
                     ]
@@ -2530,7 +2645,11 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
               ),
             ],
             if (sentences.isNotEmpty)
-              SentenceFindGrid(sentences: sentences, columns: 2),
+              SentenceFindGrid(
+                sentences: sentences, 
+                columns: 2, 
+                onStatusChanged: (c) => _onActivityItemStatusChanged(0, c, 1),
+              ),
           ],
         ),
       );

@@ -102,7 +102,7 @@ class _CertificatePageState extends State<CertificatePage> {
                       // Base 4K Image Render
                       Positioned.fill(
                         child: Image.asset(
-                          'assets/images/certificate_bg.png',
+                          'assets/images/certificate_bg_hq.png',
                           fit: BoxFit.cover,
                         ),
                       ),

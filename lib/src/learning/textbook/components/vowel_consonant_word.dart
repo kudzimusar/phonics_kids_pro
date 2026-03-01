@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class VowelConsonantWord extends StatefulWidget {
   final String word;
+  final ValueChanged<bool>? onStatusChanged;
 
-  const VowelConsonantWord({Key? key, required this.word}) : super(key: key);
+  const VowelConsonantWord({
+    Key? key, 
+    required this.word,
+    this.onStatusChanged,
+  }) : super(key: key);
 
   @override
   State<VowelConsonantWord> createState() => _VowelConsonantWordState();
@@ -27,6 +32,11 @@ class _VowelConsonantWordState extends State<VowelConsonantWord> {
     setState(() {
       _isSelected[index] = !_isSelected[index];
     });
+    
+    if (widget.onStatusChanged != null) {
+      bool isComplete = _isSelected.every((element) => element == true);
+      widget.onStatusChanged!(isComplete);
+    }
   }
 
   @override

@@ -13,11 +13,13 @@ class PictureFillInGrid extends StatefulWidget {
     }
   */
   final int columns;
+  final ValueChanged<bool>? onStatusChanged;
 
   const PictureFillInGrid({
     Key? key,
     required this.entries,
     this.columns = 3,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -127,6 +129,17 @@ class _PictureFillInGridState extends State<PictureFillInGrid> {
                           setState(() {
                             _answers[index] = val;
                           });
+                          
+                          if (widget.onStatusChanged != null) {
+                            bool isComplete = true;
+                            for (int i = 0; i < widget.entries.length; i++) {
+                              if (_answers[i].toLowerCase() != widget.entries[i]['answer'].toString().toLowerCase()) {
+                                isComplete = false;
+                                break;
+                              }
+                            }
+                            if (isComplete) widget.onStatusChanged!(true);
+                          }
                         },
                       ),
                     ),

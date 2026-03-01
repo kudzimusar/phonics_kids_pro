@@ -7,12 +7,14 @@ class DaisyChainRow extends StatefulWidget {
   final String icon;
   final List<String> letters; // '?' represents the blank/target letter
   final String targetLetter;
+  final ValueChanged<bool>? onStatusChanged;
 
   const DaisyChainRow({
     Key? key,
     required this.icon,
     required this.letters,
     required this.targetLetter,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -52,6 +54,9 @@ class _DaisyChainRowState extends State<DaisyChainRow> {
                     onDropResult: (success, letterStr) {
                       if (success) {
                         setState(() => _isFilled = true);
+                        if (widget.onStatusChanged != null) {
+                          widget.onStatusChanged!(true);
+                        }
                       }
                     },
                   );

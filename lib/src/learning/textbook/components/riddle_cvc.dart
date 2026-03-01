@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class RiddleCvc extends StatefulWidget {
   final List<Map<String, dynamic>> riddles;
+  final ValueChanged<bool>? onStatusChanged;
   /* Example riddle:
     {
       'clue': 'I have a shell.',
@@ -12,6 +13,7 @@ class RiddleCvc extends StatefulWidget {
   const RiddleCvc({
     Key? key,
     required this.riddles,
+    this.onStatusChanged,
   }) : super(key: key);
 
   @override
@@ -82,6 +84,17 @@ class _RiddleCvcState extends State<RiddleCvc> {
                     setState(() {
                       _answers[index] = val;
                     });
+                    
+                    if (widget.onStatusChanged != null) {
+                      bool isComplete = true;
+                      for (int i = 0; i < widget.riddles.length; i++) {
+                        if (_answers[i].toLowerCase() != widget.riddles[i]['answer'].toString().toLowerCase()) {
+                          isComplete = false;
+                          break;
+                        }
+                      }
+                      if (isComplete) widget.onStatusChanged!(true);
+                    }
                   },
                 ),
               ),
