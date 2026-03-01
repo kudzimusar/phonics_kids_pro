@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import '../textbook/components/phonic_fox_narrator.dart';
 import '../textbook/components/vowel_consonant_word.dart';
 import '../services/notebook_service.dart';
