@@ -57,7 +57,7 @@ class _PronunciationButtonState extends State<PronunciationButton> with SingleTi
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result.score < 0.70 
-              ? "You had trouble with '${widget.targetWord}'. Let's practice it in your notebook!"
+              ? "You had trouble with '${widget.targetWord}'. Let's practice it in your Fox Notebook!"
               : result.feedback),
             backgroundColor: result.isAccurate ? Colors.green : Colors.orange,
             behavior: SnackBarBehavior.floating,

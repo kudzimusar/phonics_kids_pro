@@ -45,6 +45,12 @@ class _PhonicFoxNarratorState extends State<PhonicFoxNarrator> {
                 'https://img.icons8.com/fluency/96/fox.png',
                 width: 64,
                 height: 64,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 64,
+                  height: 64,
+                  alignment: Alignment.center,
+                  child: Text(emoji, style: const TextStyle(fontSize: 48)),
+                ),
               ),
               if (widget.state == FoxState.success)
                 Positioned(
@@ -54,6 +60,7 @@ class _PhonicFoxNarratorState extends State<PhonicFoxNarrator> {
                     'https://img.icons8.com/fluency/48/sparkling.png',
                     width: 24,
                     height: 24,
+                    errorBuilder: (context, error, stackTrace) => const Text("✨", style: TextStyle(fontSize: 16)),
                   ),
                 ),
             ],

@@ -55,7 +55,7 @@ class _NotebookOverlayState extends State<NotebookOverlay> {
                       onPressed: widget.onDismiss,
                     ),
                     const Text(
-                      'Benjamin Notebook',
+                      'Fox Notebook',
                       style: TextStyle(
                         fontFamily: 'FredokaOne',
                         fontSize: 28,
@@ -76,9 +76,15 @@ class _NotebookOverlayState extends State<NotebookOverlay> {
                       width: 320,
                       margin: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withOpacity(0.95),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: Colors.orange.shade100, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                          )
+                        ],
                       ),
                       child: Column(
                         children: [
@@ -93,8 +99,13 @@ class _NotebookOverlayState extends State<NotebookOverlay> {
                             child: StreamBuilder<List<NotebookEntry>>(
                               stream: NotebookService().getEntriesForModule(widget.moduleId),
                               builder: (context, snapshot) {
-                                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-                                final entries = snapshot.data!;
+                                if (snapshot.hasError) {
+                                  return Center(child: Text("Connection issue: ${snapshot.error}", style: const TextStyle(fontSize: 12)));
+                                }
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                                final entries = snapshot.data ?? [];
                                 if (entries.isEmpty) {
                                   return const Center(
                                     child: Text(

@@ -13,11 +13,15 @@ class NotebookService {
     return _firestore
         .collection(_collectionPath)
         .where('moduleId', isEqualTo: moduleId)
-        .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
+        .map((snapshot) {
+          final entries = snapshot.docs
             .map((doc) => NotebookEntry.fromMap(doc.data()))
-            .toList());
+            .toList();
+          // Sort by timestamp descending in-memory
+          entries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return entries;
+        });
   }
 
   Future<void> logMistake({

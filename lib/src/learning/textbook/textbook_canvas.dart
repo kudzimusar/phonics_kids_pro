@@ -556,14 +556,13 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SelectionArea(
-          focusNode: FocusNode(canRequestFocus: false),
           contextMenuBuilder: (context, selectableRegionState) {
             return AdaptiveTextSelectionToolbar.buttonItems(
               anchors: selectableRegionState.contextMenuAnchors,
               buttonItems: [
                 ...selectableRegionState.contextMenuButtonItems,
                 ContextMenuButtonItem(
-                  label: 'Send to Benjamin Fox',
+                  label: 'Send to Fox Notebook',
                   onPressed: () async {
                     // Copy to clipboard first as SelectableRegionState doesn't expose the text directly
                     selectableRegionState.copySelection(SelectionChangedCause.toolbar);
@@ -582,7 +581,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                       );
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Sent to Benjamin Notebook!')),
+                          const SnackBar(content: Text('Sent to Fox Notebook!')),
                         );
                       }
                     }
@@ -1061,6 +1060,26 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                     ],
                   ),
                 ),
+                // Explicit "Add to Fox Notebook" button for PC/Touch accessibility
+                IconButton(
+                  tooltip: 'Add to Fox Notebook',
+                  icon: const Icon(Icons.edit_note_rounded, color: Colors.indigo, size: 28),
+                  onPressed: () {
+                    NotebookService().saveEntry(
+                      NotebookEntry(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        moduleId: page['id'] ?? 'unknown',
+                        type: NotebookEntryType.manual,
+                        content: item['w']!,
+                        timestamp: DateTime.now(),
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Added "${item['w']}" to Fox Notebook!')),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
               ],
             ),
           );
@@ -1154,6 +1173,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                 itemCount: words.length,
                 itemBuilder: (context, index) => VowelConsonantWord(
                   word: words[index],
+                  moduleId: page['id'] as String?,
                   onStatusChanged: (isComplete) => _onActivityItemStatusChanged(index, isComplete, words.length),
                 ),
               ),
