@@ -43,7 +43,7 @@ class AppStyles {
     color: Colors.blueGrey,
     fontWeight: FontWeight.w500,
   );
-}
+
   // Instruction Styles
   static final Color instructionBackground = Colors.orange.shade50.withOpacity(0.6);
   static final Border instructionBorder = Border.all(
@@ -51,3 +51,4 @@ class AppStyles {
     width: 2,
   );
 }
+
