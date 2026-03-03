@@ -14,9 +14,18 @@ class DragDropLetter extends StatelessWidget {
       feedback: Material(
         color: Colors.transparent,
         child: Transform.scale(
-          scale: 1.1,
-          child: Opacity(
-            opacity: 0.9,
+          scale: 1.15,
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
             child: PhonicsBox(text: letter, type: BoxType.small, backgroundColor: color),
           ),
         ),

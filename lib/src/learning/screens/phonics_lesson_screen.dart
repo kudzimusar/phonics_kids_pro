@@ -185,7 +185,10 @@ class _PhonicsLessonScreenState extends State<PhonicsLessonScreen>
                 children: [
                   Row(
                     children: [
-                      _SectionBadge(label: widget.lesson.id),
+                      Hero(
+                        tag: 'lesson_${widget.lesson.id}',
+                        child: _SectionBadge(label: widget.lesson.id),
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(

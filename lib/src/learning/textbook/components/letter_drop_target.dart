@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../utils/responsive_helper.dart';
 
 class LetterDropTarget extends StatefulWidget {
   final String correctLetter;
@@ -21,6 +21,8 @@ class _LetterDropTargetState extends State<LetterDropTarget> {
 
   @override
   Widget build(BuildContext context) {
+    final scale = ResponsiveHelper.componentScale(context);
+    
     return DragTarget<String>(
       onWillAccept: (data) {
         setState(() => _isHovering = true);
@@ -41,32 +43,40 @@ class _LetterDropTargetState extends State<LetterDropTarget> {
         
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          width: 50,
-          height: 60, // Match typical font size layout
-          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: 50 * scale,
+          height: 60 * scale, // Match typical font size layout
+          margin: EdgeInsets.symmetric(horizontal: 6 * scale),
           decoration: BoxDecoration(
             color: _isHovering 
                 ? Colors.indigo.shade100 
                 : (_droppedLetter != null 
-                    ? (isSuccess ? Colors.green.shade100 : Colors.red.shade100)
-                    : Colors.grey.shade100),
-            borderRadius: BorderRadius.circular(12),
+                    ? (isSuccess ? Colors.green.shade50 : Colors.red.shade50)
+                    : Colors.white),
+            borderRadius: BorderRadius.circular(16 * scale),
             border: Border.all(
               color: _isHovering 
                   ? Colors.indigo 
                   : (_droppedLetter != null
-                      ? (isSuccess ? Colors.green : Colors.red)
-                      : Colors.grey.shade400),
+                      ? (isSuccess ? Colors.green.shade300 : Colors.red.shade300)
+                      : Colors.blueGrey.withOpacity(0.2)),
               width: 2,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10 * scale,
+                offset: Offset(0, 4 * scale),
+              ),
+            ],
           ),
           alignment: Alignment.center,
           child: _droppedLetter != null
               ? Text(
                   _droppedLetter!,
-                  style: GoogleFonts.comicNeue(
-                    fontSize: 32,
+                  style: TextStyle(
+                    fontSize: ResponsiveHelper.responsiveFontSize(context, 32),
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'FredokaOne',
                     color: isSuccess ? Colors.green.shade800 : Colors.red.shade800,
                   ),
                 )

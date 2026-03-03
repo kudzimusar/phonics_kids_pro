@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
+import 'dart:ui';
 import 'textbook_database.dart';
 import 'components/teacher_overlay.dart';
 import 'components/label_tag.dart';
@@ -599,7 +600,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
                 child: Container(
                   key: ValueKey('bg-container-${currentPage['layout']}'),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.indigo.shade50,
                     image: (currentPage['layout'] == 'cover')
                       ? const DecorationImage(
                           image: AssetImage('assets/images/cover_background.png'),
@@ -765,91 +766,148 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
     );
   }
 
-  Widget _buildPageContent(Map<String, dynamic> page, BoxConstraints constraints) {
+  Widget _buildHeader(Map<String, dynamic> page) {
     final bool isSpecialPage = page['layout'] == 'cover' || page['layout'] == 'welcome' || page['layout'] == 'certificate';
+    if (isSpecialPage) return const SizedBox.shrink();
 
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isCompact = constraints.maxWidth < 600;
+        
+        if (isCompact) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              children: [
+                if (page['activityLabel'] != null) ...[
+                  GestureDetector(
+                    onDoubleTap: () => _jumpToAnswerKey(page['activityLabel'] as String),
+                    child: Transform.scale(
+                      scale: 0.8,
+                      child: LabelTag(label: page['activityLabel'] as String),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (page['title'] != null)
+                  Expanded(
+                    child: TextBlock(
+                      text: page['title'] as String,
+                      type: TextType.h1,
+                      fontSize: 22,
+                    ),
+                  ),
+                if (!_isCurrentPageCleared && page['activityLabel'] != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: Text(
+                      "${_getCompletedCount()}/${_getRequiredCount() > 0 ? _getRequiredCount() : '?'}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade700,
+                        fontFamily: 'FredokaOne',
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (page['activityLabel'] != null)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onDoubleTap: () => _jumpToAnswerKey(page['activityLabel'] as String),
+                        child: LabelTag(label: page['activityLabel'] as String),
+                      ),
+                      if (!_isCurrentPageCleared) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.blue.shade200),
+                          ),
+                          child: Text(
+                            "${_getCompletedCount()} / ${_getRequiredCount() > 0 ? _getRequiredCount() : '?'}",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade700,
+                              fontFamily: 'FredokaOne',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                const SizedBox(width: 16),
+                if (page['title'] != null)
+                  Expanded(
+                    child: TextBlock(
+                      text: page['title'] as String,
+                      type: TextType.h1,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                if (!ResponsiveHelper.isMobile(context))
+                  const SizedBox(width: 120),
+              ],
+            ),
+            if (page['subtitle'] != null) ...[
+              const SizedBox(height: 8),
+              TextBlock(
+                text: page['subtitle'] as String,
+                type: TextType.h2,
+                textAlign: TextAlign.center,
+                color: Colors.grey.shade600,
+              ),
+            ],
+            const SizedBox(height: 24),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildPageContent(Map<String, dynamic> page, BoxConstraints constraints) {
     return Material(
-      color: Colors.transparent, // Ensure the global background shows through
+      color: Colors.transparent,
       child: Padding(
-      padding: page['layout'] == 'certificate' 
-        ? EdgeInsets.zero 
-        : EdgeInsets.symmetric(
-            horizontal: ResponsiveHelper.getResponsiveValue(
-              context: context,
-              mobile: 16.0,
-              tablet: 32.0,
-              desktop: 64.0,
-            ), 
-            vertical: 24.0
-          ),
-      child: Stack( // Changed from Column to Stack so the ClearedBanner can float
+        padding: page['layout'] == 'certificate' 
+          ? EdgeInsets.zero 
+          : EdgeInsets.symmetric(
+              horizontal: ResponsiveHelper.getResponsiveValue(
+                context: context,
+                mobile: 16.0,
+                tablet: 32.0,
+                desktop: 64.0,
+              ), 
+              vertical: 24.0
+            ),
+        child: Stack(
           children: [
             Column(
               children: [
-                if (!isSpecialPage) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (page['activityLabel'] != null)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onDoubleTap: () {
-                                _jumpToAnswerKey(page['activityLabel'] as String);
-                              },
-                              child: LabelTag(label: page['activityLabel'] as String),
-                            ),
-                            if (!_isCurrentPageCleared) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.shade50,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.blue.shade200),
-                                ),
-                                child: Text(
-                                  "${_getCompletedCount()} / ${_getRequiredCount() > 0 ? _getRequiredCount() : '?'}",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue.shade700,
-                                    fontFamily: 'FredokaOne',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      const SizedBox(width: 16),
-                      if (page['title'] != null)
-                        Expanded(
-                          child: TextBlock(
-                            text: page['title'] as String,
-                            type: TextType.h1,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      if (!ResponsiveHelper.isMobile(context))
-                        const SizedBox(width: 120), // Balance the LabelTag + Progress on larger screens
-                    ],
-                  ),
-                  if (page['subtitle'] != null) ...[
-                    const SizedBox(height: 8),
-                    TextBlock(
-                      text: page['subtitle'] as String,
-                      type: TextType.h2,
-                      textAlign: TextAlign.center,
-                      color: Colors.grey.shade600,
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-                ],
+                _buildHeader(page),
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(
-                      bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 16.0,
+                      bottom: _getLetterBankForPage(page).isNotEmpty ? 120.0 : 80.0, // Room for Dock
                     ),
                     child: _buildSpecificLayout(page, constraints),
                   ),
@@ -858,6 +916,7 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
             ),
             if (_isCurrentPageCleared && page['activityLabel'] != null)
               Positioned(
+
                 bottom: _getLetterBankForPage(page).isNotEmpty ? 130.0 : 20.0,
                 left: 16,
                 right: 16,
@@ -3363,38 +3422,60 @@ class _TextbookCanvasState extends State<TextbookCanvas> {
   }
 
   Widget _buildNavigationOverlay() {
-    return Align(
-      alignment: Alignment.center,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (_currentPageIndex > 0)
-            _navButton(Icons.arrow_back_ios_new_rounded, _previousPage)
-          else
-            const SizedBox(width: 80),
-            
-          if (_currentPageIndex < TextbookDatabase.pages.length - 1)
-            _navButton(Icons.arrow_forward_ios_rounded, _nextPage)
-          else
-            const SizedBox(width: 80),
-        ],
+    return Positioned(
+      bottom: 16,
+      left: 16,
+      right: 120, // Leave room for Corner Buddy (Agent 2) in bottom-right
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (_currentPageIndex > 0)
+                  _navButton(Icons.arrow_back_ios_new_rounded, _previousPage)
+                else
+                  const SizedBox(width: 60),
+                
+                // Optional: Page indicator could go here
+                
+                if (_currentPageIndex < TextbookDatabase.pages.length - 1)
+                  _navButton(Icons.arrow_forward_ios_rounded, _nextPage)
+                else
+                  const SizedBox(width: 60),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _navButton(IconData icon, VoidCallback onPressed) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Material(
-        color: Colors.indigo.withOpacity(0.1),
-        shape: const CircleBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Icon(icon, size: 40, color: Colors.indigo),
-          ),
+    return Material(
+      color: Colors.indigo.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          child: Icon(icon, size: 32, color: Colors.indigo),
         ),
       ),
     );

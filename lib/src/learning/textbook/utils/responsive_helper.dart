@@ -65,4 +65,29 @@ class ResponsiveHelper {
     int count = (availableWidth / desiredItemWidth).floor();
     return count > 0 ? count : 1;
   }
+
+  /// Returns a scaled font size based on screenWidth / 600 (capped for safety).
+  static double responsiveFontSize(BuildContext context, double base) {
+    double width = MediaQuery.of(context).size.width;
+    double scale = width / 600;
+    // Cap for safety: between 0.8 and 1.5
+    scale = scale.clamp(0.8, 1.5);
+    return base * scale;
+  }
+
+  /// Global multiplier to be used for padding and icon sizes.
+  static double componentScale(BuildContext context) {
+    if (isMobile(context)) {
+      return 0.7; // Tiny mobile
+    } else if (isTablet(context)) {
+      return 1.0; // Tablet
+    } else {
+      return 1.2; // Desktop
+    }
+  }
+
+  /// Returns true if screenHeight < 700px (helps detect landscape phones or older iPhones).
+  static bool isShortScreen(BuildContext context) {
+    return MediaQuery.of(context).size.height < 700;
+  }
 }

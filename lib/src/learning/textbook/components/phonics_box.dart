@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../utils/responsive_helper.dart';
 
 class PhonicsBox extends StatelessWidget {
   final String text;
@@ -9,6 +9,7 @@ class PhonicsBox extends StatelessWidget {
   final Color? textColor;
   final Color? borderColor;
   final bool isDashed;
+  final double? sizeOverride;
 
   const PhonicsBox({
     Key? key,
@@ -19,56 +20,60 @@ class PhonicsBox extends StatelessWidget {
     this.textColor,
     this.borderColor,
     this.isDashed = false,
+    this.sizeOverride,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final scale = ResponsiveHelper.componentScale(context);
+    
     Color bg = backgroundColor ?? Colors.white;
-    Color border = borderColor ?? Colors.grey.shade300;
+    Color border = borderColor ?? Colors.blueGrey.withOpacity(0.2);
     Color contentColor = textColor ?? Colors.black87;
-    double width = 80;
-    double height = 80;
-    double fontSize = 48;
+    
+    double baseSize = sizeOverride ?? 80;
+    double baseFontSize = 48;
 
     if (type == BoxType.small) {
-      width = 60;
-      height = 60;
-      fontSize = 32;
+      baseSize = 60;
+      baseFontSize = 32;
     } else if (type == BoxType.vowel) {
       bg = backgroundColor ?? Colors.blue.shade50;
-      border = borderColor ?? Colors.blue.shade300;
+      border = borderColor ?? Colors.blue.withOpacity(0.3);
       contentColor = textColor ?? Colors.blue.shade800;
     } else if (type == BoxType.consonant) {
       bg = backgroundColor ?? Colors.red.shade50;
-      border = borderColor ?? Colors.red.shade300;
+      border = borderColor ?? Colors.red.withOpacity(0.3);
       contentColor = textColor ?? Colors.red.shade800;
     }
+
+    final boxSize = baseSize * scale;
+    final fontSize = ResponsiveHelper.responsiveFontSize(context, baseFontSize);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: width,
-        height: height,
+        width: boxSize,
+        height: boxSize,
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(16),
-          border: isDashed 
-              ? null // Flutter doesn't have native dashed border without a package, so we simulate it or just use solid for now, or use custom painter.
-              : Border.all(color: border, width: 3),
-          boxShadow: isDashed ? [] : [
+          borderRadius: BorderRadius.circular(16 * scale),
+          border: Border.all(color: border, width: 2),
+          boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10 * scale,
+              offset: Offset(0, 4 * scale),
             ),
           ],
         ),
         alignment: Alignment.center,
         child: Text(
           text,
-          style: GoogleFonts.comicNeue(
+          style: TextStyle(
             fontSize: fontSize,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'FredokaOne',
             color: contentColor,
           ),
         ),

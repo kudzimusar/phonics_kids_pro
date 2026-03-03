@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+import '../utils/responsive_helper.dart';
 import 'vector_graphic.dart';
+import 'ui_styles.dart';
 
-class HintOverlay extends StatelessWidget {
+class HintOverlay extends StatefulWidget {
   final VoidCallback onHintDismissed;
   final String hintText;
 
@@ -12,39 +15,83 @@ class HintOverlay extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<HintOverlay> createState() => _HintOverlayState();
+}
+
+class _HintOverlayState extends State<HintOverlay> {
+  bool _isExpanded = false;
+
+  void _toggleExpansion() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 120,
-      right: 32,
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0.0, end: 1.0),
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.elasticOut,
-        builder: (context, value, child) {
-          return Transform.scale(
-            scale: value,
+      bottom: 110, // Sits above the future Bottom Nav Dock
+      right: 24,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 600),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.elasticOut,
+            ),
             child: child,
           );
         },
-        child: GestureDetector(
-          onTap: onHintDismissed,
+        child: _isExpanded ? _buildExpandedHint() : _buildCollapsedHint(),
+      ),
+    );
+  }
+
+  Widget _buildCollapsedHint() {
+    return GestureDetector(
+      key: const ValueKey('collapsed'),
+      onTap: _toggleExpansion,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: const [AppStyles.premiumShadow],
+          border: Border.all(color: Colors.amber.shade300, width: 2),
+        ),
+        padding: const EdgeInsets.all(8),
+        child: const VectorGraphic(
+          assetName: 'fox',
+          size: 40,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandedHint() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double maxWidth = ResponsiveHelper.isMobile(context) ? screenWidth * 0.8 : 320;
+
+    return GestureDetector(
+      key: const ValueKey('expanded'),
+      onTap: _toggleExpansion,
+      child: ClipRRect(
+        borderRadius: AppStyles.standardRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: AppStyles.glassBlurX, sigmaY: AppStyles.glassBlurY),
           child: Container(
-            width: 320,
-            padding: const EdgeInsets.all(16),
+            width: maxWidth,
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.amber.shade300, width: 3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.amber.withOpacity(0.3),
-                  blurRadius: 16,
-                  spreadRadius: 4,
-                  offset: const Offset(0, 4),
-                )
-              ],
+              color: AppStyles.glassBackground,
+              borderRadius: AppStyles.standardRadius,
+              border: AppStyles.glassBorder,
+              boxShadow: const [AppStyles.premiumShadow],
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
@@ -53,33 +100,37 @@ class HintOverlay extends StatelessWidget {
                     children: [
                       const Text(
                         "Need a hint?",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange,
-                        ),
+                        style: AppStyles.hintTitleStyle,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 8),
                       Text(
-                        hintText,
-                        style: const TextStyle(fontSize: 14, color: Colors.blueGrey),
+                        widget.hintText,
+                        style: AppStyles.hintBodyStyle,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        "Tap to close",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.blueGrey.withOpacity(0.5),
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 56,
+                  height: 56,
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
+                    color: Colors.white.withOpacity(0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: ClipOval(
-                    child: const VectorGraphic(
-                      assetName: 'fox',
-                      size: 64,
-                    ),
+                  padding: const EdgeInsets.all(8),
+                  child: const VectorGraphic(
+                    assetName: 'fox',
+                    size: 40,
                   ),
                 ),
               ],

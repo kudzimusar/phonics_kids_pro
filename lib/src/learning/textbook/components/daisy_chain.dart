@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'vector_graphic.dart';
 import 'letter_drop_target.dart';
+import '../utils/responsive_helper.dart';
 
 class DaisyChainRow extends StatefulWidget {
   final String icon;
@@ -26,46 +27,59 @@ class _DaisyChainRowState extends State<DaisyChainRow> {
 
   @override
   Widget build(BuildContext context) {
+    final scale = ResponsiveHelper.componentScale(context);
+    
     return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // 1. Icon on the left
-          SizedBox(
-            width: 80,
-            child: VectorGraphic(assetName: widget.icon, size: 64),
-          ),
-          const SizedBox(width: 32),
+      margin: EdgeInsets.only(bottom: 32 * scale),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 1. Icon on the left
+              SizedBox(
+                width: 90 * scale,
+                child: VectorGraphic(
+                  assetName: widget.icon, 
+                  size: 72 * scale
+                ),
+              ),
+              SizedBox(width: 32 * scale),
 
-          // 2. Chained Daisies
-          Expanded(
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: widget.letters.map((letter) {
-                if (letter == '?') {
-                  if (_isFilled) {
-                    return DaisyShape(letter: widget.targetLetter, isTarget: true);
-                  }
-                  return LetterDropTarget(
-                    correctLetter: widget.targetLetter,
-                    onDropResult: (success, letterStr) {
-                      if (success) {
-                        setState(() => _isFilled = true);
-                        if (widget.onStatusChanged != null) {
-                          widget.onStatusChanged!(true);
-                        }
+              // 2. Chained Daisies
+              Expanded(
+                child: Wrap(
+                  spacing: 16 * scale,
+                  runSpacing: 16 * scale,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: widget.letters.map((letter) {
+                    if (letter == '?') {
+                      if (_isFilled) {
+                        return DaisyShape(
+                          letter: widget.targetLetter, 
+                          isTarget: true,
+                          isAnimate: true,
+                        );
                       }
-                    },
-                  );
-                }
-                return DaisyShape(letter: letter);
-              }).toList(),
-            ),
-          ),
-        ],
+                      return LetterDropTarget(
+                        correctLetter: widget.targetLetter,
+                        onDropResult: (success, letterStr) {
+                          if (success) {
+                            setState(() => _isFilled = true);
+                            if (widget.onStatusChanged != null) {
+                              widget.onStatusChanged!(true);
+                            }
+                          }
+                        },
+                      );
+                    }
+                    return DaisyShape(letter: letter);
+                  }).toList(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -74,55 +88,101 @@ class _DaisyChainRowState extends State<DaisyChainRow> {
 class DaisyShape extends StatelessWidget {
   final String letter;
   final bool isTarget;
+  final bool isAnimate;
 
   const DaisyShape({
     Key? key,
     required this.letter,
     this.isTarget = false,
+    this.isAnimate = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 64,
-      height: 64,
+    final scale = ResponsiveHelper.componentScale(context);
+    final size = 64.0 * scale;
+
+    Widget daisy = SizedBox(
+      width: size,
+      height: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
           // Draw subtle flower petals
           CustomPaint(
-            size: const Size(64, 64),
-            painter: DaisyPainter(isTarget: isTarget),
+            size: Size(size, size),
+            painter: DaisyPainter(
+              isTarget: isTarget,
+              scale: scale,
+            ),
           ),
           // Center content
           Container(
-            width: 36,
-            height: 36,
+            width: 38 * scale,
+            height: 38 * scale,
             decoration: BoxDecoration(
-              color: isTarget ? Colors.yellow.shade100 : Colors.white,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isTarget 
+                  ? [Colors.yellow.shade200, Colors.orange.shade300]
+                  : [Colors.white, Colors.grey.shade50],
+              ),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.blueGrey.shade800, width: 2),
+              border: Border.all(
+                color: Colors.blueGrey.withOpacity(0.2), 
+                width: 1.5
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 12 * scale,
+                  offset: Offset(0, 4 * scale),
+                ),
+              ],
             ),
             alignment: Alignment.center,
             child: Text(
               letter,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: ResponsiveHelper.responsiveFontSize(context, 20),
                 fontWeight: FontWeight.bold,
                 fontFamily: 'FredokaOne',
-                color: isTarget ? Colors.orange.shade800 : Colors.black87,
+                color: isTarget ? Colors.orange.shade900 : Colors.black87,
               ),
             ),
           ),
         ],
       ),
     );
+
+    if (isAnimate) {
+      return TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.elasticOut,
+        builder: (context, value, child) {
+          return Transform.scale(
+            scale: value,
+            child: child,
+          );
+        },
+        child: daisy,
+      );
+    }
+
+    return daisy;
   }
 }
 
 class DaisyPainter extends CustomPainter {
   final bool isTarget;
-  DaisyPainter({this.isTarget = false});
+  final double scale;
+  
+  DaisyPainter({
+    this.isTarget = false,
+    required this.scale,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -131,12 +191,14 @@ class DaisyPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
     
     final borderPaint = Paint()
-      ..color = isTarget ? Colors.orange.shade300 : Colors.blueGrey.shade800
-      ..strokeWidth = 2
+      ..color = isTarget 
+          ? Colors.orange.withOpacity(0.4) 
+          : Colors.blueGrey.withOpacity(0.2)
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
     final center = Offset(size.width / 2, size.height / 2);
-    final petalRadius = size.width * 0.25;
+    final petalRadius = size.width * 0.28;
 
     // Draw 6 petals
     for (int i = 0; i < 6; i++) {
